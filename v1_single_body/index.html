@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>슬랙라인 균형 시뮬레이터 (V1 단일 몸체 모델)</title>
+    <!-- CSS는 루트 폴더의 것을 재사용 -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div class="header" style="background: linear-gradient(90deg, #1e1e38 0%, #2d1a3b 100%);">
+        <h1>🎪 슬랙라인 시뮬레이터 <span style="font-size:0.6em; color:#ffbe0b">(V1 단일 몸체 - 발목 토크)</span></h1>
+        <span class="subtitle">1-Body Ankle Torque Model — 개발 초기 모델 보존용</span>
+    </div>
+
+    <div class="main-container">
+        <div class="canvas-area">
+            <div class="sim-container"><canvas id="sim-canvas"></canvas></div>
+            <div class="graph-container"><canvas id="graph-canvas"></canvas></div>
+        </div>
+
+        <div class="control-panel">
+            <!-- 버전 선택 -->
+            <div class="panel-section"
+                style="background: linear-gradient(135deg, rgba(58,134,255,0.08), rgba(131,56,236,0.08));">
+                <h3>📂 모델 버전</h3>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <span class="btn btn-primary"
+                        style="flex:1; text-align:center; font-size:0.8em; padding:6px 4px; cursor:default;">V1<br><span
+                            style="font-size:0.75em; opacity:0.8;">1체 발목 ✓</span></span>
+                    <a href="../v2_two_body/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V2<br><span
+                            style="font-size:0.75em; opacity:0.6;">2체 힙</span></a>
+                    <a href="../v3_three_dof/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V3<br><span
+                            style="font-size:0.75em; opacity:0.6;">3-DOF PID</span></a>
+                    <a href="../v4_lqr/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V4<br><span
+                            style="font-size:0.75em; opacity:0.6;">LQR</span></a>
+                    <a href="../v5_latency/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V5<br><span
+                            style="font-size:0.75em; opacity:0.6;">지연</span></a>
+                    <a href="../v6_3d/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V6<br><span
+                            style="font-size:0.75em; opacity:0.6;">3D</span></a>
+                    <a href="../v7_estimation/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V7<br><span
+                            style="font-size:0.75em; opacity:0.6;">상태추정</span></a>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>시뮬레이션</h3>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btn-start-stop">▶ 시작</button>
+                    <button class="btn" id="btn-reset">⟲ 리셋</button>
+                </div>
+                <div style="height:8px"></div>
+                <div class="perturb-group">
+                    <button class="btn btn-danger" id="btn-perturb-left">← 교란</button>
+                    <button class="btn btn-danger" id="btn-perturb-right">교란 →</button>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>물리 파라미터</h3>
+                <div class="slider-group">
+                    <div class="slider-label"><span>원호 반경 R (m)</span><span class="slider-val" id="val-R">1.5</span>
+                    </div><input type="range" id="slider-R">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>질량 m (kg)</span><span class="slider-val" id="val-m">70</span></div>
+                    <input type="range" id="slider-m">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>CoM 높이 L (m)</span><span class="slider-val" id="val-L">0.85</span>
+                    </div><input type="range" id="slider-L">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>원호 감쇠 b<sub>φ</sub></span><span class="slider-val"
+                            id="val-b_phi">2.0</span></div><input type="range" id="slider-b_phi">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>회전 감쇠 b<sub>θ</sub></span><span class="slider-val"
+                            id="val-b_theta">0.5</span></div><input type="range" id="slider-b_theta">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>초기 기울기 θ₀</span><span class="slider-val" id="val-theta0">0.10</span>
+                    </div><input type="range" id="slider-theta0">
+                </div>
+            </div>
+
+            <div class="panel-section controller-section">
+                <h3>PID 제어기 (발목 토크)</h3>
+                <button class="btn btn-controller active" id="btn-controller">🎛 제어기 ON</button>
+                <div style="height:10px"></div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>K<sub>p</sub></span><span class="slider-val" id="val-Kp">800</span>
+                    </div><input type="range" id="slider-Kp">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>K<sub>d</sub></span><span class="slider-val" id="val-Kd">150</span>
+                    </div><input type="range" id="slider-Kd">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>K<sub>i</sub></span><span class="slider-val" id="val-Ki">10</span>
+                    </div><input type="range" id="slider-Ki">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./src/physics/params.js"></script>
+    <script src="./src/physics/model.js"></script>
+    <script src="./src/control/pid.js"></script>
+    <script src="./src/render/renderer.js"></script>
+    <script src="./src/main.js"></script>
+</body>
+
+</html>

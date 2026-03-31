@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Slackline 가제어성 및 LQR 분석</title>
+    <style>
+        body {
+            font-family: 'Consolas', monospace;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            padding: 30px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: #3a86ff;
+        }
+
+        h2 {
+            color: #ffbe0b;
+            margin-top: 30px;
+        }
+
+        .matrix {
+            background: #0d0d24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            overflow-x: auto;
+            border: 1px solid #333;
+        }
+
+        .result {
+            font-size: 1.3em;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .pass {
+            background: rgba(6, 214, 160, 0.2);
+            border: 2px solid #06d6a0;
+            color: #06d6a0;
+        }
+
+        .fail {
+            background: rgba(255, 0, 110, 0.2);
+            border: 2px solid #ff006e;
+            color: #ff006e;
+        }
+
+        .gain {
+            background: rgba(131, 56, 236, 0.15);
+            border: 1px solid #8338ec;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        td {
+            padding: 4px 12px;
+            text-align: right;
+            font-size: 0.9em;
+        }
+
+        .label {
+            color: #ffbe0b;
+            text-align: left;
+        }
+
+        #status {
+            color: #3a86ff;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔬 슬랙라인 3-DOF 가제어성 및 LQR 분석</h1>
+    <div id="status">계산 중...</div>
+    <div id="output"></div>
+
+    <script>
+        // ================================================================
+        //   행렬 유틸리티 (General NxN)
+        // ================================================================
+        function matMul(A, B) {
+            const m = A.length, n = B[0].length, p = B.length;
+            const C = Array.from({ length: m }, () => new Float64Array(n));
+            for (let i = 0; i < m; i++)
+                for (let k = 0; k < p; k++) {
+                    const a = A[i][k];
+                    for (let j = 0; j < n; j++)
+                        C[i][j] += a * B[k][j];
+                }
+            return C.map(r => Array.from(r));
+        }
+        function matVecMul(A, v) { return A.map(row => row.reduce((s, a, j) => s + a * v[j], 0)); }
+        function transpose(A) { return A[0].map((_, j) => A.map(r => r[j])); }
+        function eye(n) { return Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => i === j ? 1 : 0)); }
+        function zeros(m, n) { return Array.from({ length: m }, () => new Array(n).fill(0)); }
+        function matAdd(A, B) { return A.map((r, i) => r.map((v, j) => v + B[i][j])); }
+        function matSub(A, B) { return A.map((r, i) => r.map((v, j) => v - B[i][j])); }
+        function matScale(A, s) { return A.map(r => r.map(v => v * s)); }
+        function matNorm(A) { let s = 0; A.forEach(r => r.forEach(v => s += v * v)); return Math.sqrt(s); }
+
+        // NxN LU 분해 (부분 피벗)
+        function luDecomp(A) {
+            const n = A.length;
+            const LU = A.map(r => [...r]);
+            const piv = Array.from({ length: n }, (_, i) => i);
+            for (let k = 0; k < n; k++) {
+                let maxVal = 0, maxRow = k;
+                for (let i = k; i < n; i++)
+                    if (Math.abs(LU[i][k]) > maxVal) { maxVal = Math.abs(LU[i][k]); maxRow = i; }
+                if (maxRow !== k) {
+                    [LU[k], LU[maxRow]] = [LU[maxRow], LU[k]];
+                    [piv[k], piv[maxRow]] = [piv[maxRow], piv[k]];
+                }
+                if (Math.abs(LU[k][k]) < 1e-15) continue;
+                for (let i = k + 1; i < n; i++) {
+                    LU[i][k] /= LU[k][k];
+                    for (let j = k + 1; j < n; j++) LU[i][j] -= LU[i][k] * LU[k][j];
+                }
+            }
+            return { LU, piv };
+        }
+
+        // LU 기반 Ax=b 풀기
+        function luSolve(lu, b) {
+            const { LU, piv } = lu;
+            const n = LU.length;
+            const x = piv.map(i => b[i]);
+            // Forward substitution (L)
+            for (let i = 1; i < n; i++)
+                for (let j = 0; j < i; j++) x[i] -= LU[i][j] * x[j];
+            // Back substitution (U)
+            for (let i = n - 1; i >= 0; i--) {
+                for (let j = i + 1; j < n; j++) x[i] -= LU[i][j] * x[j];
+                x[i] /= LU[i][i];
+            }
+            return x;
+        }
+
+        // NxN 역행렬
+        function matInv(A) {
+            const n = A.length;
+            const lu = luDecomp(A);
+            const inv = zeros(n, n);
+            for (let j = 0; j < n; j++) {
+                const e = new Array(n).fill(0); e[j] = 1;
+                const col = luSolve(lu, e);
+                for (let i = 0; i < n; i++) inv[i][j] = col[i];
+            }
+            return inv;
+        }
+
+        // 3×3 대칭 역행렬 (빠른 버전)
+        function inv3x3sym(M) {
+            const [a, b, c] = [M[0][0], M[0][1], M[0][2]], [d, e] = [M[1][1], M[1][2]], f = M[2][2];
+            const det = a * (d * f - e * e) - b * (b * f - e * c) + c * (b * e - d * c);
+            const id = 1 / det;
+            return [[id * (d * f - e * e), id * (-(b * f - c * e)), id * (b * e - c * d)],
+            [id * (-(b * f - c * e)), id * (a * f - c * c), id * (-(a * e - b * c))],
+            [id * (b * e - c * d), id * (-(a * e - b * c)), id * (a * d - b * b)]];
+        }
+
+        // 행렬 rank (가우스 소거)
+        function matRank(M, tol) {
+            tol = tol || 1e-10;
+            const m = M.length, n = M[0].length;
+            const A = M.map(r => [...r]);
+            let rank = 0;
+            for (let col = 0; col < n && rank < m; col++) {
+                let maxVal = 0, maxRow = -1;
+                for (let row = rank; row < m; row++)
+                    if (Math.abs(A[row][col]) > maxVal) { maxVal = Math.abs(A[row][col]); maxRow = row; }
+                if (maxVal < tol) continue;
+                [A[rank], A[maxRow]] = [A[maxRow], A[rank]];
+                const pivot = A[rank][col];
+                for (let row = 0; row < m; row++) {
+                    if (row === rank) continue;
+                    const f = A[row][col] / pivot;
+                    for (let j = col; j < n; j++) A[row][j] -= f * A[rank][j];
+                }
+                rank++;
+            }
+            return rank;
+        }
+
+        // ================================================================
+        //   CARE 풀이: 행렬 부호 함수 (Matrix Sign Function)
+        //   H = [A, -S; -Q, -Aᵀ],  S = BR⁻¹Bᵀ
+        //   반복: Z_{k+1} = (Z_k + Z_k⁻¹) / 2
+        //   수렴 후: W = (I - Z) / 2 → P = W₂₁ W₁₁⁻¹
+        // ================================================================
+        function solveCARE(A, B, Q, R) {
+            const n = A.length;
+            const Bt = transpose(B);
+            const Rinv = 1.0 / R; // scalar R
+
+            // S = B R⁻¹ Bᵀ (n×n)
+            const S = zeros(n, n);
+            for (let i = 0; i < n; i++)
+                for (let j = 0; j < n; j++)
+                    S[i][j] = B[i][0] * Bt[0][j] * Rinv;
+
+            // Hamiltonian H (2n × 2n)
+            const H = zeros(2 * n, 2 * n);
+            const At = transpose(A);
+            for (let i = 0; i < n; i++)
+                for (let j = 0; j < n; j++) {
+                    H[i][j] = A[i][j];
+                    H[i][j + n] = -S[i][j];
+                    H[i + n][j] = -Q[i][j];
+                    H[i + n][j + n] = -At[i][j];
+                }
+
+            // 행렬 부호 함수 반복
+            let Z = H.map(r => [...r]);
+            let converged = false;
+            for (let iter = 0; iter < 100; iter++) {
+                const Zinv = matInv(Z);
+                const Znew = matScale(matAdd(Z, Zinv), 0.5);
+                const diff = matNorm(matSub(Znew, Z));
+                Z = Znew;
+                if (diff < 1e-12) {
+                    converged = true;
+                    console.log(`Sign function converged at iteration ${iter + 1}`);
+                    break;
+                }
+            }
+            if (!converged) console.warn('Sign function did not converge!');
+
+            // W = (I_{2n} - Z) / 2
+            const I2n = eye(2 * n);
+            const W = matScale(matSub(I2n, Z), 0.5);
+
+            // 추출: W₁₁ (상단 n×n), W₂₁ (하단 n×n)
+            const W11 = zeros(n, n), W21 = zeros(n, n);
+            for (let i = 0; i < n; i++)
+                for (let j = 0; j < n; j++) {
+                    W11[i][j] = W[i][j];
+                    W21[i][j] = W[i + n][j];
+                }
+
+            // P = W₂₁ · W₁₁⁻¹
+            const W11inv = matInv(W11);
+            const P = matMul(W21, W11inv);
+
+            // K = R⁻¹ Bᵀ P (1×n)
+            const BtP = matMul(Bt, P); // 1×n
+            const K = BtP[0].map(v => v * Rinv);
+
+            return { P, K, converged };
+        }
+
+        // ================================================================
+        //   메인 분석
+        // ================================================================
+        function runAnalysis() {
+            const out = document.getElementById('output');
+            const status = document.getElementById('status');
+            let html = '';
+
+            // === 파라미터 ===
+            const m1 = 30, m2 = 40, L1 = 0.85, L2 = 0.80, R = 1.5, g = 9.81;
+            const b_phi = 2.0, b_alpha = 1.0, b_theta = 0.5;
+            const ell1 = L1 / 2, ell2 = L2 / 2;
+            const I1 = m1 * L1 * L1 / 12, I2 = m2 * L2 * L2 / 12;
+            const p1 = m1 * ell1 + m2 * L1, p2 = m2 * ell2, p3 = m2 * L1 * ell2, Mt = m1 + m2;
+            const M11v = Mt * R * R, M22v = m1 * ell1 * ell1 + I1 + m2 * L1 * L1, M33v = m2 * ell2 * ell2 + I2;
+            const M12v = R * p1, M13v = R * p2, M23v = p3;
+
+            html += '<h2>1. 파라미터</h2><div class="matrix">';
+            html += `m₁=${m1}, m₂=${m2}, L₁=${L1}, L₂=${L2}, R=${R}, g=${g}<br>`;
+            html += `p₁=${p1.toFixed(2)}, p₂=${p2.toFixed(2)}, p₃=${p3.toFixed(2)}, M_total=${Mt}</div>`;
+
+            // 평형점 질량행렬
+            const M0 = [[M11v, M12v, M13v], [M12v, M22v, M23v], [M13v, M23v, M33v]];
+            const M0inv = inv3x3sym(M0);
+
+            html += '<h2>2. 평형점 질량행렬 M₀ 및 M₀⁻¹</h2>';
+            html += fmtMat(M0, ['φ', 'α', 'θ']);
+            html += fmtMat(M0inv, ['φ', 'α', 'θ']);
+
+            // 선형화
+            const Gdiag = [-Mt * g * R, p1 * g, p2 * g];
+            const Ddiag = [-b_phi, -b_alpha, -b_theta];
+            const Btau = [0, -1, 1];
+
+            const MiG = zeros(3, 3), MiD = zeros(3, 3);
+            for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
+                MiG[i][j] = M0inv[i][j] * Gdiag[j];
+                MiD[i][j] = M0inv[i][j] * Ddiag[j];
+            }
+            const MiB = matVecMul(M0inv, Btau);
+
+            const A6 = zeros(6, 6);
+            for (let i = 0; i < 3; i++) A6[i][i + 3] = 1;
+            for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
+                A6[i + 3][j] = MiG[i][j]; A6[i + 3][j + 3] = MiD[i][j];
+            }
+            const B6 = [[0], [0], [0], [MiB[0]], [MiB[1]], [MiB[2]]];
+
+            html += '<h2>3. 선형화 A (6×6)</h2>' + fmtMat(A6, ['φ', 'α', 'θ', 'φ̇', 'α̇', 'θ̇']);
+            html += '<h2>4. 입력 벡터 B</h2>' + fmtMat(B6);
+
+            // 가제어성
+            const Cmat = zeros(6, 6);
+            let col = B6.map(r => r[0]);
+            for (let k = 0; k < 6; k++) {
+                for (let i = 0; i < 6; i++) Cmat[i][k] = col[i];
+                col = matVecMul(A6, col);
+            }
+            const rank = matRank(Cmat);
+
+            html += '<h2>5. 가제어성</h2>';
+            html += `<div class="result ${rank === 6 ? 'pass' : 'fail'}"><strong>Rank(C) = ${rank} / 6</strong> — `;
+            html += rank === 6 ? '✅ 가제어! 힙 토크만으로 제어 가능' : '❌ 가제어 불가';
+            html += '</div>';
+
+            out.innerHTML = html;
+
+            if (rank !== 6) { status.textContent = '완료 (가제어 불가)'; return; }
+
+            // === LQR 게인 계산 ===
+            status.textContent = 'LQR 게인 계산 중 (행렬 부호 함수법)...';
+
+            setTimeout(() => {
+                let lqrHtml = '<h2>6. LQR 최적 게인</h2>';
+
+                const experiments = [
+                    { name: '균형형', q: [1, 50, 50, 0.1, 5, 5], r: 0.001 },
+                    { name: '보수적', q: [1, 50, 50, 0.1, 5, 5], r: 0.01 },
+                    { name: '공격적', q: [1, 50, 50, 0.1, 5, 5], r: 0.0001 },
+                    { name: 'α 중시', q: [1, 200, 20, 0.1, 10, 2], r: 0.001 },
+                    { name: 'θ 중시', q: [1, 20, 200, 0.1, 2, 10], r: 0.001 },
+                    { name: '발 중심 유지', q: [10, 30, 30, 1, 5, 5], r: 0.001 },
+                ];
+
+                lqrHtml += '<table border="1" style="border-color:#333"><tr style="color:#ffbe0b"><td class="label">이름</td><td>Q</td><td>R</td><td>k₁(φ)</td><td>k₂(α)</td><td>k₃(θ)</td><td>k₄(φ̇)</td><td>k₅(α̇)</td><td>k₆(θ̇)</td><td>수렴</td></tr>';
+
+                let bestK = null;
+
+                experiments.forEach((exp, idx) => {
+                    const Qe = zeros(6, 6); exp.q.forEach((w, i) => Qe[i][i] = w);
+                    const res = solveCARE(A6, B6, Qe, exp.r);
+
+                    if (idx === 0) bestK = res.K;
+
+                    const ok = res.converged && res.K.every(v => isFinite(v));
+                    lqrHtml += `<tr><td class="label">${exp.name}</td>`;
+                    lqrHtml += `<td style="font-size:0.7em">[${exp.q.join(',')}]</td><td>${exp.r}</td>`;
+                    if (ok) {
+                        res.K.forEach(v => {
+                            const c = v > 0 ? '#06d6a0' : '#ff006e';
+                            lqrHtml += `<td style="color:${c}">${v.toFixed(2)}</td>`;
+                        });
+                        lqrHtml += `<td style="color:#06d6a0">✓</td>`;
+                    } else {
+                        lqrHtml += '<td colspan="6" style="color:#ff006e">NaN (수렴 실패)</td><td style="color:#ff006e">✗</td>';
+                    }
+                    lqrHtml += '</tr>';
+                });
+                lqrHtml += '</table>';
+
+                if (bestK && bestK.every(v => isFinite(v))) {
+                    lqrHtml += '<h2>7. 권장 게인 (균형형)</h2>';
+                    lqrHtml += '<div class="gain">';
+                    lqrHtml += '<strong>τ = −(k₁φ + k₂α + k₃θ + k₄φ̇ + k₅α̇ + k₆θ̇)</strong><br><br>';
+                    const labels = ['k₁ (φ 발위치)', 'k₂ (α 하체각)', 'k₃ (θ 상체각)', 'k₄ (φ̇ 발속도)', 'k₅ (α̇ 하체속도)', 'k₆ (θ̇ 상체속도)'];
+                    labels.forEach((l, i) => {
+                        lqrHtml += `  ${l} = <span style="color:#3a86ff;font-weight:bold">${bestK[i].toFixed(4)}</span><br>`;
+                    });
+                    lqrHtml += '</div>';
+
+                    lqrHtml += '<h2>8. 코드 복사용</h2>';
+                    lqrHtml += `<div class="matrix" style="color:#06d6a0;font-size:1.1em;user-select:all">const K = [${bestK.map(v => v.toFixed(6)).join(', ')}];</div>`;
+
+                    // 폐루프 안정성 확인
+                    lqrHtml += '<h2>9. 폐루프 안정성 확인</h2>';
+                    const Acl = A6.map(r => [...r]);
+                    for (let i = 0; i < 6; i++)
+                        for (let j = 0; j < 6; j++)
+                            Acl[i][j] -= B6[i][0] * bestK[j];
+                    // 간단한 고유값 추정: trace and det give rough info
+                    let trace = 0;
+                    for (let i = 0; i < 6; i++) trace += Acl[i][i];
+                    lqrHtml += `<div class="matrix">Trace(A-BK) = ${trace.toFixed(4)}<br>`;
+                    lqrHtml += `(모든 고유값의 합. 음수여야 안정)</div>`;
+                    lqrHtml += `<div class="result ${trace < 0 ? 'pass' : 'fail'}">${trace < 0 ? '✅ Trace < 0 — 안정적일 가능성 높음' : '⚠️ Trace > 0 — 불안정 가능성'}</div>`;
+                }
+
+                out.innerHTML += lqrHtml;
+                status.textContent = '✅ 계산 완료!';
+            }, 50);
+        }
+
+        function fmtMat(M, labels) {
+            let h = '<div class="matrix"><table>';
+            M.forEach((row, i) => {
+                h += '<tr>';
+                if (labels) h += `<td class="label">${labels[i] || ''}</td>`;
+                row.forEach(v => {
+                    const c = Math.abs(v) < 1e-10 ? '#555' : (v > 0 ? '#06d6a0' : '#ff006e');
+                    h += `<td style="color:${c}">${v.toFixed(4)}</td>`;
+                });
+                h += '</tr>';
+            });
+            return h + '</table></div>';
+        }
+
+        runAnalysis();
+    </script>
+</body>
+
+</html>

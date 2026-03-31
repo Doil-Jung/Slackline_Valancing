@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="슬랙라인 균형 시뮬레이터 V3 — 3-DOF Hip Torque Model">
+    <title>슬랙라인 균형 시뮬레이터</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div class="header">
+        <h1>🎪 슬랙라인 균형 시뮬레이터</h1>
+        <span class="subtitle">3-DOF Hip Torque Model (φ, α, θ) — Lateral Cross-Section View</span>
+    </div>
+
+    <div class="main-container">
+        <div class="canvas-area">
+            <div class="sim-container"><canvas id="sim-canvas"></canvas></div>
+            <div class="graph-container"><canvas id="graph-canvas"></canvas></div>
+        </div>
+
+        <div class="control-panel">
+            <!-- 버전 선택 -->
+            <div class="panel-section"
+                style="background: linear-gradient(135deg, rgba(58,134,255,0.08), rgba(131,56,236,0.08));">
+                <h3>📂 모델 버전</h3>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <a href="../v1_single_body/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V1<br><span
+                            style="font-size:0.75em; opacity:0.6;">1체 발목</span></a>
+                    <a href="../v2_two_body/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V2<br><span
+                            style="font-size:0.75em; opacity:0.6;">2체 힙</span></a>
+                    <span class="btn btn-primary"
+                        style="flex:1; text-align:center; font-size:0.8em; padding:6px 4px; cursor:default;">V3<br><span
+                            style="font-size:0.75em; opacity:0.8;">3-DOF ✓</span></span>
+                    <a href="../v4_lqr/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V4<br><span
+                            style="font-size:0.75em; opacity:0.6;">LQR</span></a>
+                    <a href="../v5_latency/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V5<br><span
+                            style="font-size:0.75em; opacity:0.6;">지연</span></a>
+                    <a href="../v6_3d/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V6<br><span
+                            style="font-size:0.75em; opacity:0.6;">3D</span></a>
+                    <a href="../v7_estimation/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V7<br><span
+                            style="font-size:0.75em; opacity:0.6;">상태추정</span></a>
+                </div>
+            </div>
+
+            <!-- 시뮬레이션 제어 -->
+            <div class="panel-section">
+                <h3>시뮬레이션</h3>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btn-start-stop">▶ 시작</button>
+                    <button class="btn" id="btn-reset">⟲ 리셋</button>
+                </div>
+                <div style="height:8px"></div>
+                <div class="perturb-group">
+                    <button class="btn btn-danger" id="btn-perturb-left">← 교란</button>
+                    <button class="btn btn-danger" id="btn-perturb-right">교란 →</button>
+                </div>
+            </div>
+
+            <!-- 물리 파라미터 -->
+            <div class="panel-section">
+                <h3>물리 파라미터</h3>
+                <div class="slider-group">
+                    <div class="slider-label"><span>원호 반경 R (m)</span><span class="slider-val" id="val-R">1.5</span>
+                    </div>
+                    <input type="range" id="slider-R">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>하체 질량 m₁ (kg)</span><span class="slider-val" id="val-m1">30</span>
+                    </div>
+                    <input type="range" id="slider-m1">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>상체 질량 m₂ (kg)</span><span class="slider-val" id="val-m2">40</span>
+                    </div>
+                    <input type="range" id="slider-m2">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>하체 길이 L₁ (m)</span><span class="slider-val" id="val-L1">0.85</span>
+                    </div>
+                    <input type="range" id="slider-L1">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>상체 길이 L₂ (m)</span><span class="slider-val" id="val-L2">0.80</span>
+                    </div>
+                    <input type="range" id="slider-L2">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>원호 감쇠 b<sub>φ</sub></span><span class="slider-val"
+                            id="val-b_phi">2.0</span></div>
+                    <input type="range" id="slider-b_phi">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>하체 감쇠 b<sub>α</sub></span><span class="slider-val"
+                            id="val-b_alpha">1.0</span></div>
+                    <input type="range" id="slider-b_alpha">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>상체 감쇠 b<sub>θ</sub></span><span class="slider-val"
+                            id="val-b_theta">0.5</span></div>
+                    <input type="range" id="slider-b_theta">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>초기 하체 기울기 α₀</span><span class="slider-val"
+                            id="val-alpha0">0.00</span></div>
+                    <input type="range" id="slider-alpha0">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>초기 상체 기울기 θ₀</span><span class="slider-val"
+                            id="val-theta0">0.15</span></div>
+                    <input type="range" id="slider-theta0">
+                </div>
+            </div>
+
+            <!-- 제어기 -->
+            <div class="panel-section controller-section">
+                <h3>PID 제어기 (힙 토크, CoM 기반)</h3>
+                <button class="btn btn-controller active" id="btn-controller">🎛 제어기 ON</button>
+                <div style="height:10px"></div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>K<sub>p</sub></span><span class="slider-val" id="val-Kp">300</span>
+                    </div>
+                    <input type="range" id="slider-Kp">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>K<sub>d</sub></span><span class="slider-val" id="val-Kd">80</span>
+                    </div>
+                    <input type="range" id="slider-Kd">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>K<sub>i</sub></span><span class="slider-val" id="val-Ki">5</span>
+                    </div>
+                    <input type="range" id="slider-Ki">
+                </div>
+            </div>
+
+            <!-- 범례 -->
+            <div class="panel-section">
+                <h3>범례</h3>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#3a86ff"></div><span>원호 트랙</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#ff006e"></div><span>발 (줄 접촉점)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#06d6a0"></div><span>하체 (다리, α 자유)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#8338ec"></div><span>상체 (몸통, θ 자유)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#ffbe0b"></div><span>힙 관절 (토크 τ)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#ff006e"></div><span>전체 CoM</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/physics/params.js"></script>
+    <script src="src/physics/model.js"></script>
+    <script src="src/control/pid.js"></script>
+    <script src="src/render/renderer.js"></script>
+    <script src="src/main.js"></script>
+</body>
+
+</html>

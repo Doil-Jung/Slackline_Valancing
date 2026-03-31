@@ -1,0 +1,49 @@
+# V5 지연시간 시뮬레이션 — Walkthrough
+
+## 작업 요약
+
+V4(LQR)를 `v4_lqr/`에 백업하고, V5에서 **센서/액추에이터 지연시간**을 시뮬레이션하는 기능을 구현했습니다.
+V1~V5 전체 버전 네비게이션도 통일했습니다.
+
+## 변경 사항
+
+### 새 파일/폴더
+| 경로 | 설명 |
+|------|------|
+| `v4_lqr/` | V4 (LQR) 소스 백업 |
+| `v5_latency/` | V5 지연시간 시뮬레이션 |
+
+### V5 핵심 변경
+
+#### [lqr.js](file:///c:/Users/doilm/OneDrive%20-%20%EC%B6%A9%EB%B6%81%EA%B3%BC%ED%95%99%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90/%EC%9B%90%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%99%EA%B8%B0%ED%99%94%20%ED%8F%B4%EB%8D%94/%EC%BD%94%EB%94%A9%20%EC%9E%91%EC%97%85%20%ED%8F%B4%EB%8D%84/slackline_valancing/v5_latency/src/control/lqr.js)
+- `sensorBuffer` (ring buffer): 과거 상태 저장, N 스텝 전 상태를 제어기 입력으로 사용
+- `actuatorBuffer` (ring buffer): 토크 저장, N 스텝 후에 물리 모델에 전달
+- [setDelay(totalDelayMs)](file:///c:/Users/doilm/OneDrive%20-%20%EC%B6%A9%EB%B6%81%EA%B3%BC%ED%95%99%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90/%EC%9B%90%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%99%EA%B8%B0%ED%99%94%20%ED%8F%B4%EB%8D%94/%EC%BD%94%EB%94%A9%20%EC%9E%91%EC%97%85%20%ED%8F%B4%EB%8D%94/slackline_valancing/v5_latency/src/control/lqr.js#41-57): 총 지연을 센서 50% + 액추에이터 50%로 분배
+
+#### [renderer.js](file:///c:/Users/doilm/OneDrive%20-%20%EC%B6%A9%EB%B6%81%EA%B3%BC%ED%95%99%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90/%EC%9B%90%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%99%EA%B8%B0%ED%99%94%20%ED%8F%B4%EB%8D%84/%EC%BD%94%EB%94%A9%20%EC%9E%91%EC%97%85%20%ED%8F%B4%EB%8D%84/slackline_valancing/v5_latency/src/render/renderer.js)
+- 정보 패널에 "⏱ 지연 = Xms (센서 + 구동)" 표시
+
+### 네비게이션 통일
+V1~V5 모든 [index.html](file:///c:/Users/doilm/OneDrive%20-%20%EC%B6%A9%EB%B6%81%EA%B3%BC%ED%95%99%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90/%EC%9B%90%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%99%EA%B8%B0%ED%99%94%20%ED%8F%B4%EB%8D%94/%EC%BD%94%EB%94%A9%20%EC%9E%91%EC%97%85%20%ED%8F%B4%EB%8D%94/slackline_valancing/index.html)에 5개 버전 버튼 적용. 루트 [index.html](file:///c:/Users/doilm/OneDrive%20-%20%EC%B6%A9%EB%B6%81%EA%B3%BC%ED%95%99%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90/%EC%9B%90%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%99%EA%B8%B0%ED%99%94%20%ED%8F%B4%EB%8D%94/%EC%BD%94%EB%94%A9%20%EC%9E%91%EC%97%85%20%ED%8F%B4%EB%8D%94/slackline_valancing/index.html)은 V5로 리다이렉트.
+
+## 브라우저 테스트
+
+### V5 초기 상태 (지연 0ms)
+![V5 시뮬레이터 — 지연시간 슬라이더와 LQR 제어기 패널](C:/Users/doilm/.gemini/antigravity/brain/56d02931-2d64-4e09-84f6-093cc9829f35/v5_initial_viewport_1773459323724.png)
+
+### 시뮬레이션 녹화
+![V5 지연시간 테스트 녹화 — 0ms, 50ms 지연 비교](C:/Users/doilm/.gemini/antigravity/brain/56d02931-2d64-4e09-84f6-093cc9829f35/v5_latency_test_1773459260386.webp)
+
+## 테스트 결과
+
+| 항목 | 결과 |
+|------|------|
+| 페이지 로딩 | ✅ 에러 없음 |
+| V1~V5 네비게이션 | ✅ 5개 버튼 정상 |
+| 지연 0ms 균형 | ✅ 안정적 균형 (V4 동일) |
+| 지연 50ms | ⚠️ 교란 시 진동 발생, 불안정 (예상된 동작) |
+| 지연 슬라이더 | ✅ 정상 동작 |
+| 정보 패널 지연 표시 | ✅ "⏱ 지연 = 50 ms" 표시 |
+
+> [!NOTE]
+> 50ms 지연에서 불안정해지는 것은 **정상적인 물리 현상**입니다. 실제 로봇/인간도 센서-액추에이터 지연이 크면 균형을 잃습니다.

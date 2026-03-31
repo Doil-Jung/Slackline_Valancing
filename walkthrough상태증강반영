@@ -1,0 +1,41 @@
+# V5 상태증강 LQR 구현 — Walkthrough
+
+## 목표
+
+지연이 있을 때 LQR 게인을 지연에 맞게 재계산하는 **상태증강 LQR** 을 구현하고,
+기존 기본 LQR과 비교할 수 있는 토글 UI를 제공합니다.
+
+## 핵심 변경
+
+### [lqr.js](file:///c:/Users/doilm/OneDrive%20-%20%EC%B6%A9%EB%B6%81%EA%B3%BC%ED%95%99%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90/%EC%9B%90%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%99%EA%B8%B0%ED%99%94%20%ED%8F%B4%EB%8D%84/%EC%BD%94%EB%94%A9%20%EC%9E%91%EC%97%85%20%ED%8F%B4%EB%8D%84/slackline_valancing/v5_latency/src/control/lqr.js) — 핵심 구현
+
+추가된 기능:
+1. **행렬 유틸리티** (`SL.Mat`): 곱셈, 전치, 덧셈, 3×3 역행렬 등
+2. **선형화** ([linearize](file:///c:/Users/doilm/OneDrive%20-%20%EC%B6%A9%EB%B6%81%EA%B3%BC%ED%95%99%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90/%EC%9B%90%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%99%EA%B8%B0%ED%99%94%20%ED%8F%B4%EB%8D%94/%EC%BD%94%EB%94%A9%20%EC%9E%91%EC%97%85%20%ED%8F%B4%EB%8D%94/slackline_valancing/v5_latency/src/control/lqr.js#183-248)): 3-DOF 시스템을 평형점에서 A_c(6×6), B_c(6×1) 추출
+3. **이산화** ([discretize](file:///c:/Users/doilm/OneDrive%20-%20%EC%B6%A9%EB%B6%81%EA%B3%BC%ED%95%99%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90/%EC%9B%90%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%99%EA%B8%B0%ED%99%94%20%ED%8F%B4%EB%8D%94/%EC%BD%94%EB%94%A9%20%EC%9E%91%EC%97%85%20%ED%8F%B4%EB%8D%94/slackline_valancing/v5_latency/src/control/lqr.js#249-278)): 4차 행렬 지수 근사로 A_d, B_d 계산 (dt=5ms)
+4. **상태증강** ([buildAugmented](file:///c:/Users/doilm/OneDrive%20-%20%EC%B6%A9%EB%B6%81%EA%B3%BC%ED%95%99%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90/%EC%9B%90%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%99%EA%B8%B0%ED%99%94%20%ED%8F%B4%EB%8D%94/%EC%BD%94%EB%94%A9%20%EC%9E%91%EC%97%85%20%ED%8F%B4%EB%8D%94/slackline_valancing/v5_latency/src/control/lqr.js#279-325)): 입력 파이프라인을 상태에 포함 → A_aug, B_aug
+5. **DARE 풀이** ([solveDARE](file:///c:/Users/doilm/OneDrive%20-%20%EC%B6%A9%EB%B6%81%EA%B3%BC%ED%95%99%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90/%EC%9B%90%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%99%EA%B8%B0%ED%99%94%20%ED%8F%B4%EB%8D%94/%EC%BD%94%EB%94%A9%20%EC%9E%91%EC%97%85%20%ED%8F%B4%EB%8D%94/slackline_valancing/v5_latency/src/control/lqr.js#326-386)): 이산 대수 리카티 방정식 반복 풀이
+6. **게인 계산** ([computeGainFromP](file:///c:/Users/doilm/OneDrive%20-%20%EC%B6%A9%EB%B6%81%EA%B3%BC%ED%95%99%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90/%EC%9B%90%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%99%EA%B8%B0%ED%99%94%20%ED%8F%B4%EB%8D%94/%EC%BD%94%EB%94%A9%20%EC%9E%91%EC%97%85%20%ED%8F%B4%EB%8D%94/slackline_valancing/v5_latency/src/control/lqr.js#387-409)): K_aug = (R + BᵀPB)⁻¹ BᵀPA
+
+### [index.html](file:///c:/Users/doilm/OneDrive%20-%20%EC%B6%A9%EB%B6%81%EA%B3%BC%ED%95%99%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90/%EC%9B%90%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C%20%EB%8F%99%EA%B8%B0%ED%99%94%20%ED%8F%B4%EB%8D%84/%EC%BD%94%EB%94%A9%20%EC%9E%91%EC%97%85%20%ED%8F%B4%EB%8D%84/slackline_valancing/v5_latency/index.html) — UI 변경
+
+- 섹션 순서 변경: **시뮬레이션 → 제어기 → 물리 파라미터** (제어기가 시뮬레이션 바로 아래)
+- "기본 LQR" / "상태증강 LQR" 토글 버튼 추가
+
+## 브라우저 테스트 결과
+
+### 20ms 지연 비교
+
+| 항목 | 기본 LQR | 상태증강 LQR |
+|------|----------|-------------|
+| 20ms 교란 복구 | ❌ 불안정 (진동→쓰러짐) | ✅ 안정적 복구 |
+| DARE 계산 시간 | — | < 100ms |
+| 증강 차원 | 6 | 10 (6+N=4) |
+
+### 스크린샷
+
+![V5 상태증강 LQR — 20ms 지연에서도 안정적 균형](C:/Users/doilm/.gemini/antigravity/brain/56d02931-2d64-4e09-84f6-093cc9829f35/v5_augmented_running_1773461151582.png)
+
+### 시뮬레이션 녹화
+
+![기본 vs 상태증강 LQR 비교 테스트](C:/Users/doilm/.gemini/antigravity/brain/56d02931-2d64-4e09-84f6-093cc9829f35/augmented_lqr_test_1773461032556.webp)
