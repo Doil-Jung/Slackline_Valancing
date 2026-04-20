@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>로봇 크기 최적화 시뮬레이션</title>
+<style>body{background:#111;color:#eee;font-family:monospace;padding:20px;font-size:12px}
+pre{white-space:pre-wrap;line-height:1.4}h2{color:#4cc9f0;margin-bottom:5px}
+p{color:#888;margin-top:0}</style>
+</head><body>
+<h2>🤖 STS3215 기반 로봇 크기 최적화 시뮬레이션</h2>
+<p>다양한 크기(20~40cm)에서 시뮬 → 토크/속도 요구량 vs 서보 한계 비교</p>
+<pre id="output">시뮬레이션 실행 중...</pre>
+<script>
+const log=[];function pr(s){log.push(s)}
+
+// STS3215 스펙
+const SERVO = {
+    name: 'STS3215',
+    stallTorque_kgfcm: 15,      // 15 kgf·cm at 7.4V
+    stallTorque_Nm: 15*9.81/100, // ≈1.47 N·m
+    noLoadSpeed_degps: 1200,     // 0.05 s/60° = 1200 °/s
+    noLoadSpeed_radps: 1200*Math.PI/180, // ≈20.9 rad/s
+    weight_g: 67,
+    dimensions_mm: '40×20×40.5'
+};
+
+// 행렬 유틸 (이전과 동일)
+const zr=(n,m)=>Array.from({length:n},()=>new Float64Array(m));
+const ey=(n)=>{const M=zr(n,n);for(let i=0;i<n;i++)M[i][i]=1;return M};
+const mm=(A,B,n,m,p)=>{const C=zr(n,p);for(let i=0;i<n;i++)for(let j=0;j<p;j++){let s=0;for(let k=0;k<m;k++)s+=A[i][k]*B[k][j];C[i][j]=s}return C};
+const ma=(A,B,n,m)=>{const C=zr(n,m);for(let i=0;i<n;i++)for(let j=0;j<m;j++)C[i][j]=A[i][j]+B[i][j];return C};
+const ms=(A,s,n,m)=>{const C=zr(n,m);for(let i=0;i<n;i++)for(let j=0;j<m;j++)C[i][j]=A[i][j]*s;return C};
+const mt=(A,n,m)=>{const T=zr(m,n);for(let i=0;i<n;i++)for(let j=0;j<m;j++)T[j][i]=A[i][j];return T};
+const mc=(A,n,m)=>{const C=zr(n,m);for(let i=0;i<n;i++)for(let j=0;j<m;j++)C[i][j]=A[i][j];return C};
+const mnd=(A,B,n,m)=>{let s=0;for(let i=0;i<n;i++)for(let j=0;j<m;j++){const d=A[i][j]-B[i][j];s+=d*d}return Math.sqrt(s)};
+const dot=(a,b,n)=>{let s=0;for(let i=0;i<n;i++)s+=a[i]*b[i];return s};
+const mv=(A,v,n,m)=>{const w=new Float64Array(n);for(let i=0;i<n;i++){let s=0;for(let j=0;j<m;j++)s+=A[i][j]*v[j];w[i]=s}return w};
+
+function inv3(M){const[a,b,c,d,e,f]=[M[0][0],M[0][1],M[0][2],M[1][1],M[1][2],M[2][2]];
+const det=a*(d*f-e*e)-b*(b*f-e*c)+c*(b*e-d*c);if(Math.abs(det)<1e-15)return null;
+const id=1/det,R=zr(3,3);R[0][0]=(d*f-e*e)*id;R[0][1]=R[1][0]=-(b*f-c*e)*id;
+R[0][2]=R[2][0]=(b*e-c*d)*id;R[1][1]=(a*f-c*c)*id;R[1][2]=R[2][1]=-(a*e-b*c)*id;R[2][2]=(a*d-b*b)*id;return R;}
+
+function solve3(M,v){const[a,b,c,d,e,f]=[M[0][0],M[0][1],M[0][2],M[1][1],M[1][2],M[2][2]];
+const det=a*(d*f-e*e)-b*(b*f-e*c)+c*(b*e-d*c);if(Math.abs(det)<1e-15)return[0,0,0];
+const id=1/det;return[((d*f-e*e)*v[0]-(b*f-c*e)*v[1]+(b*e-c*d)*v[2])*id,
+(-(b*f-c*e)*v[0]+(a*f-c*c)*v[1]-(a*e-b*c)*v[2])*id,
+((b*e-c*d)*v[0]-(a*e-b*c)*v[1]+(a*d-b*b)*v[2])*id];}
+
+function deriv(st,tau,p){const{phi,alpha,theta,phiDot,alphaDot,thetaDot}=st;
+const R=p.R,g=p.g,p1=p.p1,p2=p.p2,p3=p.p3,Mt=p.Mtotal;
+const sPA=Math.sin(phi+alpha),cPA=Math.cos(phi+alpha),sPT=Math.sin(phi+theta),cPT=Math.cos(phi+theta);
+const sAT=Math.sin(alpha-theta),cAT=Math.cos(alpha-theta);
+const M=[[Mt*R*R,R*p1*cPA,R*p2*cPT],[R*p1*cPA,p.M22,p3*cAT],[R*p2*cPT,p3*cAT,p.M33]];
+const f1=R*p1*sPA*alphaDot*alphaDot+R*p2*sPT*thetaDot*thetaDot-Mt*g*R*Math.sin(phi)-p.b_phi*phiDot;
+const f2=R*p1*sPA*phiDot*phiDot-p3*sAT*thetaDot*thetaDot+p1*g*Math.sin(alpha)-tau-p.b_alpha*alphaDot;
+const f3=R*p2*sPT*phiDot*phiDot+p3*sAT*alphaDot*alphaDot+p2*g*Math.sin(theta)+tau-p.b_theta*thetaDot;
+return[phiDot,alphaDot,thetaDot,...solve3(M,[f1,f2,f3])];}
+
+function rk4(st,tau,dt,p){const s=[st.phi,st.alpha,st.theta,st.phiDot,st.alphaDot,st.thetaDot];
+const o=a=>({phi:a[0],alpha:a[1],theta:a[2],phiDot:a[3],alphaDot:a[4],thetaDot:a[5]});
+const k1=deriv(o(s),tau,p);const k2=deriv(o(s.map((v,i)=>v+.5*dt*k1[i])),tau,p);
+const k3=deriv(o(s.map((v,i)=>v+.5*dt*k2[i])),tau,p);const k4=deriv(o(s.map((v,i)=>v+dt*k3[i])),tau,p);
+const ns=s.map((v,i)=>v+(dt/6)*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));
+return{phi:ns[0],alpha:ns[1],theta:ns[2],phiDot:ns[3],alphaDot:ns[4],thetaDot:ns[5],time:st.time+dt};}
+
+function linearize(p){const{m1,m2,R,g,L1,L2,b_phi,b_alpha,b_theta}=p;
+const e1=L1/2,e2=L2/2,I1=m1*L1*L1/12,I2=m2*L2*L2/12;
+const pv1=m1*e1+m2*L1,pv2=m2*e2,pv3=m2*L1*e2,Mt=m1+m2;
+const Meq=[[Mt*R*R,R*pv1,R*pv2],[R*pv1,m1*e1*e1+I1+m2*L1*L1,pv3],[R*pv2,pv3,m2*e2*e2+I2]];
+const Minv=inv3(Meq);if(!Minv)return null;
+const G=[[-Mt*g*R,0,0],[0,pv1*g,0],[0,0,pv2*g]];const D=[[-b_phi,0,0],[0,-b_alpha,0],[0,0,-b_theta]];const E=[[0],[-1],[1]];
+const MG=mm(Minv,G,3,3,3),MD=mm(Minv,D,3,3,3),ME=mm(Minv,E,3,3,1);
+const Ac=zr(6,6),Bc=zr(6,1);for(let i=0;i<3;i++)Ac[i][i+3]=1;
+for(let i=0;i<3;i++){for(let j=0;j<3;j++){Ac[i+3][j]=MG[i][j];Ac[i+3][j+3]=MD[i][j]}Bc[i+3][0]=ME[i][0]}
+return{Ac,Bc};}
+
+function discretize(Ac,Bc,dt){const n=6,Adt=ms(Ac,dt,n,n),Adt2=mm(Adt,Adt,n,n,n),Adt3=mm(Adt2,Adt,n,n,n),Adt4=mm(Adt3,Adt,n,n,n);
+let Ad=ey(n);Ad=ma(Ad,Adt,n,n);Ad=ma(Ad,ms(Adt2,.5,n,n),n,n);Ad=ma(Ad,ms(Adt3,1/6,n,n),n,n);Ad=ma(Ad,ms(Adt4,1/24,n,n),n,n);
+let Bi=ms(ey(n),dt,n,n);Bi=ma(Bi,ms(Adt,dt/2,n,n),n,n);Bi=ma(Bi,ms(Adt2,dt/6,n,n),n,n);Bi=ma(Bi,ms(Adt3,dt/24,n,n),n,n);
+return{Ad,Bd:mm(Bi,Bc,n,n,1)};}
+
+function dare(A,B,Q,Rs,n){const b=new Float64Array(n);for(let i=0;i<n;i++)b[i]=B[i][0];
+let PP=mc(Q,n,n);const At=mt(A,n,n);
+for(let iter=0;iter<3000;iter++){const PA=mm(PP,A,n,n,n),AtPA=mm(At,PA,n,n,n);
+const Pb=mv(PP,b,n,n),BtPB=dot(b,Pb,n);const BtPA=new Float64Array(n);
+for(let j=0;j<n;j++){let s=0;for(let i=0;i<n;i++)s+=b[i]*PA[i][j];BtPA[j]=s}
+const sc=1/(Rs+BtPB),Pn=zr(n,n);
+for(let i=0;i<n;i++)for(let j=0;j<n;j++)Pn[i][j]=AtPA[i][j]-BtPA[i]*BtPA[j]*sc+Q[i][j];
+for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)Pn[i][j]=Pn[j][i]=(Pn[i][j]+Pn[j][i])*.5;
+if(mnd(Pn,PP,n,n)<1e-9){PP=Pn;break}PP=Pn;}return PP;}
+
+function gain(A,B,PP,Rs,n){const b=new Float64Array(n);for(let i=0;i<n;i++)b[i]=B[i][0];
+const Pb=mv(PP,b,n,n),sc=1/(Rs+dot(b,Pb,n)),PA=mm(PP,A,n,n,n);
+const K=new Float64Array(n);for(let j=0;j<n;j++){let s=0;for(let i=0;i<n;i++)s+=b[i]*PA[i][j];K[j]=s*sc}return K;}
+
+// ======================== 파라미터 생성 ========================
+function makeParams(L_cm, R_cm) {
+    const L = L_cm / 100; // m
+    const R = R_cm / 100; // m
+    // PLA 밀도: ~1.24 g/cm³, 단면 5cm × 2cm = 10cm²
+    const plaVol_cm3 = L_cm * 5 * 2; // cm³
+    const plaWeight_g = plaVol_cm3 * 1.24 * 0.3; // 30% 인필
+    
+    // 하체: PLA프레임 + 서보 하단 부담(서보의 50%)
+    const m1_g = plaWeight_g + SERVO.weight_g * 0.5 + 5; // +나사/브래킷
+    // 상체: PLA프레임 + 서보 상단(50%) + ESP32(10g) + MPU6050(3g) + 배터리(18g) + 전선(10g)
+    const m2_g = plaWeight_g + SERVO.weight_g * 0.5 + 10 + 3 + 18 + 10 + 5;
+    
+    const m1 = m1_g / 1000;
+    const m2 = m2_g / 1000;
+    
+    return {
+        L_cm, m1, m2, L1: L, L2: L, R, g: 9.81,
+        b_phi: 0.01, b_alpha: 0.005, b_theta: 0.003,
+        dt: 0.001, tauMax: SERVO.stallTorque_Nm,
+        phiMax: 80*Math.PI/180,
+        m1_g, m2_g, totalMass_g: m1_g + m2_g,
+        get ell1(){return this.L1/2}, get ell2(){return this.L2/2},
+        get I1(){return this.m1*this.L1*this.L1/12}, get I2(){return this.m2*this.L2*this.L2/12},
+        get p1(){return this.m1*this.ell1+this.m2*this.L1}, get p2(){return this.m2*this.ell2},
+        get p3(){return this.m2*this.L1*this.ell2}, get Mtotal(){return this.m1+this.m2},
+        get M11(){return this.Mtotal*this.R*this.R},
+        get M22(){return this.m1*this.ell1*this.ell1+this.I1+this.m2*this.L1*this.L1},
+        get M33(){return this.m2*this.ell2*this.ell2+this.I2}
+    };
+}
+
+// ======================== 시뮬 실행 ========================
+function runSim(p, theta0, perturbs, duration) {
+    const lin=linearize(p); if(!lin)return null;
+    const disc=discretize(lin.Ac,lin.Bc,p.dt);
+    const Q=zr(6,6);[1,50,50,0.1,5,5].forEach((v,i)=>Q[i][i]=v);
+    const PP=dare(disc.Ad,disc.Bd,Q,0.001,6);
+    const K=gain(disc.Ad,disc.Bd,PP,0.001,6);
+    
+    let st={phi:0,alpha:0,theta:theta0,phiDot:0,alphaDot:0,thetaDot:0,time:0};
+    let maxT=0,maxHV=0,maxHA=0;
+    let tauSum=0,tauCount=0;
+    const pf=perturbs.map(()=>false);
+    const totalSteps=Math.round(duration/p.dt);
+    let diverged=false;
+    
+    // 자연 낙하 시간 측정 (제어 없이 30°에서 떨어지는 시간)
+    const naturalFallTime = Math.sqrt(2*p.I2/(p.m2*p.g*p.ell2)); // 근사
+
+    for(let s=0;s<totalSteps;s++){
+        for(let pi=0;pi<perturbs.length;pi++){
+            if(st.time>=perturbs[pi].t&&!pf[pi]){st.thetaDot+=perturbs[pi].v;pf[pi]=true;}
+        }
+        const x=[st.phi,st.alpha,st.theta,st.phiDot,st.alphaDot,st.thetaDot];
+        let tau=0;for(let i=0;i<6;i++)tau-=K[i]*x[i];
+        tau=Math.max(-p.tauMax,Math.min(p.tauMax,tau));
+
+        const at=Math.abs(tau);if(at>maxT)maxT=at;
+        const hv=Math.abs(st.thetaDot-st.alphaDot);if(hv>maxHV)maxHV=hv;
+        const ha=Math.abs(st.theta-st.alpha);if(ha>maxHA)maxHA=ha;
+        tauSum+=at;tauCount++;
+
+        st=rk4(st,tau,p.dt,p);
+        if(Math.abs(st.phi)>p.phiMax){st.phi=Math.sign(st.phi)*p.phiMax;st.phiDot*=-.3;}
+        if(!isFinite(st.phi)||!isFinite(st.theta)){diverged=true;break;}
+    }
+
+    const balanced=!diverged&&Math.abs(st.theta)<0.05&&Math.abs(st.alpha)<0.05;
+    const saturated=Math.abs(maxT-p.tauMax)<0.001;
+    return{K,maxT,maxHV,maxHA,balanced,diverged,saturated,
+           avgTau:tauSum/tauCount,naturalFallTime,finalState:st};
+}
+
+// ======================== 메인 ========================
+setTimeout(()=>{
+pr('======================================================================');
+pr('  STS3215 기반 로봇 크기 최적화 시뮬레이션');
+pr('======================================================================\n');
+pr('[STS3215 스펙]');
+pr(`  스톨 토크: ${SERVO.stallTorque_kgfcm} kgf·cm (${SERVO.stallTorque_Nm.toFixed(3)} N·m)`);
+pr(`  무부하 속도: ${SERVO.noLoadSpeed_degps} °/s (${SERVO.noLoadSpeed_radps.toFixed(1)} rad/s)`);
+pr(`  무게: ${SERVO.weight_g}g`);
+pr(`  크기: ${SERVO.dimensions_mm} mm\n`);
+
+// 서보의 토크-속도 곡선 (선형 근사)
+// 부하 시: τ = τ_stall × (1 - ω/ω_noload)
+// → 특정 속도에서 가용 토크: τ_avail = τ_stall × (1 - ω/ω_noload)
+pr('[서보 토크-속도 관계 (선형 근사)]');
+pr('  속도(°/s) →  가용토크(kgf·cm)  가용토크(N·m)');
+[0, 100, 200, 400, 600, 800, 1000, 1200].forEach(spd=>{
+    const ratio = spd/SERVO.noLoadSpeed_degps;
+    const avail = SERVO.stallTorque_kgfcm * (1 - ratio);
+    pr(`  ${String(spd).padStart(7)}   ${avail.toFixed(1).padStart(12)}     ${(avail*9.81/100).toFixed(3).padStart(8)}`);
+});
+pr('');
+
+// ========== 크기 스윕 ==========
+const sizes = [
+    {L:15, R:22},
+    {L:20, R:30},
+    {L:25, R:35},
+    {L:30, R:40},
+    {L:35, R:45},
+    {L:40, R:50}
+];
+
+const results = [];
+
+pr('======================================================================');
+pr('  크기별 시뮬레이션 결과');
+pr('======================================================================\n');
+
+sizes.forEach(sz => {
+    const p = makeParams(sz.L, sz.R);
+    
+    // 4가지 테스트
+    const t1 = runSim(p, 0.15, [], 3);                                    // 8.6° 복원
+    const t2 = runSim(p, 20*Math.PI/180, [], 3);                          // 20° 복원
+    const t3 = runSim(p, 0.15, [{t:1,v:1},{t:2,v:-1.5}], 4);            // 교란
+    const t4 = runSim(p, 30*Math.PI/180, [], 3);                          // 30° 복원
+    
+    // 서보 한계 대비 여유율 계산
+    const torqueMargin = SERVO.stallTorque_Nm / (t1?t1.maxT:999);
+    const speedMargin = SERVO.noLoadSpeed_radps / (t1?t1.maxHV:999);
+    
+    // 부하상태에서 가용 토크 (최대 속도 시)
+    const maxSpd_ratio = t3?(t3.maxHV/SERVO.noLoadSpeed_radps):0;
+    const availTorqueAtMaxSpeed = SERVO.stallTorque_Nm * (1 - Math.min(maxSpd_ratio, 0.99));
+    const torqueOKwithSpeed = t3?(availTorqueAtMaxSpeed > t3.maxT):false;
+    
+    const r = {sz, p, t1, t2, t3, t4, torqueMargin, speedMargin, availTorqueAtMaxSpeed, torqueOKwithSpeed};
+    results.push(r);
+    
+    pr(`─── L=${sz.L}cm × 2 = 총 ${sz.L*2}cm, R=${sz.R}cm ───`);
+    pr(`  질량: m₁=${p.m1_g.toFixed(0)}g m₂=${p.m2_g.toFixed(0)}g 총=${p.totalMass_g.toFixed(0)}g`);
+    pr(`  관성: I₁=${p.I1.toExponential(2)} I₂=${p.I2.toExponential(2)} kg·m²`);
+    if(t1) pr(`  자연 낙하 특성시간: ${(t1.naturalFallTime*1000).toFixed(0)} ms (이보다 빠르면 균형 가능)`);
+    pr('');
+    
+    const tests = [
+        {name:'θ₀=8.6°', r:t1},
+        {name:'θ₀=20°', r:t2},
+        {name:'교란±1.5', r:t3},
+        {name:'θ₀=30°', r:t4}
+    ];
+    tests.forEach(tt=>{
+        if(!tt.r)return;
+        const emoji = tt.r.diverged?'💥':tt.r.balanced?'✅':'⚠️';
+        const sat = tt.r.saturated?' [포화]':'';
+        const tNm = (tt.r.maxT*1000).toFixed(1);
+        const tKgf = (tt.r.maxT*100/9.81).toFixed(2);
+        const spd = (tt.r.maxHV*180/Math.PI).toFixed(0);
+        const ha = (tt.r.maxHA*180/Math.PI).toFixed(1);
+        // 해당 속도에서 가용 토크
+        const spdRatio = tt.r.maxHV/SERVO.noLoadSpeed_radps;
+        const availT = SERVO.stallTorque_Nm*(1-Math.min(spdRatio,0.99));
+        const realOK = availT > tt.r.maxT;
+        pr(`  ${tt.name.padEnd(8)} ${emoji} τ=${tNm.padStart(7)}mN·m (${tKgf.padStart(5)}kgf·cm) ω=${spd.padStart(5)}°/s 힙=${ha.padStart(5)}°${sat} 가용토크${realOK?'✅':'❌'}${(availT*100/9.81).toFixed(1)}kgf·cm`);
+    });
+    pr('');
+});
+
+// ========== 종합 비교표 ==========
+pr('======================================================================');
+pr('  종합 비교표 (STS3215 기준, 토크-속도 곡선 반영)');
+pr('======================================================================\n');
+pr('  크기    총질량   θ₀=8.6°  θ₀=20°  θ₀=30°  교란±1.5  낙하시간  토크여유  속도여유  종합');
+
+results.forEach(r=>{
+    const sz = `${r.sz.L*2}cm`;
+    const mass = `${r.p.totalMass_g.toFixed(0)}g`;
+    const s1 = r.t1?(r.t1.balanced?'✅':'❌'):'?';
+    const s2 = r.t2?(r.t2.balanced?'✅':'❌'):'?';
+    const s4 = r.t4?(r.t4.balanced?'✅':'❌'):'?';
+    const s3 = r.t3?(r.t3.balanced?'✅':'❌'):'?';
+    const ft = r.t1?`${(r.t1.naturalFallTime*1000).toFixed(0)}ms`:'?';
+    const tm = r.torqueMargin?`×${r.torqueMargin.toFixed(1)}`:'?';
+    const sm = r.speedMargin?`×${r.speedMargin.toFixed(1)}`:'?';
+    
+    // 종합 점수: 모든 테스트 통과 + 여유율
+    let score = 0;
+    if(r.t1&&r.t1.balanced) score+=1;
+    if(r.t2&&r.t2.balanced) score+=2;
+    if(r.t3&&r.t3.balanced) score+=1;
+    if(r.t4&&r.t4.balanced) score+=3;
+    if(r.torqueMargin>2) score+=1;
+    if(r.speedMargin>1.5) score+=1;
+    if(r.torqueOKwithSpeed) score+=2;
+    const stars = '⭐'.repeat(Math.min(score, 5)) + (score>5?`+${score-5}`:'');
+    
+    pr(`  ${sz.padEnd(7)} ${mass.padEnd(7)} ${s1.padEnd(7)} ${s2.padEnd(7)} ${s4.padEnd(7)} ${s3.padEnd(8)} ${ft.padEnd(8)} ${tm.padEnd(8)} ${sm.padEnd(8)} ${stars}`);
+});
+
+// ========== 최적 크기 추천 ==========
+pr('\n======================================================================');
+pr('  최적 크기 추천');
+pr('======================================================================\n');
+
+// 가장 많은 테스트를 통과하면서 포화 없는 크기 찾기
+let bestIdx = 0, bestScore = -1;
+results.forEach((r,i) => {
+    let score = 0;
+    if(r.t1&&r.t1.balanced&&!r.t1.saturated) score+=2;
+    else if(r.t1&&r.t1.balanced) score+=1;
+    if(r.t2&&r.t2.balanced) score+=3;
+    if(r.t3&&r.t3.balanced) score+=2;
+    if(r.t4&&r.t4.balanced) score+=3;
+    if(r.torqueOKwithSpeed) score+=2;
+    // 크기 페널티 (너무 크면 감점 - 전시 규격 60cm 이내)
+    if(r.sz.L*2 > 55) score -= 2;
+    if(score > bestScore) { bestScore = score; bestIdx = i; }
+});
+
+const best = results[bestIdx];
+pr(`  ★ 추천 크기: L₁=L₂=${best.sz.L}cm (총 높이 ${best.sz.L*2}cm), R=${best.sz.R}cm`);
+pr(`    질량: m₁=${best.p.m1_g.toFixed(0)}g, m₂=${best.p.m2_g.toFixed(0)}g, 총=${best.p.totalMass_g.toFixed(0)}g`);
+pr(`    토크 여유: ×${best.torqueMargin.toFixed(1)} (서보 / 필요)`);
+pr(`    속도 여유: ×${best.speedMargin.toFixed(1)} (서보 / 필요)`);
+pr(`    자연 낙하 시간: ${(best.t1.naturalFallTime*1000).toFixed(0)}ms (ESP32 제어 루프 ~15ms 대비 충분)`);
+pr('');
+
+// 부하 속도에서의 가용 토크 체크
+if(best.t3){
+    const maxSpd = best.t3.maxHV;
+    const ratio = maxSpd / SERVO.noLoadSpeed_radps;
+    const avail = SERVO.stallTorque_Nm * (1 - Math.min(ratio, 0.99));
+    pr(`  [토크-속도 동시 체크]`);
+    pr(`    교란 시 최대 힙 속도: ${(maxSpd*180/Math.PI).toFixed(0)}°/s (서보 최대의 ${(ratio*100).toFixed(0)}%)`);
+    pr(`    해당 속도에서 가용 토크: ${(avail*100/9.81).toFixed(2)} kgf·cm`);
+    pr(`    교란 시 필요 토크:      ${(best.t3.maxT*100/9.81).toFixed(2)} kgf·cm`);
+    pr(`    → ${avail > best.t3.maxT ? '✅ 충분' : '❌ 부족'}`);
+}
+
+pr('\n  [최종 부품 구성]');
+pr(`    MCU:     ESP32-S3-DevKitC (~5,000원)`);
+pr(`    서보:    STS3215 (~15,000원)`);
+pr(`    IMU:     MPU6050 GY-521 (~2,000원)`);
+pr(`    배터리:  2S LiPo 7.4V 300mAh (~5,000원)`);
+pr(`    프레임:  PLA 3D프린트 (~2,000원)`);
+pr(`    줄+기둥: 알루미늄 프로파일+합사 (~8,000원)`);
+pr(`    기타:    전선, 나사, 브래킷 (~3,000원)`);
+pr(`    ────────────────────────────────────`);
+pr(`    합계:    ~40,000원`);
+
+document.getElementById('output').textContent=log.join('\n');
+},50);
+</script></body></html>
