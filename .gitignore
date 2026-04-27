@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS 생성 파일
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 가상 환경
+venv/
+.env/
+*.venv/
+
+# OneDrive 충돌 파일
+*-충북과학고등학교*
+*.tmp
+
+# 대용량 / 바이너리
+*.zip
+*.stl
+
+# Gemini / Antigravity 데이터
+.gemini/

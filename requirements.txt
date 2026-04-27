@@ -1,0 +1,9 @@
+# Slackline Valancing 프로젝트 의존성
+# 설치: pip install -r requirements.txt
+# SSL 오류 시: pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
+
+pybullet>=3.2.5
+numpy
+scipy
+matplotlib
+pillow

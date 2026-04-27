@@ -1,0 +1,127 @@
+<mujoco model="slackline_v11">
+  <compiler angle="radian" autolimits="true"/>
+  <option timestep="0.001" gravity="0 0 -9.81" integrator="Euler"
+          solver="Newton" iterations="50" tolerance="1e-10"/>
+  <default>
+    <joint armature="0.001"/>
+    <geom condim="3" friction="1.0 0.5 0.1"/>
+  </default>
+
+  <worldbody>
+    <!-- Ground -->
+    <geom name="ground" type="plane" size="10 10 0.1" rgba="0.12 0.12 0.22 1"/>
+
+    <!-- Pole A (origin = top, where rope ties) -->
+    <body name="pole_a" pos="0 2.0 2.5">
+      <geom name="pole_a_cyl" type="cylinder" size="0.04 1.25"
+            pos="0 0 -1.25" rgba="0.5 0.5 0.5 1"
+            contype="0" conaffinity="0"/>
+      <geom name="pole_a_cap" type="sphere" size="0.06"
+            rgba="0.9 0.9 0.9 1" contype="0" conaffinity="0"/>
+    </body>
+
+    <!-- Pole B (origin = top, where rope ties) -->
+    <body name="pole_b" pos="0 -2.0 2.5">
+      <geom name="pole_b_cyl" type="cylinder" size="0.04 1.25"
+            pos="0 0 -1.25" rgba="0.5 0.5 0.5 1"
+            contype="0" conaffinity="0"/>
+      <geom name="pole_b_cap" type="sphere" size="0.06"
+            rgba="0.9 0.9 0.9 1" contype="0" conaffinity="0"/>
+    </body>
+
+    <!-- ===== Kinematic chain: rope_a -> lower -> upper + rope_b ===== -->
+
+    <!-- Rope A: joint at pole_a_top, capsule hangs down to lower_body -->
+    <body name="rope_a" pos="0 2.0 2.5">
+      <joint name="ra_x" type="hinge" axis="1 0 0" damping="0.05"/>
+            <joint name="ra_y" type="hinge" axis="0 1 0" damping="0.05"/>
+            <joint name="ra_z" type="hinge" axis="0 0 1" damping="0.05"/>
+      <geom name="rope_a_geom" type="capsule" size="0.012"
+            fromto="0 0 0  0 -1.875 -1.653594569415369"
+            rgba="1.0 0.8 0.0 1" mass="0.05"
+            contype="0" conaffinity="0"/>
+      <inertial pos="0 -0.9375 -0.8267972847076845" mass="0.05"
+                diaginertia="0.02604167 0.02604167 0.00000360"/>
+
+      <!-- Lower body: joint at rope_a endpoint (= foot's +y edge) -->
+      <body name="lower_body" pos="0 -1.875 -1.653594569415369">
+        <joint name="ankle" type="hinge" axis="0 1 0" damping="1.0"/>
+        <geom name="bkt_base" type="box" size="0.01200 0.02300 0.00100" pos="0 -0.12500 0.73543" rgba="0.75 0.75 0.75 1" contype="0" conaffinity="0"/>
+        <geom name="bkt_f" type="box" size="0.01200 0.00100 0.01500" pos="0 -0.10300 0.79457" rgba="0.75 0.75 0.75 1" contype="0" conaffinity="0"/>
+        <geom name="bkt_b" type="box" size="0.01200 0.00100 0.01500" pos="0 -0.14700 0.79457" rgba="0.75 0.75 0.75 1" contype="0" conaffinity="0"/>
+        <geom name="lf_top" type="box" size="0.01200 0.02300 0.00200" pos="0 -0.12500 0.71696" rgba="0.47 0.47 0.47 0.4" contype="0" conaffinity="0"/>
+        <geom name="lf_col" type="box" size="0.01200 0.03000 0.31228" pos="0 -0.12500 0.33076" rgba="0.47 0.47 0.47 0.35" contype="0" conaffinity="0"/>
+        <geom name="mpu_lo" type="box" size="0.00800 0.00150 0.01050" pos="0 -0.09350 0.58391" rgba="0.86 0.08 0.24 1" contype="0" conaffinity="0"/>
+        <inertial pos="0 -0.125 0.425" mass="30.0"
+                  diaginertia="1.962500 1.887250 0.237250"/>
+
+        <!-- Upper body: hip joint at top-center of lower body -->
+        <body name="upper_body" pos="0 -0.125 0.85">
+          <joint name="hip" type="hinge" axis="0 1 0" damping="0.5"/>
+          <geom name="motor" type="box" size="0.01235 0.01750 0.02260" pos="0 0 0.04440" rgba="0.18 0.20 0.21 1" contype="0" conaffinity="0"/>
+          <geom name="horn_f" type="cylinder" size="0.01000 0.00150" pos="0 0.02000 0" euler="1.5708 0 0" rgba="1.0 0.84 0.0 1" contype="0" conaffinity="0"/>
+          <geom name="horn_b" type="cylinder" size="0.01000 0.00150" pos="0 -0.02000 0" euler="1.5708 0 0" rgba="1.0 0.84 0.0 1" contype="0" conaffinity="0"/>
+          <geom name="uf_l" type="box" size="0.00200 0.01950 0.02260" pos="0.01435 0 0.04440" rgba="0.68 0.85 0.90 0.4" contype="0" conaffinity="0"/>
+          <geom name="uf_r" type="box" size="0.00200 0.01950 0.02260" pos="-0.01435 0 0.04440" rgba="0.68 0.85 0.90 0.4" contype="0" conaffinity="0"/>
+          <geom name="uf_top" type="box" size="0.01635 0.01950 0.00200" pos="0 0 0.14280" rgba="0.68 0.85 0.90 0.4" contype="0" conaffinity="0"/>
+          <geom name="uf_col" type="box" size="0.01635 0.03000 0.29260" pos="0 0 0.50740" rgba="0.68 0.85 0.90 0.35" contype="0" conaffinity="0"/>
+          <geom name="esp32" type="box" size="0.00600 0.02500 0.03250" pos="0.02235 0 0.64000" rgba="0.13 0.55 0.13 1" contype="0" conaffinity="0"/>
+          <geom name="urt1" type="box" size="0.00600 0.01850 0.02800" pos="0.02235 0 0.36000" rgba="0.85 0.65 0.13 1" contype="0" conaffinity="0"/>
+          <geom name="powerbank" type="cylinder" size="0.01100 0.04600" pos="-0.02735 0 0.62000" rgba="0.95 0.95 0.95 1" contype="0" conaffinity="0"/>
+          <geom name="lipo" type="box" size="0.00750 0.01500 0.03050" pos="-0.02385 0 0.26000" rgba="0.25 0.41 0.88 1" contype="0" conaffinity="0"/>
+          <geom name="mpu_up" type="box" size="0.00800 0.00150 0.01050" pos="0 0.03150 0.24000" rgba="0.86 0.08 0.24 1" contype="0" conaffinity="0"/>
+          <inertial pos="0 0 0.4" mass="40.0"
+                    diaginertia="2.341667 2.433333 0.508333"/>
+          <!-- Hip visual marker -->
+          <geom name="hip_marker" type="cylinder"
+                size="0.03 0.175" euler="1.5708 0 0"
+                rgba="1.0 0.75 0.04 1" contype="0" conaffinity="0"/>
+        </body>
+
+        <!-- Rope B: joint at lower_body's -y edge (= foot's -y edge) -->
+        <body name="rope_b" pos="0 -0.25 0">
+          <joint name="rb_x" type="hinge" axis="1 0 0" damping="0.05"/>
+            <joint name="rb_y" type="hinge" axis="0 1 0" damping="0.05"/>
+            <joint name="rb_z" type="hinge" axis="0 0 1" damping="0.05"/>
+          <geom name="rope_b_geom" type="capsule" size="0.012"
+                fromto="0 0 0  0 -1.875 1.653594569415369"
+                rgba="1.0 0.8 0.0 1" mass="0.05"
+                contype="0" conaffinity="0"/>
+          <inertial pos="0 -0.9375 0.8267972847076845" mass="0.05"
+                    diaginertia="0.02604167 0.02604167 0.00000360"/>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <!-- Rope B tip connects to Pole B top -->
+  <equality>
+    <connect body1="rope_b" anchor="0 -1.875 1.653594569415369"
+             body2="pole_b"
+             solref="0.005 1"/>
+  </equality>
+
+  <!-- Hip torque actuator -->
+  <actuator>
+    <motor name="hip_torque" joint="hip" gear="1"
+           ctrlrange="-1500.0 1500.0"/>
+  </actuator>
+
+  <!-- Sensors -->
+  <sensor>
+    <jointpos name="s_ankle_pos" joint="ankle"/>
+    <jointvel name="s_ankle_vel" joint="ankle"/>
+    <jointpos name="s_hip_pos" joint="hip"/>
+    <jointvel name="s_hip_vel" joint="hip"/>
+    <framepos name="s_foot_pos" objtype="body" objname="lower_body"/>
+    <framequat name="s_foot_quat" objtype="body" objname="lower_body"/>
+    <frameangvel name="s_foot_angvel" objtype="body" objname="lower_body"/>
+    <subtreecom name="s_robot_com" body="lower_body"/>
+  </sensor>
+
+  <!-- Keyframe: initial pose for Backspace reset -->
+  <!-- qpos: rope_a joints, ankle, hip, rope_b joints -->
+  <keyframe>
+    <key name="init" qpos="0.000000 0.000000 0.000000 0.000000 0.148353 0.000000 0.000000 0.000000"/>
+  </keyframe>
+</mujoco>

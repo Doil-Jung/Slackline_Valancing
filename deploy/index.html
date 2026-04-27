@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>슬랙라인 로봇 배포 도구</title>
+<style>
+:root { --bg:#0d1117; --bg2:#161b22; --bg3:#21262d; --border:#30363d; --text:#e6edf3; --text2:#8b949e;
+  --accent:#58a6ff; --green:#3fb950; --red:#f85149; --yellow:#d29922; --purple:#bc8cff; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; }
+header { background:var(--bg2); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:16px; }
+header h1 { font-size:18px; font-weight:600; }
+header h1 span { color:var(--accent); }
+nav { display:flex; gap:2px; background:var(--bg2); padding:0 24px; border-bottom:1px solid var(--border); }
+nav button { background:none; border:none; color:var(--text2); padding:10px 16px; font-size:13px; cursor:pointer;
+  border-bottom:2px solid transparent; transition:all .15s; }
+nav button:hover { color:var(--text); background:var(--bg3); }
+nav button.active { color:var(--accent); border-bottom-color:var(--accent); }
+.tab-content { display:none; padding:24px; max-width:1200px; }
+.tab-content.active { display:block; }
+.card { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:20px; margin-bottom:16px; }
+.card h3 { font-size:15px; margin-bottom:12px; color:var(--accent); }
+.card h4 { font-size:13px; margin:12px 0 8px; color:var(--text2); }
+.form-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; color:var(--text2); }
+.form-group input, .form-group select { background:var(--bg); border:1px solid var(--border); color:var(--text);
+  padding:6px 10px; border-radius:4px; font-size:13px; font-family:monospace; }
+.form-group input:focus { border-color:var(--accent); outline:none; }
+.form-group .unit { font-size:11px; color:var(--text2); }
+button.btn { background:var(--accent); color:#fff; border:none; padding:8px 20px; border-radius:6px;
+  font-size:13px; cursor:pointer; font-weight:500; transition:opacity .15s; }
+button.btn:hover { opacity:0.85; }
+button.btn-green { background:var(--green); }
+button.btn-red { background:var(--red); }
+button.btn-purple { background:var(--purple); color:#000; }
+.result-box { background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:12px;
+  font-family:monospace; font-size:12px; white-space:pre-wrap; overflow-x:auto; line-height:1.6; max-height:400px; overflow-y:auto; }
+.gain-display { font-size:16px; font-family:monospace; color:var(--green); padding:12px; background:var(--bg);
+  border:1px solid var(--green); border-radius:4px; margin:8px 0; word-break:break-all; }
+canvas { border:1px solid var(--border); border-radius:4px; background:var(--bg); }
+.flex-row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.flex-row > * { flex-shrink:0; }
+.slider-group { display:flex; align-items:center; gap:8px; }
+.slider-group input[type=range] { width:160px; }
+.slider-group .val { font-family:monospace; font-size:12px; min-width:60px; }
+.info-box { background:#1a2332; border-left:3px solid var(--accent); padding:12px 16px; font-size:12px;
+  border-radius:0 4px 4px 0; margin:8px 0; line-height:1.8; }
+.info-box.warn { border-left-color:var(--yellow); background:#2a1f00; }
+.info-box.ok { border-left-color:var(--green); background:#0f2a1a; }
+table { width:100%; border-collapse:collapse; font-size:12px; }
+th,td { padding:6px 10px; text-align:left; border-bottom:1px solid var(--border); }
+th { color:var(--text2); font-weight:500; }
+.tag { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:500; }
+.tag-ok { background:#0f2a1a; color:var(--green); }
+.tag-fail { background:#2a0f0f; color:var(--red); }
+.tag-warn { background:#2a1f00; color:var(--yellow); }
+.step-guide { counter-reset:step; }
+.step-guide .step { counter-increment:step; padding:8px 0 8px 36px; position:relative; border-left:2px solid var(--border); margin-left:12px; }
+.step-guide .step::before { content:counter(step); position:absolute; left:-13px; top:6px;
+  width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+code { background:var(--bg3); padding:2px 6px; border-radius:3px; font-size:12px; }
+.chart-container { display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; }
+#esp32-code { font-size:11px; line-height:1.4; max-height:600px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🤖 <span>슬랙라인 로봇</span> 배포 도구</h1>
+</header>
+
+<nav id="tabs">
+  <button class="active" data-tab="params">① 파라미터 입력</button>
+  <button data-tab="inertia">② 관성 측정</button>
+  <button data-tab="damping">③ 감쇠 측정</button>
+  <button data-tab="sweep">④ R 스윕 강건성</button>
+  <button data-tab="gain">⑤ 게인 계산</button>
+  <button data-tab="export">⑥ ESP32 내보내기</button>
+</nav>
+
+<!-- ============ TAB 1: 파라미터 입력 ============ -->
+<div class="tab-content active" id="tab-params">
+  <div class="card">
+    <h3>물리 파라미터</h3>
+    <div class="info-box">실측값을 입력하세요. 모르는 파라미터는 기본값(50cm 로봇, STS3215)을 사용합니다.</div>
+    <div style="margin:8px 0"><label><input type="checkbox" id="uniformRod" checked onchange="DT.UI.toggleUniform()"> 균일 막대 가정 사용 (I = mL²/12, ℓ = L/2)</label></div>
+    <div class="form-grid" id="param-form">
+      <div class="form-group"><label>m₁ (하체 질량) <span class="unit">kg</span></label><input type="number" id="p_m1" value="0.132" step="0.001"></div>
+      <div class="form-group"><label>m₂ (상체 질량) <span class="unit">kg</span></label><input type="number" id="p_m2" value="0.173" step="0.001"></div>
+      <div class="form-group"><label>L₁ (하체 길이) <span class="unit">m</span></label><input type="number" id="p_L1" value="0.25" step="0.01"></div>
+      <div class="form-group"><label>L₂ (상체 길이) <span class="unit">m</span></label><input type="number" id="p_L2" value="0.25" step="0.01"></div>
+      <div class="form-group ind-param"><label>ℓ₁ (하체 CoM) <span class="unit">m</span></label><input type="number" id="p_ell1" value="0.125" step="0.001"></div>
+      <div class="form-group ind-param"><label>ℓ₂ (상체 CoM) <span class="unit">m</span></label><input type="number" id="p_ell2" value="0.125" step="0.001"></div>
+      <div class="form-group ind-param"><label>I₁ (하체 관성) <span class="unit">kg·m²</span></label><input type="number" id="p_I1" value="0.000688" step="0.000001"></div>
+      <div class="form-group ind-param"><label>I₂ (상체 관성) <span class="unit">kg·m²</span></label><input type="number" id="p_I2" value="0.000902" step="0.000001"></div>
+      <div class="form-group"><label>R (줄 처짐 반경) <span class="unit">m</span></label><input type="number" id="p_R" value="0.35" step="0.01"></div>
+      <div class="form-group"><label>τ_max (서보 최대토크) <span class="unit">N·m</span></label><input type="number" id="p_tauMax" value="1.47" step="0.01"></div>
+      <div class="form-group"><label>b_φ (줄 감쇠)</label><input type="number" id="p_bphi" value="0.01" step="0.001"></div>
+      <div class="form-group"><label>b_α (하체 감쇠)</label><input type="number" id="p_balpha" value="0.005" step="0.001"></div>
+      <div class="form-group"><label>b_θ (상체 감쇠)</label><input type="number" id="p_btheta" value="0.003" step="0.001"></div>
+      <div class="form-group"><label>g (중력가속도) <span class="unit">m/s²</span></label><input type="number" id="p_g" value="9.81" step="0.01"></div>
+    </div>
+    <div style="margin-top:12px" class="flex-row">
+      <button class="btn" onclick="DT.UI.saveParams()">💾 저장 (localStorage)</button>
+      <button class="btn btn-purple" onclick="DT.UI.loadParams()">📂 불러오기</button>
+      <button class="btn btn-red" onclick="DT.UI.resetParams()">↩️ 기본값 복원</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TAB 2: 관성 측정 ============ -->
+<div class="tab-content" id="tab-inertia">
+  <div class="card">
+    <h3>복합 진자법으로 관성모멘트(I) 측정</h3>
+    <div class="step-guide">
+      <div class="step">상체(또는 하체)를 수평으로 놓고 균형점을 찾으세요 → <strong>ℓ</strong> (피벗~CoM 거리)</div>
+      <div class="step">한쪽 끝에 실을 매달고 자유 진동시키세요</div>
+      <div class="step"><strong>10회 왕복 시간</strong>을 스톱워치로 측정 → T = 시간 ÷ 10</div>
+      <div class="step">아래 폼에 입력하면 I를 자동 계산합니다</div>
+    </div>
+    <h4>계산기</h4>
+    <div class="form-grid">
+      <div class="form-group"><label>질량 m <span class="unit">kg</span></label><input type="number" id="in_m" value="0.173" step="0.001"></div>
+      <div class="form-group"><label>피벗~CoM 거리 d <span class="unit">m</span></label><input type="number" id="in_d" value="0.125" step="0.001"></div>
+      <div class="form-group"><label>왕복 주기 T <span class="unit">s</span></label><input type="number" id="in_T" value="0.8" step="0.01"></div>
+    </div>
+    <button class="btn" style="margin-top:12px" onclick="DT.UI.calcInertia()">계산</button>
+    <div class="result-box" id="inertia-result" style="margin-top:12px">결과가 여기에 표시됩니다</div>
+    <div class="info-box" style="margin-top:12px">
+      공식: <code>I_cm = m·g·d·(T/2π)² − m·d²</code><br>
+      I_cm = CoM 기준 관성모멘트 (시뮬에 입력할 값)
+    </div>
+  </div>
+</div>
+
+<!-- ============ TAB 3: 감쇠 측정 ============ -->
+<div class="tab-content" id="tab-damping">
+  <div class="card">
+    <h3>감쇠 계수 추정</h3>
+    <div class="step-guide">
+      <div class="step">상체를 힙 관절에서 자유 낙하시키고 진동을 관찰하세요</div>
+      <div class="step">연속된 두 피크의 진폭(A₁, A₂)을 측정하세요</div>
+      <div class="step">아래에 입력하면 감쇠 계수를 추정합니다</div>
+    </div>
+    <h4>로그 감쇠율법</h4>
+    <div class="form-grid">
+      <div class="form-group"><label>첫 번째 피크 진폭 A₁ <span class="unit">rad</span></label><input type="number" id="damp_A1" value="0.3" step="0.01"></div>
+      <div class="form-group"><label>두 번째 피크 진폭 A₂ <span class="unit">rad</span></label><input type="number" id="damp_A2" value="0.2" step="0.01"></div>
+      <div class="form-group"><label>진동 주기 T <span class="unit">s</span></label><input type="number" id="damp_T" value="0.5" step="0.01"></div>
+      <div class="form-group"><label>관성모멘트 I <span class="unit">kg·m²</span></label><input type="number" id="damp_I" value="0.0009" step="0.0001"></div>
+    </div>
+    <button class="btn" style="margin-top:12px" onclick="DT.UI.calcDamping()">계산</button>
+    <div class="result-box" id="damping-result" style="margin-top:12px">결과가 여기에 표시됩니다</div>
+    <div class="info-box" style="margin-top:12px">
+      공식: <code>δ = ln(A₁/A₂)</code>, <code>ζ = δ / √(4π²+δ²)</code>, <code>b = 2ζ·√(k·I)</code><br>
+      또는 V10의 RLS 시스템 식별로 자동 추정할 수도 있습니다.
+    </div>
+  </div>
+</div>
+
+<!-- ============ TAB 4: R 스윕 강건성 ============ -->
+<div class="tab-content" id="tab-sweep">
+  <div class="card">
+    <h3>R 스윕 강건성 분석</h3>
+    <div class="info-box">R(제어 노력 페널티)을 바꿔가면서 파라미터 오차에 대한 강건성을 테스트합니다.<br>
+    초록 = 균형 유지, 빨강 = 실패. <strong>안전한 R 범위</strong>를 찾는 것이 목표입니다.</div>
+    <div class="flex-row" style="margin:12px 0">
+      <div class="form-group"><label>오차 파라미터</label>
+        <select id="sweep_param"><option value="m2">m₂ (상체 질량)</option><option value="m1">m₁ (하체 질량)</option>
+        <option value="I2">I₂ (상체 관성)</option><option value="I1">I₁ (하체 관성)</option>
+        <option value="ell2">ℓ₂ (상체 CoM)</option></select>
+      </div>
+      <div class="form-group"><label>오차 범위 (%)</label><input type="number" id="sweep_range" value="30" step="5" style="width:80px"></div>
+      <div class="form-group"><label>초기 기울기 (°)</label><input type="number" id="sweep_theta0" value="8.6" step="1" style="width:80px"></div>
+      <button class="btn btn-green" onclick="DT.UI.runSweep()" style="align-self:flex-end">▶ 스윕 실행</button>
+    </div>
+    <canvas id="sweep-canvas" width="700" height="400"></canvas>
+    <div class="result-box" id="sweep-result" style="margin-top:12px">스윕 실행 결과가 여기에 표시됩니다</div>
+  </div>
+</div>
+
+<!-- ============ TAB 5: 게인 계산 ============ -->
+<div class="tab-content" id="tab-gain">
+  <div class="card">
+    <h3>LQR 게인 계산 + 시뮬 검증</h3>
+    <div class="flex-row" style="margin-bottom:12px">
+      <div class="slider-group"><label>R (토크 페널티):</label>
+        <input type="range" id="gain_R" min="-3" max="2" step="0.1" value="-2" oninput="DT.UI.updateRDisplay()">
+        <span class="val" id="gain_R_val">0.01</span></div>
+    </div>
+    <h4>Q 대각 성분 (상태 가중치)</h4>
+    <div class="form-grid" style="grid-template-columns:repeat(6,1fr)">
+      <div class="form-group"><label>Q_φ</label><input type="number" id="q0" value="1" step="0.1"></div>
+      <div class="form-group"><label>Q_α</label><input type="number" id="q1" value="50" step="1"></div>
+      <div class="form-group"><label>Q_θ</label><input type="number" id="q2" value="50" step="1"></div>
+      <div class="form-group"><label>Q_φ̇</label><input type="number" id="q3" value="0.1" step="0.01"></div>
+      <div class="form-group"><label>Q_α̇</label><input type="number" id="q4" value="5" step="0.1"></div>
+      <div class="form-group"><label>Q_θ̇</label><input type="number" id="q5" value="5" step="0.1"></div>
+    </div>
+    <div class="flex-row" style="margin-top:12px">
+      <button class="btn btn-green" onclick="DT.UI.computeGain()">⚡ 게인 계산</button>
+      <button class="btn" onclick="DT.UI.runVerifySim()">▶ 시뮬 검증 (3초)</button>
+    </div>
+    <div class="gain-display" id="gain-display">K = [ 아직 계산되지 않음 ]</div>
+    <div class="chart-container">
+      <canvas id="sim-chart-tau" width="540" height="200"></canvas>
+      <canvas id="sim-chart-angle" width="540" height="200"></canvas>
+    </div>
+    <div class="result-box" id="gain-result" style="margin-top:12px">게인 계산 결과가 여기에 표시됩니다</div>
+  </div>
+</div>
+
+<!-- ============ TAB 6: ESP32 내보내기 ============ -->
+<div class="tab-content" id="tab-export">
+  <div class="card">
+    <h3>ESP32 C++ 코드 생성</h3>
+    <div class="info-box">위 ⑤번 탭에서 게인을 먼저 계산한 뒤 코드를 생성하세요.</div>
+    <div class="flex-row" style="margin:12px 0">
+      <button class="btn btn-green" onclick="DT.UI.generateESP32()">🔧 코드 생성</button>
+      <button class="btn" onclick="DT.UI.copyESP32()">📋 클립보드 복사</button>
+    </div>
+    <div class="result-box" id="esp32-code" style="font-size:11px">코드가 여기에 표시됩니다</div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="src/physics/model.js"></script>
+<script src="src/control/lqr.js"></script>
+<script>
+// ============================================================
+//  UI Controller
+// ============================================================
+DT.UI = {
+    currentK: null,
+    currentParams: null,
+
+    // --- 탭 전환 ---
+    init() {
+        document.querySelectorAll('#tabs button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#tabs button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+            });
+        });
+        this.toggleUniform();
+        this.loadParams();
+    },
+
+    // --- 균일 막대 토글 ---
+    toggleUniform() {
+        const uniform = document.getElementById('uniformRod').checked;
+        document.querySelectorAll('.ind-param').forEach(el => {
+            el.style.display = uniform ? 'none' : 'flex';
+        });
+        if (uniform) {
+            const L1 = parseFloat(document.getElementById('p_L1').value);
+            const L2 = parseFloat(document.getElementById('p_L2').value);
+            const m1 = parseFloat(document.getElementById('p_m1').value);
+            const m2 = parseFloat(document.getElementById('p_m2').value);
+            document.getElementById('p_ell1').value = (L1 / 2).toFixed(4);
+            document.getElementById('p_ell2').value = (L2 / 2).toFixed(4);
+            document.getElementById('p_I1').value = (m1 * L1 * L1 / 12).toFixed(6);
+            document.getElementById('p_I2').value = (m2 * L2 * L2 / 12).toFixed(6);
+        }
+    },
+
+    // --- 파라미터 객체 생성 ---
+    getParams() {
+        const uniform = document.getElementById('uniformRod').checked;
+        const m1 = parseFloat(document.getElementById('p_m1').value);
+        const m2 = parseFloat(document.getElementById('p_m2').value);
+        const L1 = parseFloat(document.getElementById('p_L1').value);
+        const L2 = parseFloat(document.getElementById('p_L2').value);
+        if (uniform) this.toggleUniform(); // recalc
+        const opts = {
+            m1, m2, L1, L2,
+            ell1: parseFloat(document.getElementById('p_ell1').value),
+            ell2: parseFloat(document.getElementById('p_ell2').value),
+            I1: parseFloat(document.getElementById('p_I1').value),
+            I2: parseFloat(document.getElementById('p_I2').value),
+            R: parseFloat(document.getElementById('p_R').value),
+            tauMax: parseFloat(document.getElementById('p_tauMax').value),
+            b_phi: parseFloat(document.getElementById('p_bphi').value),
+            b_alpha: parseFloat(document.getElementById('p_balpha').value),
+            b_theta: parseFloat(document.getElementById('p_btheta').value),
+            g: parseFloat(document.getElementById('p_g').value)
+        };
+        this.currentParams = DT.makeParams(opts);
+        return this.currentParams;
+    },
+
+    // --- 저장/불러오기 ---
+    saveParams() {
+        const data = {};
+        document.querySelectorAll('#param-form input').forEach(inp => data[inp.id] = inp.value);
+        data.uniformRod = document.getElementById('uniformRod').checked;
+        localStorage.setItem('dt_params', JSON.stringify(data));
+        alert('파라미터가 저장되었습니다!');
+    },
+    loadParams() {
+        const raw = localStorage.getItem('dt_params');
+        if (!raw) return;
+        try {
+            const data = JSON.parse(raw);
+            Object.keys(data).forEach(k => {
+                const el = document.getElementById(k);
+                if (el) { if (el.type === 'checkbox') el.checked = data[k]; else el.value = data[k]; }
+            });
+            this.toggleUniform();
+        } catch(e) {}
+    },
+    resetParams() {
+        const defaults = {p_m1:'0.132',p_m2:'0.173',p_L1:'0.25',p_L2:'0.25',p_R:'0.35',p_tauMax:'1.47',
+            p_bphi:'0.01',p_balpha:'0.005',p_btheta:'0.003',p_g:'9.81'};
+        Object.keys(defaults).forEach(k => document.getElementById(k).value = defaults[k]);
+        document.getElementById('uniformRod').checked = true;
+        this.toggleUniform();
+    },
+
+    // --- 관성 측정 ---
+    calcInertia() {
+        const m = parseFloat(document.getElementById('in_m').value);
+        const d = parseFloat(document.getElementById('in_d').value);
+        const T = parseFloat(document.getElementById('in_T').value);
+        const g = 9.81;
+        const I_pivot = m * g * d * (T / (2 * Math.PI)) ** 2;
+        const I_cm = I_pivot - m * d * d;
+        const I_rod = m * (2 * d) * (2 * d) / 12; // 동일 질량/길이의 균일 막대
+        document.getElementById('inertia-result').textContent =
+            `피벗 기준 관성모멘트: I_pivot = ${I_pivot.toExponential(4)} kg·m²\n` +
+            `CoM 기준 관성모멘트: I_cm    = ${I_cm.toExponential(4)} kg·m²  ← 이 값을 파라미터에 입력\n` +
+            `균일 막대 기준값:     I_rod   = ${I_rod.toExponential(4)} kg·m²\n` +
+            `차이:                         ${((I_cm / I_rod - 1) * 100).toFixed(1)}% ${I_cm > I_rod ? '(막대보다 큼 — 양끝 집중 질량)' : '(막대보다 작음)'}`;
+    },
+
+    // --- 감쇠 측정 ---
+    calcDamping() {
+        const A1 = parseFloat(document.getElementById('damp_A1').value);
+        const A2 = parseFloat(document.getElementById('damp_A2').value);
+        const T = parseFloat(document.getElementById('damp_T').value);
+        const I = parseFloat(document.getElementById('damp_I').value);
+        const delta = Math.log(A1 / A2);
+        const zeta = delta / Math.sqrt(4 * Math.PI * Math.PI + delta * delta);
+        const omega_d = 2 * Math.PI / T;
+        const omega_n = omega_d / Math.sqrt(1 - zeta * zeta);
+        const b = 2 * zeta * omega_n * I;
+        document.getElementById('damping-result').textContent =
+            `로그 감쇠율 δ = ${delta.toFixed(4)}\n` +
+            `감쇠비 ζ = ${zeta.toFixed(4)} (${zeta < 0.1 ? '약감쇠' : zeta < 0.3 ? '중간 감쇠' : '강감쇠'})\n` +
+            `감쇠 고유진동수 ω_d = ${omega_d.toFixed(2)} rad/s\n` +
+            `비감쇠 고유진동수 ω_n = ${omega_n.toFixed(2)} rad/s\n` +
+            `감쇠 계수 b = ${b.toExponential(4)}  ← b_α 또는 b_θ에 입력`;
+    },
+
+    // --- R 스윕 ---
+    runSweep() {
+        const baseParams = this.getParams();
+        const paramName = document.getElementById('sweep_param').value;
+        const rangePercent = parseFloat(document.getElementById('sweep_range').value);
+        const theta0 = parseFloat(document.getElementById('sweep_theta0').value) * Math.PI / 180;
+        const canvas = document.getElementById('sweep-canvas');
+        const ctx = canvas.getContext('2d');
+
+        const R_values = [];
+        for (let e = -3; e <= 1.5; e += 0.15) R_values.push(Math.pow(10, e));
+        const err_values = [];
+        for (let e = -rangePercent; e <= rangePercent; e += 2) err_values.push(e);
+
+        const w = canvas.width, h = canvas.height;
+        const pw = Math.floor((w - 80) / err_values.length);
+        const ph = Math.floor((h - 50) / R_values.length);
+        ctx.clearRect(0, 0, w, h);
+
+        let safeRmin = Infinity, safeRmax = 0;
+        const results = [];
+
+        for (let ri = 0; ri < R_values.length; ri++) {
+            const R_lqr = R_values[ri];
+            for (let ei = 0; ei < err_values.length; ei++) {
+                const errPct = err_values[ei] / 100;
+                const modParams = Object.assign({}, baseParams);
+                const baseVal = baseParams[paramName];
+                modParams[paramName] = baseVal * (1 + errPct);
+                // recalc derived
+                if (['m1','m2','ell1','ell2','I1','I2','L1','L2'].includes(paramName)) {
+                    modParams.p1 = modParams.m1 * modParams.ell1 + modParams.m2 * modParams.L1;
+                    modParams.p2 = modParams.m2 * modParams.ell2;
+                    modParams.p3 = modParams.m2 * modParams.L1 * modParams.ell2;
+                    modParams.Mtotal = modParams.m1 + modParams.m2;
+                    modParams.I1_total = modParams.m1 * modParams.ell1**2 + modParams.I1 + modParams.m2 * modParams.L1**2;
+                    modParams.I2_total = modParams.m2 * modParams.ell2**2 + modParams.I2;
+                }
+
+                // 기본 파라미터로 게인 계산 (모델 불일치 시뮬)
+                const Q_diag = [1, 50, 50, 0.1, 5, 5];
+                const gainResult = DT.computeLQRGain(baseParams, Q_diag, R_lqr);
+                if (!gainResult) { results.push({ri,ei,ok:false}); continue; }
+
+                // 변형 파라미터로 시뮬 실행
+                const sim = DT.runMiniSim(modParams, gainResult.K, 2, theta0, []);
+                const ok = sim.success && !sim.diverged;
+                results.push({ri, ei, ok});
+
+                // 히트맵 색상
+                ctx.fillStyle = ok ? '#1a6b3a' : '#6b1a1a';
+                ctx.fillRect(60 + ei * pw, 10 + ri * ph, pw - 1, ph - 1);
+
+                if (ok && errPct === 0) {
+                    if (R_lqr < safeRmin) safeRmin = R_lqr;
+                    if (R_lqr > safeRmax) safeRmax = R_lqr;
+                }
+            }
+        }
+
+        // 축 레이블
+        ctx.fillStyle = '#8b949e'; ctx.font = '10px monospace';
+        for (let ei = 0; ei < err_values.length; ei += Math.max(1, Math.floor(err_values.length/10))) {
+            ctx.fillText(err_values[ei].toFixed(0)+'%', 60+ei*pw, h-5);
+        }
+        for (let ri = 0; ri < R_values.length; ri += Math.max(1, Math.floor(R_values.length/8))) {
+            ctx.fillText(R_values[ri].toExponential(1), 2, 18+ri*ph);
+        }
+        ctx.fillStyle='#58a6ff'; ctx.font='11px sans-serif';
+        ctx.fillText('파라미터 오차 →', w/2-30, h-2);
+        ctx.save(); ctx.rotate(-Math.PI/2); ctx.fillText('R (토크 페널티) →', -h/2-40, 12); ctx.restore();
+
+        // 안전범위 분석
+        let safeSummary = '';
+        for (let ri = 0; ri < R_values.length; ri++) {
+            let allOk = true;
+            for (let ei = 0; ei < err_values.length; ei++) {
+                if (!results[ri * err_values.length + ei].ok) { allOk = false; break; }
+            }
+            if (allOk) safeSummary += `R=${R_values[ri].toExponential(2)} → ±${rangePercent}% 전대역 안정 ✅\n`;
+        }
+        document.getElementById('sweep-result').textContent = safeSummary || '어떤 R 값에서도 전 범위 안정을 달성하지 못했습니다.\n오차 범위를 줄이거나 Q 가중치를 조절해 보세요.';
+    },
+
+    // --- 게인 계산 ---
+    updateRDisplay() {
+        const exp = parseFloat(document.getElementById('gain_R').value);
+        document.getElementById('gain_R_val').textContent = Math.pow(10, exp).toExponential(2);
+    },
+
+    computeGain() {
+        const p = this.getParams();
+        const R_lqr = Math.pow(10, parseFloat(document.getElementById('gain_R').value));
+        const Q_diag = [];
+        for (let i = 0; i < 6; i++) Q_diag.push(parseFloat(document.getElementById('q' + i).value));
+
+        const result = DT.computeLQRGain(p, Q_diag, R_lqr);
+        if (!result) {
+            document.getElementById('gain-display').textContent = 'K = [ 선형화 실패! 파라미터를 확인하세요 ]';
+            return;
+        }
+        this.currentK = result.K;
+        const Kstr = Array.from(result.K).map(v => v.toFixed(4)).join(', ');
+        document.getElementById('gain-display').textContent = `K = [ ${Kstr} ]`;
+
+        // 자연 낙하 시간 계산
+        const fallTime = Math.sqrt(2 * p.I2_total / (p.m2 * p.g * p.ell2));
+        document.getElementById('gain-result').textContent =
+            `R = ${R_lqr.toExponential(2)}\n` +
+            `Q = diag(${Q_diag.join(', ')})\n` +
+            `K = [${Kstr}]\n\n` +
+            `자연 낙하 특성시간: ${(fallTime*1000).toFixed(0)} ms\n` +
+            `각 게인의 물리적 의미:\n` +
+            `  K[0]=${result.K[0].toFixed(2)} (φ - 발 위치)\n` +
+            `  K[1]=${result.K[1].toFixed(2)} (α - 하체 기울기)\n` +
+            `  K[2]=${result.K[2].toFixed(2)} (θ - 상체 기울기)\n` +
+            `  K[3]=${result.K[3].toFixed(2)} (φ̇ - 발 속도)\n` +
+            `  K[4]=${result.K[4].toFixed(2)} (α̇ - 하체 각속도)\n` +
+            `  K[5]=${result.K[5].toFixed(2)} (θ̇ - 상체 각속도)`;
+    },
+
+    // --- 시뮬 검증 ---
+    runVerifySim() {
+        if (!this.currentK) { alert('먼저 게인을 계산하세요!'); return; }
+        const p = this.getParams();
+        const sim = DT.runMiniSim(p, this.currentK, 3, 0.15, [{t:1.5, v:0.8}]);
+
+        // 토크 차트
+        this.drawChart('sim-chart-tau', sim.history, 'tau', 'mN·m', v => v.tau * 1000, '#58a6ff');
+        // 각도 차트
+        this.drawChart('sim-chart-angle', sim.history, '°', '각도', v => v.theta * 180 / Math.PI, '#3fb950', v => v.alpha * 180 / Math.PI, '#f85149');
+
+        const resultText = sim.diverged ? '💥 발산! 게인 조정이 필요합니다.' :
+            sim.success ? `✅ 균형 유지 성공\n  최대 토크: ${(sim.maxTau*100/9.81).toFixed(2)} kgf·cm ${sim.saturated?'(포화!)':''}\n  최대 힙 속도: ${(sim.maxHipVel*180/Math.PI).toFixed(0)} °/s` :
+            '⚠️ 불안정 — R을 올리거나 Q를 조절해 보세요.';
+        document.getElementById('gain-result').textContent += '\n\n[시뮬 검증 결과]\n' + resultText;
+    },
+
+    drawChart(canvasId, data, yLabel, title, fn1, color1, fn2, color2) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width, h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+        if (!data || data.length < 2) return;
+
+        const vals1 = data.map(fn1);
+        const vals2 = fn2 ? data.map(fn2) : null;
+        let yMin = Math.min(...vals1.filter(isFinite));
+        let yMax = Math.max(...vals1.filter(isFinite));
+        if (vals2) { yMin = Math.min(yMin, ...vals2.filter(isFinite)); yMax = Math.max(yMax, ...vals2.filter(isFinite)); }
+        const pad = (yMax - yMin) * 0.1 || 1;
+        yMin -= pad; yMax += pad;
+
+        const mx = 50, my = 20, cw = w - mx - 20, ch = h - my - 30;
+        const toX = i => mx + (i / (data.length - 1)) * cw;
+        const toY = v => my + ch - ((v - yMin) / (yMax - yMin)) * ch;
+
+        // 축
+        ctx.strokeStyle = '#30363d'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(mx, my + ch); ctx.lineTo(mx + cw, my + ch); ctx.stroke();
+        ctx.fillStyle = '#8b949e'; ctx.font = '10px monospace';
+        ctx.fillText(yMax.toFixed(1), 2, my + 10);
+        ctx.fillText(yMin.toFixed(1), 2, my + ch);
+        ctx.fillText('0s', mx, my + ch + 12);
+        ctx.fillText(data[data.length-1].t.toFixed(1)+'s', mx+cw-20, my+ch+12);
+        ctx.fillStyle = color1; ctx.fillText(title + ' (' + yLabel + ')', mx + 5, my - 4);
+        // 0선
+        if (yMin < 0 && yMax > 0) { ctx.strokeStyle='#30363d'; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(mx,toY(0)); ctx.lineTo(mx+cw,toY(0)); ctx.stroke(); ctx.setLineDash([]); }
+
+        // 데이터
+        const drawLine = (vals, color) => {
+            ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.beginPath();
+            for (let i = 0; i < vals.length; i++) {
+                if (!isFinite(vals[i])) break;
+                i === 0 ? ctx.moveTo(toX(i), toY(vals[i])) : ctx.lineTo(toX(i), toY(vals[i]));
+            }
+            ctx.stroke();
+        };
+        drawLine(vals1, color1);
+        if (vals2) drawLine(vals2, color2);
+    },
+
+    // --- ESP32 코드 생성 ---
+    generateESP32() {
+        if (!this.currentK || !this.currentParams) { alert('먼저 ⑤번 탭에서 게인을 계산하세요!'); return; }
+        const K = this.currentK;
+        const p = this.currentParams;
+        const R_lqr = Math.pow(10, parseFloat(document.getElementById('gain_R').value));
+        const code = `// ============================================================
+//  슬랙라인 균형 로봇 — ESP32-S3 제어 코드
+//  자동 생성: ${new Date().toISOString().slice(0,16)}
+//  LQR R=${R_lqr.toExponential(2)}
+// ============================================================
+#include <Wire.h>
+
+// --- STS3215 시리얼 서보 ---
+#define SERVO_SERIAL Serial2
+#define SERVO_TX 17
+#define SERVO_RX 18
+#define SERVO_ID 1
+
+// --- MPU6050 ---
+#define MPU_ADDR 0x68
+#define IMU_SDA 21
+#define IMU_SCL 22
+
+// --- 물리 파라미터 ---
+const float M1 = ${p.m1.toFixed(4)}f;      // kg
+const float M2 = ${p.m2.toFixed(4)}f;      // kg
+const float L1 = ${p.L1.toFixed(4)}f;      // m
+const float L2 = ${p.L2.toFixed(4)}f;      // m
+const float ELL1 = ${p.ell1.toFixed(4)}f;  // m (CoM)
+const float ELL2 = ${p.ell2.toFixed(4)}f;  // m (CoM)
+const float R_ARC = ${p.R.toFixed(4)}f;    // m
+const float G = ${p.g.toFixed(2)}f;
+const float TAU_MAX = ${p.tauMax.toFixed(3)}f;  // N·m
+
+// --- LQR 게인 (자동 계산됨) ---
+const float K[6] = {
+    ${K[0].toFixed(6)}f,   // K_phi
+    ${K[1].toFixed(6)}f,   // K_alpha
+    ${K[2].toFixed(6)}f,   // K_theta
+    ${K[3].toFixed(6)}f,   // K_phiDot
+    ${K[4].toFixed(6)}f,   // K_alphaDot
+    ${K[5].toFixed(6)}f    // K_thetaDot
+};
+
+// --- 칼만 필터 (정상상태 게인 하드코딩) ---
+// TODO: 시뮬에서 수렴된 칼만 게인을 여기에 입력
+float phi_est = 0, phiDot_est = 0;
+
+// --- 상태 변수 ---
+float theta = 0, alpha = 0;
+float thetaDot = 0, alphaDot = 0;
+float hipAngle = 0;  // 서보 엔코더
+unsigned long lastTime = 0;
+const float DT_CTRL = 0.005f;  // 5ms 제어 주기
+
+// --- PWM→토크 변환 상수 (실험으로 캘리브 필요) ---
+const float K_TORQUE = 1.0f;  // PWM듀티 → 토크(N·m) 변환 계수
+const float K_EMF = 0.0f;     // 역기전력 보상 계수
+
+void setup() {
+    Serial.begin(115200);
+    
+    // IMU 초기화
+    Wire.begin(IMU_SDA, IMU_SCL);
+    Wire.beginTransmission(MPU_ADDR);
+    Wire.write(0x6B); Wire.write(0); // 슬립 해제
+    Wire.endTransmission();
+    
+    // 서보 시리얼 초기화
+    SERVO_SERIAL.begin(115200, SERIAL_8N1, SERVO_RX, SERVO_TX);
+    
+    Serial.println("슬랙라인 로봇 초기화 완료");
+    lastTime = micros();
+}
+
+void loop() {
+    unsigned long now = micros();
+    float dt = (now - lastTime) * 1e-6f;
+    if (dt < DT_CTRL) return;  // 5ms 미만이면 대기
+    lastTime = now;
+    
+    // 1. 센서 읽기
+    readIMU(&theta, &thetaDot);  // 상체 IMU
+    readServoAngle(&hipAngle);   // 서보 엔코더
+    alpha = theta - hipAngle;    // α = θ - 힙각
+    alphaDot = thetaDot - getServoSpeed();  // 근사
+    
+    // 2. φ 추정 (칼만 필터 — 간소화)
+    // TODO: 정상상태 칼만 게인 사용한 관측기 구현
+    // 현재는 역기구학 근사 사용
+    estimatePhi();
+    
+    // 3. LQR 제어
+    float state[6] = {phi_est, alpha, theta, phiDot_est, alphaDot, thetaDot};
+    float tau = 0;
+    for (int i = 0; i < 6; i++) tau -= K[i] * state[i];
+    tau = constrain(tau, -TAU_MAX, TAU_MAX);
+    
+    // 4. 서보 구동 (PWM 토크 제어)
+    float pwm = tau * K_TORQUE + getServoSpeed() * K_EMF;
+    setServoPWM((int)(pwm * 1000));  // STS3215 PWM 명령
+    
+    // 5. 텔레메트리
+    if (millis() % 100 < 5) {
+        Serial.printf("t=%.2f θ=%.1f° α=%.1f° τ=%.0fmNm\\n",
+            now*1e-6f, theta*57.3f, alpha*57.3f, tau*1000);
+    }
+}
+
+// ============================================================
+//  센서 함수 (기본 구현, 필요시 보정)
+// ============================================================
+void readIMU(float* angle, float* gyro) {
+    Wire.beginTransmission(MPU_ADDR);
+    Wire.write(0x3B);
+    Wire.endTransmission(false);
+    Wire.requestFrom(MPU_ADDR, 14, true);
+    int16_t ax = (Wire.read()<<8)|Wire.read();
+    int16_t ay = (Wire.read()<<8)|Wire.read();
+    int16_t az = (Wire.read()<<8)|Wire.read();
+    Wire.read(); Wire.read(); // temp
+    int16_t gx = (Wire.read()<<8)|Wire.read();
+    
+    // 상보 필터
+    float accAngle = atan2(ax, az);
+    float gyroRate = gx / 131.0f * 0.01745f;  // rad/s
+    static float filtAngle = 0;
+    filtAngle = 0.98f * (filtAngle + gyroRate * DT_CTRL) + 0.02f * accAngle;
+    *angle = filtAngle;
+    *gyro = gyroRate;
+}
+
+void readServoAngle(float* angle) {
+    // TODO: STS3215 프로토콜로 현재 위치 읽기
+    // 임시: 0°
+    *angle = 0;
+}
+
+float getServoSpeed() {
+    // TODO: STS3215 속도 읽기
+    return 0;
+}
+
+void setServoPWM(int pwm) {
+    // TODO: STS3215 PWM 모드 명령
+    // 프로토콜: ID, 명령, PWM 값
+}
+
+void estimatePhi() {
+    // 역기구학 근사: CoM 수평 위치에서 φ 추정
+    float xCom = ELL1*sin(alpha)*M1 + (L1*sin(alpha)+ELL2*sin(theta))*M2;
+    xCom /= (M1 + M2);
+    phi_est = asin(constrain(xCom / R_ARC, -1.0f, 1.0f));
+    // φ̇ 근사 (수치 미분)
+    static float phi_prev = 0;
+    phiDot_est = (phi_est - phi_prev) / DT_CTRL;
+    phi_prev = phi_est;
+}`;
+
+        document.getElementById('esp32-code').textContent = code;
+    },
+
+    copyESP32() {
+        const code = document.getElementById('esp32-code').textContent;
+        navigator.clipboard.writeText(code).then(() => alert('클립보드에 복사되었습니다!'));
+    }
+};
+
+// 초기화
+DT.UI.init();
+DT.UI.updateRDisplay();
+</script>
+</body>
+</html>
