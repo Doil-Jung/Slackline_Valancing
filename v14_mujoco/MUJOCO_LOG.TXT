@@ -7,3 +7,6 @@ WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Ti
 Mon Apr 27 00:40:26 2026
 WARNING: Nan, Inf or huge value in QACC at DOF 1. The simulation is unstable. Time = 0.0010.
 
+Fri May  8 17:23:32 2026
+ERROR: mj_copyDataVisual: attempting to copy mjData while stack is in use
+

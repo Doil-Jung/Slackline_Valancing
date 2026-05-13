@@ -377,7 +377,7 @@ var SL = SL || {};
             const rSlider = document.getElementById('slider-R');
             if (rDisplay) rDisplay.textContent = SL.Params.R.toFixed(3);
             if (rSlider) rSlider.value = SL.Params.R;
-            // 공칭값 재캡처 → LQR 게인 재계산
+            // 공칭값 재캡처 → 편차 재적용 → LQR 게인 재계산
             paramManager.captureNominal();
             applyMismatch();
             controller.recomputeBaseGain(paramManager.nominalParams, controller.rScale);
@@ -409,6 +409,7 @@ var SL = SL || {};
                 SL.Params.L0 = val;
                 l0Display.textContent = val.toFixed(1);
                 recomputeR();
+                renderer3d.rebuild();
             });
         }
 

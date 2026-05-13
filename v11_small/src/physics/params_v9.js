@@ -21,14 +21,8 @@ SL.ParamManager = class {
 
     /** SL.Params 현재값을 공칭 기준으로 저장 */
     captureNominal() {
-        // 먼저 공칭값을 복원하여 편차 누적 방지
-        // (SL.Params에 이미 편차가 적용되어 있을 수 있으므로)
-        if (Object.keys(this._nominalSnapshot).length > 0) {
-            // 기존 공칭값 복원 후 새 공칭값 캐쳐
-            ['m1', 'm2', 'L1', 'L2', 'R'].forEach(k => {
-                SL.Params[k] = this._nominalSnapshot[k];
-            });
-        }
+        // SL.Params에 편차가 적용되어 있을 수 있으므로,
+        // 편차를 역산하여 실제 공칭값을 복원한 뒤 캡처
         const keys = ['m1', 'm2', 'L1', 'L2', 'R',
                        'b_phi', 'b_alpha', 'b_theta', 'g',
                        'dt', 'stepsPerFrame', 'speedMultiplier',
@@ -39,7 +33,12 @@ SL.ParamManager = class {
                        'L_pole', 'L0', 'bodyDepth', 'showArc'];
         this._nominalSnapshot = {};
         keys.forEach(k => {
-            this._nominalSnapshot[k] = SL.Params[k];
+            let val = SL.Params[k];
+            // 편차가 적용된 파라미터는 역산하여 공칭값 복원
+            if (k in this.mismatch && this.mismatch[k] !== 0) {
+                val = val / (1 + this.mismatch[k]);
+            }
+            this._nominalSnapshot[k] = val;
         });
         // 편차 재적용
         this.applyPlantToGlobal();

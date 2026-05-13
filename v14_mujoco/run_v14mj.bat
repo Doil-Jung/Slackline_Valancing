@@ -3,7 +3,7 @@ echo Starting V14 Launcher...
 
 :: Auto-detect: desktop(user) vs laptop(doilm)
 if "%USERNAME%"=="user" (
-    set PYTHON=C:\Users\user\miniconda3\envs\pybullet\python.exe
+    set PYTHON=C:\Users\user\AppData\Local\Programs\Python\Python311\python.exe
 ) else if "%USERNAME%"=="doilm" (
     set PYTHON=C:\Users\doilm\AppData\Local\Programs\Python\Python311\python.exe
 ) else (
