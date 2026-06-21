@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="슬랙라인 균형 시뮬레이터 V10 — 적응 제어 (R/Q 튜닝 + 시스템 식별)">
-    <title>슬랙라인 균형 시뮬레이터 V10</title>
+    <meta name="description" content="슬랙라인 균형 시뮬레이터 V11 — 소형 로봇 스케일 (3-DOF)">
+    <title>슬랙라인 균형 시뮬레이터 V11 (Small)</title>
     <link rel="stylesheet" href="../css/style.css">
     <style>
         /* === V6 3D 전용 스타일 === */
@@ -87,7 +87,7 @@
 <body>
     <div class="header">
         <h1>🎪 슬랙라인 균형 시뮬레이터</h1>
-        <span class="subtitle">V10 — 적응 제어 (R/Q Tuning + System Identification)</span>
+        <span class="subtitle">V11 — 소형 로봇 스케일 (Small Robotic Scale)</span>
     </div>
 
     <div class="main-container">
@@ -133,9 +133,12 @@
                     <a href="../v9_robustness/index.html" class="btn"
                         style="flex:1; text-align:center; font-size:0.8em; padding:6px 4px;">V9<br><span
                             style="font-size:0.75em; opacity:0.6;">강건성</span></a>
+                    <a href="../v10_adaptive/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; padding:6px 4px;">V10<br><span
+                            style="font-size:0.75em; opacity:0.6;">적응</span></a>
                     <span class="btn btn-primary"
-                        style="flex:1; text-align:center; font-size:0.8em; padding:6px 4px; cursor:default;">V10<br><span
-                            style="font-size:0.75em; opacity:0.8;">적응 ✓</span></span>
+                        style="flex:1; text-align:center; font-size:0.8em; padding:6px 4px; cursor:default;">V11<br><span
+                            style="font-size:0.75em; opacity:0.8;">소형 ✓</span></span>
                 </div>
             </div>
 
@@ -573,9 +576,9 @@
         })();
     </script>
 
-    <!-- Physics & Control (v9) -->
-    <script src="../v5_latency/src/physics/params.js"></script>
-    <script src="../v5_latency/src/physics/model.js"></script>
+    <!-- Physics & Control (V11 Small) -->
+    <script src="src/physics/params.js"></script>
+    <script src="src/physics/model.js"></script>
     <script src="src/physics/params_v9.js"></script>
     <script src="src/physics/noise.js"></script>
     <script src="src/control/lqr_v9.js"></script>

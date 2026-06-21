@@ -82,7 +82,8 @@ SL.ParamManager = class {
             ell1:   { get() { return this.L1 / 2; } },
             ell2:   { get() { return this.L2 / 2; } },
             I1:     { get() { return this.m1 * this.L1 * this.L1 / 12; } },
-            I2:     { get() { return this.m2 * this.L2 * this.L2 / 12; } },
+            // V14 매칭: body(0.25kg)+head(0.05kg) 유효 관성모멘트
+            I2:     { get() { return 0.001821; } },
             p1:     { get() { return this.m1 * this.ell1 + this.m2 * this.L1; } },
             p2:     { get() { return this.m2 * this.ell2; } },
             p3:     { get() { return this.m2 * this.L1 * this.ell2; } },

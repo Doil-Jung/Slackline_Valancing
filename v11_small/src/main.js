@@ -1,9 +1,9 @@
 /**
- * Slackline Balance Simulator V10 — Main Entry Point (Adaptive Control)
+ * Slackline Balance Simulator V11 — Main Entry Point (Small Robotic Scale)
  * 
- * V9 기반 + LQR R/Q 튜닝 + 온라인 시스템 식별 (RLS)
+ * V10 기반 + 소형 로봇 물리 파라미터 적용 (m1:100g, m2:320g, L1:23cm)
  * 
- * 핵심: R 스케일로 게인 강도 조절 + RLS로 실제 파라미터 추정
+ * 핵심: 실측 소형 로봇 치수 반영 및 LQR 제어
  */
 var SL = SL || {};
 
@@ -19,7 +19,7 @@ var SL = SL || {};
     // 3D 추가 파라미터 기본값 설정
     SL.Params.L_pole = 0.8;
     SL.Params.L0 = 1.0;
-    SL.Params.bodyDepth = 0.046;
+    SL.Params.bodyDepth = 0.10;
     SL.Params.showArc = true;
 
     /** 초기화 */
@@ -60,6 +60,9 @@ var SL = SL || {};
         // 3D 렌더러
         const container3d = document.getElementById('container-3d');
         renderer3d = new SL.Renderer3D(container3d, SL.Params);
+
+        // 카메라 조작 시 즉시 렌더링 (시뮬레이션 정지 상태에서도 뷰 회전 가능)
+        renderer3d.startIdleRender();
 
         // 2D 그래프
         const graphCanvas = document.getElementById('graph-canvas');

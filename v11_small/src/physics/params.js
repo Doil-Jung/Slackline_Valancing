@@ -12,25 +12,23 @@ var SL = SL || {};
 
 SL.Params = {
     // === 하체 (다리) ===
-    m1: 0.10,       // 하체 질량 (kg) — V11 실측: ~100g
-    L1: 0.23,       // 하체 길이 — 발에서 힙 (m) — V11: 230mm
-
-    // === 상체 (몸통) ===
-    m2: 0.32,       // 상체 질량 (kg) — V11 실측: ~320g
-    L2: 0.23,       // 상체 길이 — 힙에서 머리 (m) — V11: 230mm
+    m1: 0.10,       // 하체 질량 (kg) — V14 matching
+    L1: 0.20,       // 하체 길이 (m) — V14 matching
+    m2: 0.30,       // 상체 질량 (kg) — V14 (m2+mh) matching
+    L2: 0.25,       // 상체 길이 (m) — V14 (Effective L2 to match CoM=0.125m) matching
 
     // === 줄 ===
-    R: 0.30,        // 원호 반경 = 처짐 깊이 (m) — V11: 30cm
+    R: 0.30,        // 원호 반경 (m) — V14 matching (rtgt)
     g: 9.81,        // 중력 가속도 (m/s²)
 
     // === 렌더링 치수 ===
-    lowerWidth: 0.024,  // 하체 폭 (m) — V11: 24mm
-    upperWidth: 0.033,  // 상체 폭 (m) — V11: 33mm
+    lowerWidth: 0.05,   // 하체 폭 (m) — V14 matching (L2/4)
+    upperWidth: 0.05,   // 상체 폭 (m) — V14 matching (L2/4)
 
     // === 감쇠 (V11 소형 로봇 스케일) ===
-    b_phi: 0.05,    // 원호 운동 감쇠 (N·m·s/rad)
-    b_alpha: 0.02,  // 하체 회전 감쇠 (N·m·s/rad)
-    b_theta: 0.01,  // 상체 감쇠 (N·m·s/rad)
+    b_phi: 0.0,     // 원호 감쇠
+    b_alpha: 0.0,   // 하체 회전 감쇠
+    b_theta: 0.01,  // 상체 감쇠 — V14 matching (btht)
 
     // === 시뮬레이션 ===
     dt: 0.001,
@@ -46,20 +44,25 @@ SL.Params = {
     // === 초기 조건 ===
     phi0: 0,
     alpha0: 0,
-    theta0: 0.05,       // 초기 상체 각도 (rad) — V11 소형: 약 3°
+    theta0: 0.1501,     // 초기 상체 각도 (rad) — V14 matching (8.6°)
     phiDot0: 0,
     alphaDot0: 0,
     thetaDot0: 0,
 
     // === 제한 ===
     phiMax: 80 * Math.PI / 180,
-    tauMax: 1500,       // 시뮬레이션: 무제한 (하드웨어 제한은 배포 시 적용)
+    tauMax: 2.2,        // 최대 토크 (N·m) — V14 matching
 
     // === 파생 상수 (getter) ===
     get ell1() { return this.L1 / 2; },                     // 하체 CoM까지 거리
-    get ell2() { return this.L2 / 2; },                     // 상체 CoM까지 거리
+    get ell2() { return this.L2 / 2; },                     // 상체 CoM까지 거리 (= V14 LC2_EFF)
     get I1() { return this.m1 * this.L1 * this.L1 / 12; },  // 하체 관성모멘트
-    get I2() { return this.m2 * this.L2 * this.L2 / 12; },  // 상체 관성모멘트
+    // V14 매칭: 상체 관성모멘트 = 몸통(0.25kg rod L2=0.2) + 머리(0.05kg sphere r=0.05)
+    // 를 유효 CoM(0.125m) 기준 평행축 정리로 환산한 값
+    // i2_body = 0.25*0.04/12 + 0.25*(0.1-0.125)² = 0.000990
+    // i2_head = 0.4*0.05*0.0025 + 0.05*(0.25-0.125)² = 0.000831
+    // I2_eff = 0.001821
+    get I2() { return 0.001821; },                           // 상체 유효 관성모멘트 (V14 body+head)
 
     // EOM 유도용 보조 상수
     get p1() { return this.m1 * this.ell1 + this.m2 * this.L1; },  // m₁ℓ₁ + m₂L₁
@@ -72,16 +75,16 @@ SL.Params = {
     get M22() { return this.m1 * this.ell1 * this.ell1 + this.I1 + this.m2 * this.L1 * this.L1; },
     get M33() { return this.m2 * this.ell2 * this.ell2 + this.I2; },
 
-    /** UI 슬라이더 범위 */
+    /** UI 슬라이더 범위 (소형 로봇 스케일) */
     ranges: {
-        R:       { min: 0.05, max: 5.0, step: 0.01, label: '원호 반경 R (m)' },
-        m1:      { min: 0.01, max: 80,  step: 0.01, label: '하체 질량 m₁ (kg)' },
-        m2:      { min: 0.01, max: 100, step: 0.01, label: '상체 질량 m₂ (kg)' },
-        L1:      { min: 0.05, max: 1.2, step: 0.01, label: '하체 길이 L₁ (m)' },
-        L2:      { min: 0.05, max: 1.2, step: 0.01, label: '상체 길이 L₂ (m)' },
-        b_phi:   { min: 0,   max: 10,  step: 0.01,  label: '원호 감쇠 b_φ' },
-        b_alpha: { min: 0,   max: 10,  step: 0.01,  label: '하체 감쇠 b_α' },
-        b_theta: { min: 0,   max: 5,   step: 0.01,  label: '상체 감쇠 b_θ' },
+        R:       { min: 0.05, max: 1.0,  step: 0.01, label: '원호 반경 R (m)' },
+        m1:      { min: 0.01, max: 2.0,  step: 0.01, label: '하체 질량 m₁ (kg)' },
+        m2:      { min: 0.01, max: 2.0,  step: 0.01, label: '상체 질량 m₂ (kg)' },
+        L1:      { min: 0.05, max: 0.6,  step: 0.01, label: '하체 길이 L₁ (m)' },
+        L2:      { min: 0.05, max: 0.6,  step: 0.01, label: '상체 길이 L₂ (m)' },
+        b_phi:   { min: 0,   max: 2,    step: 0.01, label: '원호 감쇠 b_φ' },
+        b_alpha: { min: 0,   max: 1,    step: 0.01, label: '하체 감쇠 b_α' },
+        b_theta: { min: 0,   max: 1,    step: 0.01, label: '상체 감쇠 b_θ' },
         Kp:      { min: 0,   max: 2000, step: 1,    label: 'Kp (비례)' },
         Kd:      { min: 0,   max: 300,  step: 1,    label: 'Kd (미분)' },
         Ki:      { min: 0,   max: 50,   step: 0.1,  label: 'Ki (적분)' },

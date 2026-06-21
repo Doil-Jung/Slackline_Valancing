@@ -428,7 +428,7 @@ SL.LQRController = class {
         const ell2 = L2 / 2;
         const M33_actual = m2 * ell2 * ell2 + m2 * L2 * L2 / 12;
         const M33_ref = 8.5;  // 인체 스케일 기준
-        const baseR = 0.001 * (M33_ref / Math.max(M33_actual, 1e-6));
+        const baseR = 0.001; // V14 matching: Use fixed R_cost instead of auto-scaling
         const R_actual = baseR * this.rScale;
         
         console.log(`LQR R_scalar: baseR=${baseR.toFixed(4)} (M33=${M33_actual.toFixed(6)}), R_actual=${R_actual.toFixed(4)}`);
@@ -506,7 +506,7 @@ SL.LQRController = class {
         const ell2 = L2 / 2;
         const M33_actual = m2 * ell2 * ell2 + m2 * L2 * L2 / 12;
         const M33_ref = 8.5;
-        const R_scalar = 0.001 * (M33_ref / Math.max(M33_actual, 1e-6));
+        const R_scalar = 0.001; // V14 matching
 
         // 5. DARE 풀이
         const P = this.solveDARE(Aaug, Baug, Qaug, R_scalar, nAug, 2000, 1e-9);

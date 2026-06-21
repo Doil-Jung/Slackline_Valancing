@@ -541,9 +541,22 @@ SL.Renderer3D = class {
 
     dispose() {
         window.removeEventListener('resize', this._onResize);
+        this._idleRunning = false;
         this.renderer.dispose();
         if (this.renderer.domElement.parentNode) {
             this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
         }
+    }
+
+    /** 시뮬레이션 정지 상태에서도 카메라 조작이 가능하도록 독립 렌더 루프 */
+    startIdleRender() {
+        this._idleRunning = true;
+        const idleLoop = () => {
+            if (!this._idleRunning) return;
+            this.controls.update();
+            this.renderer.render(this.scene, this.camera);
+            requestAnimationFrame(idleLoop);
+        };
+        requestAnimationFrame(idleLoop);
     }
 };

@@ -42,6 +42,9 @@ SL.Renderer3D = class {
         this.controls.target.set(0, 0, robotMidZ);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.08;
+        this.controls.rotateSpeed = 0.3;    // 소형 모델 세밀 조정용
+        this.controls.zoomSpeed = 0.5;
+        this.controls.panSpeed = 0.5;
         this.controls.minDistance = 0.3;
         this.controls.maxDistance = 10;
         this.controls.update();
@@ -547,9 +550,22 @@ SL.Renderer3D = class {
 
     dispose() {
         window.removeEventListener('resize', this._onResize);
+        this._idleRunning = false;
         this.renderer.dispose();
         if (this.renderer.domElement.parentNode) {
             this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
         }
+    }
+
+    /** 시뮬레이션 정지 상태에서도 카메라 조작이 가능하도록 독립 렌더 루프 */
+    startIdleRender() {
+        this._idleRunning = true;
+        const idleLoop = () => {
+            if (!this._idleRunning) return;
+            this.controls.update();
+            this.renderer.render(this.scene, this.camera);
+            requestAnimationFrame(idleLoop);
+        };
+        requestAnimationFrame(idleLoop);
     }
 };

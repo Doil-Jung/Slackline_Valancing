@@ -33,3 +33,10 @@ venv/
 
 # Gemini / Antigravity 데이터
 .gemini/
+
+# 슬랙라인과 무관 / 민감 (자동 제외)
+ai_grader_v2_backup/
+downloads/
+*.cab
+.api_keys.json
+*.api_keys.json

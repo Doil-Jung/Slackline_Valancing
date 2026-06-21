@@ -34,6 +34,7 @@ var SL = SL || {};
         // 3D 렌더러
         const container3d = document.getElementById('container-3d');
         renderer3d = new SL.Renderer3D(container3d, SL.Params);
+        renderer3d.startIdleRender();
 
         // 2D 그래프
         const graphCanvas = document.getElementById('graph-canvas');

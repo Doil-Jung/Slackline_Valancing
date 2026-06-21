@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="슬랙라인 균형 시뮬레이터 V10 — 적응 제어 (R/Q 튜닝 + 시스템 식별)">
+    <title>슬랙라인 균형 시뮬레이터 V10</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* === V6 3D 전용 스타일 === */
+        .canvas-area {
+            position: relative;
+        }
+
+        .sim-container {
+            flex: 3;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .sim-container canvas {
+            display: block;
+        }
+
+        #container-3d {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #info-overlay {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-family: 'Inter', monospace;
+            color: #e0e0e0;
+            line-height: 1.7;
+            pointer-events: none;
+            z-index: 10;
+            min-width: 200px;
+        }
+
+        #info-overlay div {
+            white-space: nowrap;
+        }
+
+        .camera-hint {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .panel-section-3d {
+            background: linear-gradient(135deg, rgba(255, 190, 11, 0.06), rgba(255, 0, 110, 0.06)) !important;
+        }
+
+        /* V9 전용 스타일 */
+        .panel-section-mismatch {
+            background: linear-gradient(135deg, rgba(251, 146, 60, 0.08), rgba(239, 68, 68, 0.06)) !important;
+        }
+
+        .panel-section-noise {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.08), rgba(96, 165, 250, 0.06)) !important;
+        }
+
+        .mismatch-slider .slider-val {
+            min-width: 45px;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>🎪 슬랙라인 균형 시뮬레이터</h1>
+        <span class="subtitle">V10 — 적응 제어 (R/Q Tuning + System Identification)</span>
+    </div>
+
+    <div class="main-container">
+        <div class="canvas-area">
+            <div class="sim-container">
+                <div id="container-3d"></div>
+                <div id="info-overlay"></div>
+                <div class="camera-hint">🖱 마우스: 회전 | 스크롤: 줌 | 우클릭+드래그: 이동</div>
+                <div style="position:absolute; bottom:12px; right:12px; z-index:10; display:flex; gap:4px;">
+                    <button class="btn" id="btn-view-side" style="font-size:11px; padding:4px 8px; opacity:0.7;">📐 XZ 사이드</button>
+                    <button class="btn" id="btn-view-3d" style="font-size:11px; padding:4px 8px; opacity:0.7;">🎥 3D</button>
+                </div>
+            </div>
+            <div class="graph-container"><canvas id="graph-canvas"></canvas></div>
+        </div>
+
+        <div class="control-panel">
+            <!-- 버전 선택 -->
+            <div class="panel-section"
+                style="background: linear-gradient(135deg, rgba(58,134,255,0.08), rgba(131,56,236,0.08));">
+                <h3>📂 모델 버전</h3>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <a href="../v1_single_body/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V1<br><span
+                            style="font-size:0.75em; opacity:0.6;">1체 발목</span></a>
+                    <a href="../v2_two_body/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V2<br><span
+                            style="font-size:0.75em; opacity:0.6;">2체 힙</span></a>
+                    <a href="../v3_three_dof/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V3<br><span
+                            style="font-size:0.75em; opacity:0.6;">3-DOF PID</span></a>
+                    <a href="../v4_lqr/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V4<br><span
+                            style="font-size:0.75em; opacity:0.6;">LQR</span></a>
+                    <a href="../v5_latency/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V5<br><span
+                            style="font-size:0.75em; opacity:0.6;">지연</span></a>
+                    <a href="../v6_3d/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; text-decoration:none; padding:6px 4px;">V6<br><span
+                            style="font-size:0.75em; opacity:0.6;">3D</span></a>
+                    <a href="../v7_estimation/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; padding:6px 4px;">V7<br><span
+                            style="font-size:0.75em; opacity:0.6;">발위치추정</span></a>
+                    <a href="../v8_observer/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; padding:6px 4px;">V8<br><span
+                            style="font-size:0.75em; opacity:0.6;">관측기</span></a>
+                    <a href="../v9_robustness/index.html" class="btn"
+                        style="flex:1; text-align:center; font-size:0.8em; padding:6px 4px;">V9<br><span
+                            style="font-size:0.75em; opacity:0.6;">강건성</span></a>
+                    <span class="btn btn-primary"
+                        style="flex:1; text-align:center; font-size:0.8em; padding:6px 4px; cursor:default;">V10<br><span
+                            style="font-size:0.75em; opacity:0.8;">적응 ✓</span></span>
+                </div>
+            </div>
+
+            <!-- 시뮬레이션 제어 -->
+            <div class="panel-section">
+                <h3>시뮬레이션</h3>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btn-start-stop">▶ 시작</button>
+                    <button class="btn" id="btn-reset">⟲ 리셋</button>
+                </div>
+                <div style="height:8px"></div>
+                <div class="perturb-group">
+                    <button class="btn btn-danger" id="btn-perturb-left">← 교란</button>
+                    <button class="btn btn-danger" id="btn-perturb-right">교란 →</button>
+                </div>
+                <div style="height:8px"></div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>교란 강도 (rad/s)</span><span class="slider-val"
+                            id="val-perturbStr">0.5</span></div>
+                    <input type="range" id="slider-perturbStr" min="0.1" max="3.0" step="0.1" value="0.5">
+                </div>
+                <div style="height:8px"></div>
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>재생 속도</span>
+                        <span class="slider-val" id="val-speed" style="color:#4cc9f0; font-weight:bold;">1.00x</span>
+                    </div>
+                    <input type="range" id="slider-speed" min="0.05" max="1.0" step="0.05" value="1.0">
+                </div>
+                <div style="height:4px"></div>
+                <div style="display:flex; gap:4px;">
+                    <button class="btn" id="btn-step-back" style="flex:1; font-size:0.85em;">⏮ 1장 뒤로</button>
+                    <button class="btn" id="btn-step" style="flex:1; font-size:0.85em;">⏭ 1장 전진</button>
+                </div>
+            </div>
+
+            <!-- FWE 제어기 -->
+            <div class="panel-section controller-section" style="background: linear-gradient(135deg, rgba(58,134,255,0.08), rgba(255,0,110,0.08));">
+                <h3>🎪 FWE 4단계 제어 + 힙 PD 서보</h3>
+                <button class="btn btn-controller active" id="btn-controller">🎛 제어기 ON</button>
+                <div style="height:10px"></div>
+
+                <!-- eps: 접기 강도 -->
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>ε (접기 강도 스케일)</span>
+                        <span class="slider-val" id="val-fwe-eps" style="color:#ff006e; font-weight:bold;">0.5</span>
+                    </div>
+                    <input type="range" id="slider-fwe-eps" min="0.1" max="8.0" step="0.1" value="0.5">
+                </div>
+
+                <!-- T_f: 접기 시간 -->
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>T_f (FOLD/EXTEND 시간, ms)</span>
+                        <span class="slider-val" id="val-fwe-Tf" style="color:#ffbe0b; font-weight:bold;">150</span>
+                    </div>
+                    <input type="range" id="slider-fwe-Tf" min="50" max="400" step="5" value="150">
+                </div>
+
+                <!-- T_w1: 대기 시간 -->
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>T_w1 (WAIT₁ 대기 시간, ms)</span>
+                        <span class="slider-val" id="val-fwe-Tw1" style="color:#06d6a0; font-weight:bold;">80</span>
+                    </div>
+                    <input type="range" id="slider-fwe-Tw1" min="10" max="500" step="5" value="80">
+                </div>
+
+                <!-- beta_threshold: 트리거 각도 -->
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Trigger 각도 임계값 (°)</span>
+                        <span class="slider-val" id="val-fwe-betaThresh" style="color:#3a86ff; font-weight:bold;">1.00</span>
+                    </div>
+                    <input type="range" id="slider-fwe-betaThresh" min="0.1" max="5.0" step="0.05" value="1.00">
+                </div>
+
+                <!-- c_pred: 적응적 예측 계수 -->
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>c_pred (적응적 예측 계수, s/rad)</span>
+                        <span class="slider-val" id="val-fwe-cpred" style="color:#a78bfa; font-weight:bold;">1.0</span>
+                    </div>
+                    <input type="range" id="slider-fwe-cpred" min="0" max="5.0" step="0.1" value="1.0">
+                </div>
+
+                <!-- c_beta_dot: 속도 감쇠 계수 -->
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>c_beta_dot (속도 감쇠 계수)</span>
+                        <span class="slider-val" id="val-fwe-cbetadot" style="color:#4cc9f0; font-weight:bold;">0.30</span>
+                    </div>
+                    <input type="range" id="slider-fwe-cbetadot" min="0.0" max="1.5" step="0.05" value="0.30">
+                </div>
+
+                <!-- max_delta: 최대 힙각 제한 -->
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>최대 접기 각도 제한 (°)</span>
+                        <span class="slider-val" id="val-fwe-maxdelta" style="color:#f72585; font-weight:bold;">30</span>
+                    </div>
+                    <input type="range" id="slider-fwe-maxdelta" min="10" max="90" step="1" value="30">
+                </div>
+
+                <!-- Kp_servo: PD P게인 -->
+                <div class="slider-group" style="margin-top:10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                    <div class="slider-label">
+                        <span>Kp_servo (힙 비례 제어)</span>
+                        <span class="slider-val" id="val-fwe-Kp" style="color:#8338ec; font-weight:bold;">35000</span>
+                    </div>
+                    <input type="range" id="slider-fwe-Kp" min="5000" max="80000" step="1000" value="35000">
+                </div>
+
+                <!-- Kd_servo: PD D게인 -->
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Kd_servo (힙 미분 제어)</span>
+                        <span class="slider-val" id="val-fwe-Kd" style="color:#34d399; font-weight:bold;">1000</span>
+                    </div>
+                    <input type="range" id="slider-fwe-Kd" min="100" max="4000" step="50" value="1000">
+                </div>
+
+                <!-- === V15 추가 제어 옵션 === -->
+                <div style="margin-top:12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                    <div style="font-weight:bold; font-size:13px; margin-bottom:6px; color:#ffbe0b;">🔄 상태머신 흐름 옵션</div>
+                    <div style="display:flex; align-items:center; flex-direction:row; padding: 4px 0;">
+                        <input type="checkbox" id="check-fwe-skipWait2OnExtendZero" checked style="margin:0 8px 0 0; cursor:pointer;">
+                        <label for="check-fwe-skipWait2OnExtendZero" style="font-size:12px; cursor:pointer; color:#e0e0e0;">
+                            펴는 도중 발 영점 통과시 즉시 다음 사이클
+                        </label>
+                    </div>
+                    <div style="display:flex; align-items:center; flex-direction:row; padding: 4px 0;">
+                        <input type="checkbox" id="check-fwe-skipWait2Entirely" checked style="margin:0 8px 0 0; cursor:pointer;">
+                        <label for="check-fwe-skipWait2Entirely" style="font-size:12px; cursor:pointer; color:#e0e0e0;">
+                            펴기 완료 시 WAIT₂ 생략하고 바로 다음 사이클
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 발위치 획득 방식 -->
+                <div style="margin-top:10px; margin-bottom:4px; font-weight:bold; font-size:13px;">발 위치(φ) 획득 방식</div>
+                <div style="display:flex; gap:4px; margin-bottom:6px; flex-wrap:wrap;">
+                    <button class="btn btn-primary" id="btn-est-ideal"
+                        style="flex:1; font-size:0.78em; padding:5px 3px; background:#4cc9f0; color:#000; min-width:80px;">🎯 완벽한 센싱</button>
+                    <button class="btn" id="btn-est-kinematic"
+                        style="flex:1; font-size:0.78em; padding:5px 3px; min-width:80px;">📐 CoM 역기구학</button>
+                </div>
+                <div id="est-desc" style="font-size:11px; color:rgba(255,255,255,0.5); line-height:1.4; margin-bottom:8px;">
+                    완벽한 센싱: φ를 오류 없이 정확하게 측정한다고 가정합니다.
+                </div>
+            </div>
+
+            <!-- V9: 모델 불확실성 -->
+            <div class="panel-section panel-section-mismatch">
+                <h3>🔧 모델 불확실성 (Plant ≠ Model)</h3>
+                <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-bottom:8px; line-height:1.4;">
+                    플랜트(실제) 파라미터를 공칭(설계) 값에서 편차 적용.<br>
+                    제어기/옵저버는 공칭값을 그대로 사용합니다.
+                </div>
+                <div class="slider-group mismatch-slider">
+                    <div class="slider-label"><span>m₁ 편차 (하체 질량)</span><span class="slider-val" id="val-mismatch-m1" style="color:rgba(255,255,255,0.5);">+0%</span></div>
+                    <input type="range" id="slider-mismatch-m1" min="-30" max="30" step="1" value="0">
+                </div>
+                <div class="slider-group mismatch-slider">
+                    <div class="slider-label"><span>m₂ 편차 (상체 질량)</span><span class="slider-val" id="val-mismatch-m2" style="color:rgba(255,255,255,0.5);">+0%</span></div>
+                    <input type="range" id="slider-mismatch-m2" min="-30" max="30" step="1" value="0">
+                </div>
+                <div class="slider-group mismatch-slider">
+                    <div class="slider-label"><span>L₁ 편차 (하체 길이)</span><span class="slider-val" id="val-mismatch-L1" style="color:rgba(255,255,255,0.5);">+0%</span></div>
+                    <input type="range" id="slider-mismatch-L1" min="-30" max="30" step="1" value="0">
+                </div>
+                <div class="slider-group mismatch-slider">
+                    <div class="slider-label"><span>L₂ 편차 (상체 길이)</span><span class="slider-val" id="val-mismatch-L2" style="color:rgba(255,255,255,0.5);">+0%</span></div>
+                    <input type="range" id="slider-mismatch-L2" min="-30" max="30" step="1" value="0">
+                </div>
+                <div class="slider-group mismatch-slider">
+                    <div class="slider-label"><span>R 편차 (원호 반경)</span><span class="slider-val" id="val-mismatch-R" style="color:rgba(255,255,255,0.5);">+0%</span></div>
+                    <input type="range" id="slider-mismatch-R" min="-30" max="30" step="1" value="0">
+                </div>
+            </div>
+
+            <!-- V9: 센서 노이즈 -->
+            <div class="panel-section panel-section-noise">
+                <h3>📡 센서 노이즈 (IMU)</h3>
+                <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-bottom:8px; line-height:1.4;">
+                    α/θ 측정 → 가우시안 백색 노이즈<br>
+                    α̇/θ̇ 측정 → 백색 노이즈 + 자이로 바이어스 드리프트
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>각도 노이즈 σ (°)</span><span class="slider-val" id="val-angleNoise">0.00°</span></div>
+                    <input type="range" id="slider-angleNoise" min="0" max="2.0" step="0.05" value="0">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>각속도 노이즈 σ (rad/s)</span><span class="slider-val" id="val-gyroNoise">0.000</span></div>
+                    <input type="range" id="slider-gyroNoise" min="0" max="0.2" step="0.005" value="0">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>자이로 바이어스 (rad/s²)</span><span class="slider-val" id="val-biasDrift">0.00</span></div>
+                    <input type="range" id="slider-biasDrift" min="0" max="1.0" step="0.05" value="0">
+                </div>
+                <div style="margin-top:4px; font-size:10px; color:rgba(255,255,255,0.3); line-height:1.4;">
+                    ideal 모드에서는 노이즈가 적용되지 않습니다.
+                </div>
+            </div>
+
+            <!-- 3D 파라미터 -->
+            <div class="panel-section panel-section-3d">
+                <h3>🎯 3D 파라미터</h3>
+                <div class="slider-group">
+                    <div class="slider-label"><span>기둥 간 거리 L<sub>pole</sub> (m)</span><span class="slider-val"
+                            id="val-L_pole">4.0</span></div>
+                    <input type="range" id="slider-L_pole" min="2.0" max="8.0" step="0.5" value="4.0">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>줄 전체 길이 L<sub>0</sub> (m)</span><span class="slider-val"
+                            id="val-L0">5.0</span></div>
+                    <input type="range" id="slider-L0" min="3.0" max="10.0" step="0.5" value="5.0">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>몸체 깊이 (m)</span><span class="slider-val"
+                            id="val-bodyDepth">0.25</span></div>
+                    <input type="range" id="slider-bodyDepth" min="0.10" max="0.50" step="0.05" value="0.25">
+                </div>
+                <div class="slider-group" style="align-items:center; flex-direction:row; padding: 4px 10px;">
+                    <input type="checkbox" id="check-showArc" checked style="margin:0 8px 0 0; cursor:pointer;">
+                    <label for="check-showArc" style="font-size:12px; cursor:pointer;">원호 궤적 표시</label>
+                </div>
+                <div class="slider-group" style="align-items:center; flex-direction:row; padding: 4px 10px;">
+                    <input type="checkbox" id="check-showPoles" style="margin:0 8px 0 0; cursor:pointer;">
+                    <label for="check-showPoles" style="font-size:12px; cursor:pointer;">지지 기둥 표시</label>
+                </div>
+            </div>
+
+            <!-- 물리 파라미터 -->
+            <div class="panel-section">
+                <h3>물리 파라미터 (공칭값)</h3>
+                <div class="slider-group">
+                    <div class="slider-label"><span>원호 반경 R (m)</span><span class="slider-val"
+                            id="val-R">1.5</span></div>
+                    <input type="range" id="slider-R">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>하체 질량 m₁ (kg)</span><span class="slider-val"
+                            id="val-m1">30</span></div>
+                    <input type="range" id="slider-m1">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>상체 질량 m₂ (kg)</span><span class="slider-val"
+                            id="val-m2">40</span></div>
+                    <input type="range" id="slider-m2">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>하체 길이 L₁ (m)</span><span class="slider-val"
+                            id="val-L1">0.85</span></div>
+                    <input type="range" id="slider-L1">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>상체 길이 L₂ (m)</span><span class="slider-val"
+                            id="val-L2">0.80</span></div>
+                    <input type="range" id="slider-L2">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>원호 감쇠 b<sub>φ</sub></span><span class="slider-val"
+                            id="val-b_phi">2.0</span></div>
+                    <input type="range" id="slider-b_phi">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>하체 감쇠 b<sub>α</sub></span><span class="slider-val"
+                            id="val-b_alpha">1.0</span></div>
+                    <input type="range" id="slider-b_alpha">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>상체 감쇠 b<sub>θ</sub></span><span class="slider-val"
+                            id="val-b_theta">0.5</span></div>
+                    <input type="range" id="slider-b_theta">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>초기 하체 기울기 α₀</span><span class="slider-val"
+                            id="val-alpha0">0.00</span></div>
+                    <input type="range" id="slider-alpha0">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label"><span>초기 상체 기울기 θ₀</span><span class="slider-val"
+                            id="val-theta0">0.15</span></div>
+                    <input type="range" id="slider-theta0">
+                </div>
+            </div>
+
+            <!-- 범례 -->
+            <div class="panel-section">
+                <h3>범례</h3>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#3a86ff"></div><span>원호 트랙</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#ff006e"></div><span>발 (줄 접촉점)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#06d6a0"></div><span>하체 직육면체 (α 자유)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#8338ec"></div><span>상체 직육면체 (θ 자유)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#ffbe0b"></div><span>힙 관절 (LQR 토크 τ)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#ffcc00"></div><span>V자 슬랙라인 줄</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#888888"></div><span>지지 기둥</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:#ff006e"></div><span>전체 CoM</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // OrbitControls inline
+        THREE.OrbitControls = (function () {
+            function OrbitControls(camera, domElement) {
+                this.camera = camera;
+                this.domElement = domElement;
+                this.target = new THREE.Vector3();
+                this.enableDamping = false;
+                this.dampingFactor = 0.05;
+                this.minDistance = 0;
+                this.maxDistance = Infinity;
+                this.rotateSpeed = 1.0;
+                this.zoomSpeed = 1.0;
+                this.panSpeed = 1.0;
+
+                var scope = this;
+                var spherical = new THREE.Spherical();
+                var sphericalDelta = new THREE.Spherical();
+                var panOffset = new THREE.Vector3();
+                var scale = 1;
+
+                var rotateStart = new THREE.Vector2();
+                var panStart = new THREE.Vector2();
+                var state = -1;
+
+                function getZoomScale() { return Math.pow(0.95, scope.zoomSpeed); }
+                function rotateLeft(angle) { sphericalDelta.theta -= angle; }
+                function rotateUp(angle) { sphericalDelta.phi -= angle; }
+                function panLeft(distance, objectMatrix) {
+                    var v = new THREE.Vector3();
+                    v.setFromMatrixColumn(objectMatrix, 0);
+                    v.multiplyScalar(-distance);
+                    panOffset.add(v);
+                }
+                function panUp(distance, objectMatrix) {
+                    var v = new THREE.Vector3();
+                    v.setFromMatrixColumn(objectMatrix, 1);
+                    v.multiplyScalar(distance);
+                    panOffset.add(v);
+                }
+                function pan(deltaX, deltaY) {
+                    var element = scope.domElement;
+                    var position = scope.camera.position;
+                    var offset = position.clone().sub(scope.target);
+                    var targetDistance = offset.length();
+                    targetDistance *= Math.tan((scope.camera.fov / 2) * Math.PI / 180);
+                    panLeft(2 * deltaX * targetDistance / element.clientHeight, scope.camera.matrix);
+                    panUp(2 * deltaY * targetDistance / element.clientHeight, scope.camera.matrix);
+                }
+
+                this.update = function () {
+                    var offset = new THREE.Vector3();
+                    var quat = new THREE.Quaternion().setFromUnitVectors(camera.up, new THREE.Vector3(0, 1, 0));
+                    var quatInverse = quat.clone().invert();
+                    var position = scope.camera.position;
+                    offset.copy(position).sub(scope.target);
+                    offset.applyQuaternion(quat);
+                    spherical.setFromVector3(offset);
+                    spherical.theta += sphericalDelta.theta;
+                    spherical.phi += sphericalDelta.phi;
+                    spherical.phi = Math.max(0.05, Math.min(Math.PI - 0.05, spherical.phi));
+                    spherical.radius *= scale;
+                    spherical.radius = Math.max(scope.minDistance, Math.min(scope.maxDistance, spherical.radius));
+                    scope.target.add(panOffset);
+                    offset.setFromSpherical(spherical);
+                    offset.applyQuaternion(quatInverse);
+                    position.copy(scope.target).add(offset);
+                    scope.camera.lookAt(scope.target);
+                    if (scope.enableDamping) {
+                        sphericalDelta.theta *= (1 - scope.dampingFactor);
+                        sphericalDelta.phi *= (1 - scope.dampingFactor);
+                    } else {
+                        sphericalDelta.set(0, 0, 0);
+                    }
+                    panOffset.set(0, 0, 0);
+                    scale = 1;
+                };
+
+                function onMouseDown(event) {
+                    event.preventDefault();
+                    if (event.button === 0) { state = 0; rotateStart.set(event.clientX, event.clientY); }
+                    else if (event.button === 2) { state = 2; panStart.set(event.clientX, event.clientY); }
+                    document.addEventListener('mousemove', onMouseMove, false);
+                    document.addEventListener('mouseup', onMouseUp, false);
+                }
+                function onMouseMove(event) {
+                    event.preventDefault();
+                    if (state === 0) {
+                        var dx = event.clientX - rotateStart.x;
+                        var dy = event.clientY - rotateStart.y;
+                        rotateLeft(2 * Math.PI * dx / domElement.clientHeight * scope.rotateSpeed);
+                        rotateUp(2 * Math.PI * dy / domElement.clientHeight * scope.rotateSpeed);
+                        rotateStart.set(event.clientX, event.clientY);
+                    } else if (state === 2) {
+                        var dx = event.clientX - panStart.x;
+                        var dy = event.clientY - panStart.y;
+                        pan(dx, dy);
+                        panStart.set(event.clientX, event.clientY);
+                    }
+                    scope.update();
+                }
+                function onMouseUp() {
+                    state = -1;
+                    document.removeEventListener('mousemove', onMouseMove, false);
+                    document.removeEventListener('mouseup', onMouseUp, false);
+                }
+                function onWheel(event) {
+                    event.preventDefault();
+                    if (event.deltaY < 0) scale /= getZoomScale();
+                    else if (event.deltaY > 0) scale *= getZoomScale();
+                    scope.update();
+                }
+                function onContextMenu(event) { event.preventDefault(); }
+
+                domElement.addEventListener('mousedown', onMouseDown, false);
+                domElement.addEventListener('wheel', onWheel, { passive: false });
+                domElement.addEventListener('contextmenu', onContextMenu, false);
+
+                // Touch events
+                var touchStart = new THREE.Vector2();
+                var touchStartDistance = 0;
+                function onTouchStart(event) {
+                    if (event.touches.length === 1) {
+                        state = 0;
+                        rotateStart.set(event.touches[0].pageX, event.touches[0].pageY);
+                    } else if (event.touches.length === 2) {
+                        state = 1;
+                        var dx = event.touches[0].pageX - event.touches[1].pageX;
+                        var dy = event.touches[0].pageY - event.touches[1].pageY;
+                        touchStartDistance = Math.sqrt(dx * dx + dy * dy);
+                    }
+                }
+                function onTouchMove(event) {
+                    event.preventDefault();
+                    if (event.touches.length === 1 && state === 0) {
+                        var dx = event.touches[0].pageX - rotateStart.x;
+                        var dy = event.touches[0].pageY - rotateStart.y;
+                        rotateLeft(2 * Math.PI * dx / domElement.clientHeight * scope.rotateSpeed);
+                        rotateUp(2 * Math.PI * dy / domElement.clientHeight * scope.rotateSpeed);
+                        rotateStart.set(event.touches[0].pageX, event.touches[0].pageY);
+                    } else if (event.touches.length === 2 && state === 1) {
+                        var dx = event.touches[0].pageX - event.touches[1].pageX;
+                        var dy = event.touches[0].pageY - event.touches[1].pageY;
+                        var distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance > touchStartDistance) scale /= getZoomScale();
+                        else if (distance < touchStartDistance) scale *= getZoomScale();
+                        touchStartDistance = distance;
+                    }
+                    scope.update();
+                }
+                function onTouchEnd() { state = -1; }
+                domElement.addEventListener('touchstart', onTouchStart, { passive: false });
+                domElement.addEventListener('touchmove', onTouchMove, { passive: false });
+                domElement.addEventListener('touchend', onTouchEnd, false);
+
+                this.update();
+            }
+            return OrbitControls;
+        })();
+    </script>
+
+    <!-- Physics & Control (v15) -->
+    <script src="src/physics/params.js"></script>
+    <script src="src/physics/model.js"></script>
+    <script src="src/physics/params_v9.js"></script>
+    <script src="src/physics/noise.js"></script>
+    <script src="src/control/fwe_controller.js"></script>
+
+    <!-- V9 3D Renderer & Graph -->
+    <script src="src/render/renderer3d.js"></script>
+    <script src="src/render/graph2d.js"></script>
+    <script src="src/main.js"></script>
+</body>
+
+</html>
