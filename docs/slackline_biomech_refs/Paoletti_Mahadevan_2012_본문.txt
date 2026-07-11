@@ -1,0 +1,1497 @@
+[출처] Paoletti & Mahadevan 2012, J. R. Soc. Interface 9(74):2097
+[원문 PDF] https://softmath.seas.harvard.edu/wp-content/uploads/2019/10/2012-08.pdf
+
+https://softmath.seas.harvard.edu/wp-content/uploads/2019/10/2012-08.pdf
+→ https://softmath.seas.harvard.edu/wp-content/uploads/2019/10/2012-08.pdf
+Content-Type: application/pdf
+
+J. R. Soc. Interface 2012 9, doi: 10.1098/rsif.2012.0077 first published online 18 April 2012
+P. Paoletti and L. Mahadevan
+Balancing on tightropes and slacklines
+References
+http://rsif.royalsocietypublishing.org/content/9/74/2097.full.html#related-urls
+Article cited in:
+http://rsif.royalsocietypublishing.org/content/9/74/2097.full.html#ref-list-1
+This article cites 26 articles, 10 of which can be accessed free
+Subject collections
+ biocomplexity (48 articles)
+Articles on similar topics can be found in the following collections
+Email alerting service right-hand corner of the article or click here
+Receive free email alerts when new articles cite this article - sign up in the box at the top
+To subscribe to J. R. Soc. Interface go to: http://rsif.royalsocietypublishing.org/subscriptions
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013
+Balancing on tightropes and slacklines
+P. Paoletti1 and L. Mahadevan1,2,3,*
+1
+School of Engineering and Applied Sciences, 2Department of Organismic and
+Evolutionary Biology, and 3
+Wyss Institute for Bioinspired Engineering, Harvard University,
+Cambridge, MA 02138, USA
+Balancing on a tightrope or a slackline is an example of a neuromechanical task where the
+whole body both drives and responds to the dynamics of the external environment, often
+on multiple timescales. Motivated by a range of neurophysiological observations, here we formulate a minimal model for this system and use optimal control theory to design a strategy
+for maintaining an upright position. Our analysis of the open and closed-loop dynamics shows
+the existence of an optimal rope sag where balancing requires minimal effort, consistent with
+qualitative observations and suggestive of strategies for optimizing balancing performance
+while standing and walking. Our consideration of the effects of nonlinearities, potential parameter coupling and delays on the overall performance shows that although these factors
+change the results quantitatively, the existence of an optimal strategy persists.
+Keywords: balance; tightrope; slackline
+1. INTRODUCTION
+Postural balance in humans requires active control
+because the normal upright position is mechanically
+unstable. Indeed, a stable upright stance can only be
+achieved by exploiting a feedback mechanism that
+creates a corrective torque based on multiple sensory
+inputs associated with body swaying [1]. In addition
+to its intrinsic neuromechanical importance, understanding the mechanisms involved with balance may
+help in the design of biped robots [2], in the diagnosis
+and amelioration of motor control problems in a range
+of neurological ailments [3,4], as well as in analysing
+games, such as stick-balancing [5] and even possibly
+in the active stabilization of large structures, such
+as buildings [6].
+Most studies on postural balance are restricted to
+static or externally controlled platforms [7] where the
+active feedback between body motion and the dynamics
+of the environment is limited. Here, we consider the
+neuromechanical task of balancing on a soft dynamic
+support since this couples the internal dynamics of
+the body to the external dynamics induced by the
+body in a relatively simple setting, and thus begs the
+question of how the body can sense and then optimize
+its response to a dynamic environment. In addition,
+by considering the separate timescales associated
+with the response of the body and the controllable
+environment, we can begin to potentially probe the
+sensory-motor dynamics of the body as a function of
+age, size, health, etc.
+A variety of models have been proposed to describe
+the dynamics of body sway motion during balancing
+on a fixed or moving platform [8,9]. Most of them
+reduce to the dynamics of a single degree-of-freedom
+system where the body is represented as an inverted
+pendulum; this simplification allows researchers to
+easily analyse the dynamics and control issues that
+arise for obtaining insight into postural balance strategies
+implemented by neural controllers [1,9–12]. An important aspect in all these studies requires the estimation
+of the body’s current spatial orientation, which is clearly
+important to generate the necessary corrective action for
+stabilizing the mechanically unstable upright stance. In
+humans, this information about actual deviations from
+the upright position involves several proprioceptive,
+visual and vestibular sensory systems [13] and the
+relative importance of these mechanisms has led to a proposal of sensory channel reweighting accordingly to the
+strengths of different perturbative stimuli [7,13]. Thus,
+vestibular feedback sensors are thought to be more relevant on moving platforms, whereas proprioceptive and
+visual systems are the primary feedback sensors during
+quiet standing [13]. Furthermore, the presence of delay
+in the feedback loop has a non-negligible impact on the
+overall performance [8,14].
+When balancing on a rope rather than on a rigid
+substrate, the neuromechanical dynamics of the body
+is coupled with the external dynamics of the rope
+which itself moves in response to body swaying. To
+address how balance might be achieved in this system,
+we need to understand the passive coupled dynamics of the system, sensory modalities that allow the
+body to infer its orientation and activate motor
+coordination to maintain or regain balance.
+In §2, we present a minimal mechanical model for the
+body – rope system along with a plausible sensory motor
+feedback control unit based on the vestibular system
+that may be used to maintain the equilibrium position.
+In §3, we analyse the linearized dynamics of our model
+and derive an optimal feedback controller for posture
+*Author for correspondence (lm@seas.harvard.edu). control in the presence of limited information about
+J. R. Soc. Interface (2012) 9, 2097–2108
+doi:10.1098/rsif.2012.0077
+Published online 18 April 2012
+Received 31 January 2012
+Accepted 23 March 2012 2097 This journal is q 2012 The Royal Society
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013
+the state space. The performance of this control law
+is tested in §4 on the full nonlinear model. Finally, in
+§5, we conclude with a discussion of the sensitivity of
+our model to additional effects such as the coupling
+between parameters, the effects of delay and outline
+some future directions of study.
+2. MATHEMATICAL MODEL
+2.1. Mechanics
+A schematic of a man on a high wire is shown in
+figure 1. To develop a minimal model of the system
+that allows for analysis, we make several simplifying
+assumptions. Firstly, although the number of degrees
+of freedom of a human body is large, it is only the
+slow modes associated with the long limbs that are typically relevant since they are relatively easy to actuate
+for the purposes of balance. Here, we consider a model
+with only one degree of freedom associated with the
+orientation of the body, modelled as a simple inverted
+pendulum. Similarly, we model the rope as a (possibly)
+tensioned string that is deformed by the body, envisaging two extreme limits: large tension that is typical
+of tightropes, and small tension typical of slacklines.
+In both cases, we neglect the additional rope tension
+caused by the body sway motion since it is negligible
+relative to the static tension caused by either the pretension or the body weight [15]. Within this setting,
+the presence of the rope thus does no more than introduce a kinematic constraint on the motion of the cart,
+forcing this latter to move on a circular track associated
+with the swinging of the rope at constant extension, an
+excellent approximation for slacklines. The limit of very
+large pretension, i.e. small sag, however is not so trivial
+as there are three possible scenarios. In the simplest setting, but also probably the least realistic, we assume
+that the presence of the rope can be still assimilated
+via a kinematic constraint on the cart motion. This
+does not have to be true always—in particular, if one
+tries to recover the case of a pendulum on a fixed base,
+the ratio between the pendulum and cart inertia must
+vanish as R ! 0 to make sure the cart is not moving;
+this second situation is analysed in §5.1. Finally, elastic
+ropes with large pretension can still admit oscillations
+in orthogonal directions, but the horizontal and vertical
+motions become uncoupled. In this case, the rope introduces a dynamic, rather than a kinematic constraint on
+the motion of the cart and in §5.2, we introduce a third
+model for describing this situation.
+Thus, our minimal dynamical system is an inverted
+pendulum (the body) placed on a cart (the rope) that
+moves on a circular track of radius R characterizing
+the envelope of transverse motions of the rope, shown
+in figure 1b. We note that R varies from zero near the
+rope supports to a maximum value when the man is
+at midspan, i.e. R is a parameter that identifies the position of the body along the rope. The inverted
+pendulum is assumed to have length l and a concentrated mass m on top, and its deviation from the
+radial direction is the angle a [8,16]. The cart is
+assumed to have mass M, with an angular position
+along the track given by the angle f. We will initially
+consider R and M þ m as independent parameters by
+assuming, for example, that the rope pretension, and
+thus the sag, can be set at will, but will relax it eventually and in §5, we discuss the effects of a possible
+linear dependence between them induced by the
+elasticity of the rope.
+The position of the cart (rope) relative to a fixed origin
+centred at O in figure 1b is ðxM ; yM Þ ¼ Rsinf;
+ðRð1  cosfÞÞ, while the position of the pendulum bob
+(body) is ðxm; ymÞ¼ðxM  lsinða þ fÞ; yM þ lcos
+ða þ fÞÞ, so that the Lagrangian of the system then reads
+L ¼ 1
+2
+ðM þ mÞR2 _
+f2 mRlcosaða_ þf_Þf_ þ
+þ
+1
+2
+ml2
+ða_ þf_Þ
+2  ðM þ mÞgRð1  cosfÞ
+ mglcosða þ fÞ;
+ð2:1Þ
+where the first three terms represent the kinetic energy
+and the last two terms the gravitational potential energy.
+(a)
+(b)
+–5 0 5
+–5
+0
+5
+Im (
+l)
+Re (l)
+xO
+y
+R m
+l M
+a
+f
+l2 l1
+l4
+l3
+(c)
+P
+P
+Figure 1. (a) Schematic of a man balancing on a rope and (b)
+associated mechanical model describing the transverse motion
+on the plane P. The linearized equations of motion for
+this system are reported in (3.1) and (3.2). (c) Spectrum of
+the linearized system defined in (3.1) and (3.2) as a function of R (top). The circular markers correspond to
+R ¼ 0; 0:5; 1; 1:5; 2; 3. The markers for the imaginary eigenvalues for R ¼ 0 is missing because jl3j¼jl4j ! 1 as R !
+0. (Online version in colour.)
+2098 Balancing on tightropes and slacklines P. Paoletti and L. Mahadevan
+J. R. Soc. Interface (2012)
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013
+Maintaining balance implies staying in a restricted
+region around the upright position corresponding to
+f ¼ 0, a ¼ 0 so that we start with a focus on a linearized model of the dynamics (although we will later
+consider the complete dynamics). This linearized
+model around the unstable equilibrium with at most
+quadratic terms in the Lagrangian (2.1) then reads
+L~ ¼ 1
+2
+ðM þ mÞR2
+f_
+2
+mRlðf_
+2
+þa_ f_Þ þ mRla2
+þ
+1
+2
+ml2
+ða_ þ f_Þ
+2  ðM þ mÞgRf2
+ mgl½1  ða þ fÞ
+2
+:
+ð2:2Þ
+The equations of motion for the system are then
+given by
+d
+dt
+@L~
+@q˙  @L~@q ¼ Fq
+; ð2:3Þ
+where Fq ¼ ðFf ; Fa Þ represents the generalized force
+acting in the direction of the generalized coordinate q.
+Humans use their arms or a pole to maintain balance,
+this corresponds to a torque Fa on the inverted pendulum. Moreover, as the angle of the cart is not controlled,
+we have Ff ; 0. We have ignored the role of dissipation
+and damping in our model given its equivalence to the
+action of the torque Fa. It is convenient to express
+the dynamics in dimensionless form by defining
+R ¼ R=l, m ¼ m=M, t
+¼ ffiffiffiffiffiffi
+g=l p t, Fa ¼ Fa =mgl. Here,
+the scaled sag parameter R determines if one is in the
+tightrope or slackline limit, while the scaled body mass
+m is initially considered constant. Later, we assume
+that the cart mass is the sum of the mass of the feet
+(about 2% of the body mass [16]) and that of
+the rope; we initially set m ≃ 30, but the overall
+behaviour of the system is relatively insensitive to the
+exact value of this parameter, as discussed in §5.1.
+For notational simplification, from now on we will
+always refer to dimensionless quantities without using
+the overbars.
+2.2. Neurobiology
+To complement the physical model with the neurobiological controller requires the specification of a suitable
+sensory cue that can be implemented via a physiological
+system and a concomitant control action implemented
+via an internal torque.
+Complete knowledge of the full state of the system
+requires separate measurements of f, f_, a and a_ ,
+which is both unreasonable and unlikely. The three
+main sources of orientation measurements in humans
+are proprioceptive, visual and vestibular systems [13].
+Precise information about absolute orientation with
+respect to the environment can be obtained by the
+visual system, but this introduces delays of the order
+of 100– 200 ms [13], and are thus unlikely to be useful
+here given the fast timescales induced by the movable
+support, as we will see later. Proprioceptive sensors can
+measure the relative position and orientation between
+two joints of the body, but during balancing this
+information is inaccurate owing to the lack of a fixed
+reference for the cart (feet). However, fast and reliable
+measurements of body rotational and translational
+velocities are provided by the vestibular system located
+in the inner ear. The relative importance of these three
+sources varies accordingly to the motor task [13].
+Experimental studies on quiet standing atop a
+sway-referenced platforms, i.e. the closest existing
+experimental set-up to our problem we are aware of,
+show that proprioceptive information quality is
+degraded and that the vestibular system starts to play
+a prominent role [2,7]. Since velocity measurements
+are more reliable than position and acceleration [17],
+we will assume that only the measurement of absolute
+angular velocity f_ þ a_ is available for feedback control.
+This is motivated by the fact that vestibular system velocity estimate is the most accurate among available
+body sway measures and as we will prove, this limited
+information is enough to correctly estimate the full
+state of the system. This is also a very conservative
+model since it corresponds to the worst case scenario
+where we completely neglect visual, proprioceptive
+and absolute inclination measurements. However, it is
+worth noting that our results are robust to different
+choices of sensory input; for example, the same qualitative behaviour is observed if we assume that a_ and f_ are
+measured separately by the proprioceptive system, or
+even in the ideal case when the whole state can be
+measured. For the control action, we assume that
+balancing around the upright position is achievable
+using the torque Fa [8] that is assumed to be bounded,
+i.e. jFa ðtÞj  Fa
+max (see appendix C for a simple
+derivation of an upper bound on the scaled torque
+Fa max ≃ 0:3). Once again, our results are quite insensitive to the particular choice of Fmax; we can vary this
+quantity by a factor of 10 (for example, by considering
+potential torso and leg movements) without affecting
+the overall qualitative behaviour of the system.
+For control strategies, we have a choice of continuous or discontinuous control strategies. The latter
+has been proposed for stabilization of quiet upright
+stance [18–21], based on the assumption that small
+deviations from upright position are not detected by
+the control unit and that active corrective torques are
+generated only when the position [19] or the velocity
+[20] exceeds a given threshold, i.e. when jaðtÞj . acr or
+ja_ j . a_ cr. In the case under study, the coupling with the
+rope dynamics amplifies the sway dynamics and therefore the time spent inside the uncontrolled region
+jaðtÞj  acr, ja_ðtÞj  a_ cr is small, so that a continuous
+strategy might be practically equivalent to an intermittent control. Intermittent control strategies have also
+been proposed to cope with the intrinsic delay that is
+present in the feedback loop during quiet standing,
+exploiting the intrinsic stable manifold of the pendulum
+dynamics to passively drive the system towards the
+equilibrium [22]. Although such an approach can
+explain several experimental observations about quiet
+standing, its relevance for the problem at hand is not
+obvious. In fact, replacing the fixed base with a rope
+couples the dynamics of the rope to that of the
+human on it, so that the argument used for designing
+switching regions is invalid because the state space
+has now four-dimensional instead of two-dimensional.
+Balancing on tightropes and slacklines P. Paoletti and L. Mahadevan 2099
+J. R. Soc. Interface (2012)
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013
+Moreover, since the maximum admissible delay in our
+system is of the order of 40 – 70 ms (see §5.3), and
+thus shorter than the typical 100 – 200 ms, the performance gap between intermittent and continuous
+strategies is minimal, and therefore we focus here only
+on continuous feedback control.
+3. ANALYSIS AND CONTROL
+Before we discuss the controller, we first discuss the linearized dynamics of the system about the upright
+position.
+3.1. Linearized dynamic analysis
+The state of the system can be represented as
+x ¼ ðf;f_; a; a_Þ with the input torque u ¼ Fa.
+Then the linearized non-dimensional dynamics (see
+appendix A for the full nonlinear dynamics) is given by
+x˙ðtÞ ¼ AxðtÞ þ BuðtÞ; ð3:1Þ
+and
+A¼
+01 0 0
+1=R 0 m=R 0
+00 0 1
+1=R 0 1 þ m  m=R 0
+2
+6
+6
+4
+3
+7
+7
+5
+B ¼
+0
+mðR  1ÞR2
+0
+1 þ m þ mð1  2RÞR2
+2
+6
+6
+4
+3
+7
+7
+5:
+9
+>>>>>>>>>>=
+>>>>>>>>>>;
+ð3:2Þ
+The linear stability of the upright position is completely
+characterized by the spectrum of the matrix A and is
+shown in figure 1c as a function of R (see also
+appendix B). We note that as R increases the magnitude of the real eigenvalues also increases, so that the
+system instability becomes severe, making control
+more difficult for large R. However, simultaneously,
+the imaginary eigenvalues move towards the origin, so
+that the natural frequencies of the system decrease
+and make control easier due to the absence of high frequencies in the system response. On the other hand, as
+R decreases, the system instability becomes less severe
+but the presence of high-frequency oscillations makes
+the model less likely to be accurate, because the
+dynamics of the rope can no longer be neglected and
+the control task becomes harder because the controller
+has to damp out such fast oscillations. The competition
+between these two effects suggests the existence of an
+optimum sag R, and thus a location along the tightrope/slackline where it is easiest to balance for a given
+mass ratio m.
+In any case, for all R, the presence of one unstable
+mode requires the presence of a controller to stabilize
+the upright position. To ensure the existence of a feedback controller capable of such a task requires that the
+system is controllable, i.e. that there exists an input Fa
+capable of steering the system to the desired position. In
+a linear setting, this condition states that the system is
+controllable if and only if the controllability matrix
+J ¼ ½B AB ... An1
+B has full rank [23]. In our model,
+J is always full-rank so that a suitable linear controller
+always exists (appendix B). However, as R ! 0 or
+R ! þ1 the matrix has a weak rank deficiency;
+in figure 2b, the condition number k of the matrix J
+is plotted as a function of R and shows that a minimum
+occurs at R ≃ 1.
+As discussed in §2, partial measurements of the full
+state ðf;f_; a; a_Þ are provided by f_ þ a_ via the vestibular system. To check that the system is observable, i.e.
+that the reconstruction of the full state x from f_ þ a_
+is possible, we first write the measurement equation
+yðtÞ ¼ f_ðtÞ þ a_ðtÞ as
+yðtÞ ¼ CxðtÞ ð3:3Þ
+with C ¼ [0, 1, 0, 1]. In the linear setting, observability
+reduces to testing that the associated observability
+matrix V has full rank [23], where
+V ¼
+C
+CA
+.
+.
+.
+CAn1
+2
+6
+6
+6
+4
+3
+7
+7
+7
+5: ð3:4Þ
+In our model, V has full-rank for each value of R and M
+(appendix B), but as R ! 0 and R ! þ1, V shows
+again a weak rank deficiency as reported in figure 2
+that also shows that the minimum condition number
+occurs when R ≃ 1.
+3.2. Optimal control strategy
+Given the complete controllability and observability
+properties of our linearized model, it is also possible to
+stabilize the pendulum dynamics via a feedback controller, but the control strategy is not unique. Here, we focus
+on an optimal output feedback controller that takes the
+form of an LQG (linear quadratic Gaussian) controller,
+consisting of two parts: an optimal controller (linear
+quadratic or simply LQ regulator) given full state
+measurements and an optimal observer (Kalman filter)
+to estimate the full state given partial measurements,
+with the overall control scheme shown in figure 2 (see
+appendix C for a comparison of the case with complete
+measurements and that with limited information).
+Since we want to minimize deviations from the upright
+position f ¼ a ¼ 0, we choose a performance index
+JðuÞ ¼ ðþ1
+0
+½qff2 þ qaa2 þ Fa2dt; ð3:5Þ
+where we have assumed an infinite time horizon for simplicity and we have set the weights qf ¼ qa ¼ 10 in order to
+obtain stabilization for a wide range of R1
+, while enlarging
+the basin of stabilization by limiting large variations in f
+that would bring the system out of the range where linearization is valid. We do not weight the velocities f_ and a_ so
+that we do not affect the controlled dynamics and deteriorate the performance. Recently, other authors [24] have
+analysed quiet standing using a two-link inverted
+1
+The magnitude of these weights is quite different from Qu et al. [9]
+where the authors study the balancing problem on the sagittal
+plane with the feet on a fixed platform. However, what matters in
+LQ design is the relative magnitude among the various weights and
+in this perspective our choice is quite close to the one reported in
+the study of Qu et al. [9].
+2100 Balancing on tightropes and slacklines P. Paoletti and L. Mahadevan
+J. R. Soc. Interface (2012)
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013
+pendulum model to show that balance can also be
+achieved by minimizing a linear combination of angular
+deviations and velocities of the two links instead of
+using the classical centre-of-mass displacement minimization. We argue that the presence of a swaying rope
+makes our strategy similar to that proposed in the study
+of Kiemel et al. [24] because deviations from the vertical
+are automatically reflected in rope swaying motion and
+centre-of mass displacement. Defining three matrices
+Q ¼ diagðqf; 0; qa; 0Þ, H ¼ 1, N ¼ 0, the performance
+index (3.5) can be written as
+JðuÞ ¼ ðþ1
+0
+½xTQx þ uTHu þ xTNudt: ð3:6Þ
+Given the values of Q, H and N, the control input that
+minimizes the performance index J(u) can be expressed as
+uðtÞ¼KxðtÞ; ð3:7Þ
+where the optimal feedback gain K is determined by the
+unique symmetric positive definite solution P of an
+algebraic matrix Riccati equation [25]
+K ¼ H1
+ðBTP þ NÞ ð3:8Þ
+and
+ATP þ PA  ðPB þ NÞH1
+ðPB þ NÞ
+T þ Q ¼ 0:
+ð3:9Þ
+In order to compare the influence of the system parameters
+R and m on the controller performance, we fix the cost
+(3.6) and allow the feedback gain K to change according
+to (3.8) and (3.9).2
+In the presence of noise in the sensor measurements and
+information processing, and because we only have partial
+information, the LQ regulator (3.7) is not sufficient and
+must be supplemented by an estimate xˆ of the true state
+0 1 2 3 4 5
+5000
+10 000
+absolute velocity sensor
+LQ regulator
+f(t) + a(t)
+LQG controller
+Kalman filter x(t) u(t) x(t)
+R
+0 5
+500
+1000
+(i) (ii)
+(iii) (iv)
+0 5
+0.5
+0 5
+0.5
+1.0
+R
+S
+0 5
+0.05
+0.10
+R
+U
+F a
+max
+(a)
+(b)
+(c)
+ts
+max(
+Fa)
+k (X)
+k (W)
+Figure 2. (a) Schematics of the balancing control loop. (b) Condition number k of the controllability matrix J (solid) and observability matrix V (dashed) as a function of normalized radius R. (c) Influence of the normalized radius R on time to steady state
+ts (i), maximum control torque maxðFa Þ (ii), stabilization S (iii) and energy spent for control U (iv). Data obtained by simulating
+the full nonlinear model (A 3) and (A 4) with m ¼ 30 and LQG controller based on measurement of f_ þ a_ (see §3.2). (Online
+version in colour.)
+2
+The opposite strategy, i.e. the comparison of controller performance
+with fixed feedback gain K is not viable because the feedback gain
+designed for a given value of the parameters (and thus for a given A
+and B) can be even non-stabilizing for different values of parameters.
+Balancing on tightropes and slacklines P. Paoletti and L. Mahadevan 2101
+J. R. Soc. Interface (2012)
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013
+variable x, so that the optimal control input now reads
+uðtÞ¼KxˆðtÞ: ð3:10Þ:
+To estimate xˆ given noisy and limited measurement
+yðtÞ ¼ f_ðtÞ þ a_ðtÞ, while preserving the optimality of
+the control design, we design a Kalman filter as an optimal observer that gives a minimum-variance estimate of
+the system state variables. In the presence of noise on
+the internal dynamics and in the measurement process,
+(3.1) and (3.3) read
+x˙ðtÞ ¼ AxðtÞ þ BuðtÞ þ GwðtÞ ð3:11Þ
+and
+yðtÞ ¼ CxðtÞ þ vðtÞ: ð3:12Þ
+where w(t), v(t) are stochastic variables, G is a gain
+vector linking the scalar noise w(t) to the vectorial
+state variable x˙ðtÞ, and the stochastic variables have
+zero mean and variance S and Q, respectively. Then
+the Kalman filter dynamics can be written as
+_
+x^ðtÞ ¼ AxˆðtÞ þ BuðtÞ þ LðyðtÞ  y^ðtÞÞ ð3:13Þ
+and
+y^ðtÞ ¼ CxˆðtÞ; ð3:14Þ
+where the matrix gain L is derived from the positive
+definite solution S of an algebraic Riccati equation [25]
+L ¼ SCT Q1 ð3:15Þ
+and
+AS þ SAT þGSGT  SCT Q1
+CS ¼ 0: ð3:16Þ
+We note that the Kalman filter (3.12) and (3.13) can be
+viewed as a copy of the original system (3.1) – (3.3) with
+an additional input yðtÞ  CxˆðtÞ that allows for corrections to the estimates based on actual measurements.
+In absence of noise, i.e. if S ¼ Q ¼ 0, equations (3.15)
+and (3.16) can be satisfied by taking S ¼ 0 and arbitrary
+L. However, we use a ‘virtual noise’ to allow the system
+to be controlled in a weakly nonlinear regime. We choose
+S ¼ Q ¼ 106 and G ¼ [100, 100, 10, 10]T so that the
+noise amplitude on a is in agreement with the result
+reported in the work of Boulet et al. [26] and the coefficients
+of variation of Gw(t) with respect to a(0) and f(0) read,
+respectively, 0.5 and 5. The noise in f is assumed to
+be larger than the noise in a because deviations from
+f ¼ 0 quickly invalidate the linearized model and thus
+the controller design. Finally, we note that, although we
+do not have any experimental measurement of such noise
+parameters, the qualitative behaviour of the system is
+robust to changes in these parameter values, the more sensitive being the ratio between the noise on a and the noise
+in f, and all the results presented below still hold.
+4. SIMULATIONS
+To verify the performance of our linear control design, we
+now test it on the full nonlinear model. This is required
+as the same linearized model used for controller design
+could potentially hide performance degradation due to
+large deviations from the equilibrium position that
+dramatically changes the local response of the model to
+actuation. Such large deviations are indeed the main
+cause for instability in the closed loop system, as shown
+below, but they will be correctly compensated in the linearized model, although with large controller efforts. We
+simulate the system with initial conditions að0Þ¼18,
+fð0Þ ¼ 18 and a_ð0Þ ¼ f_ð0Þ ¼ 0 until tf ¼ 1000 which
+in dimensional terms corresponds to a few minutes.
+To obtain a quantitative measure of the performance, we need to define one or more performance
+indexes. Two natural choices are the time ts needed to
+reach the steady state, defined as aðtsÞ  0:1að0Þ and
+fðtsÞ  0:1fð0Þ, and the maximum torque maxðFa Þ
+applied by the controller. To detect situations where
+stabilization is achieved by using a maximum torque
+maxðFa Þ . Fa
+max, we define an index of success S as
+S ¼
+1 maxfFa ðtÞg  Fa
+max and ts  tf
+0:5 maxfFa ðtÞg . Fa
+max and ts  tf
+0 ts . tf or system unstable;
+8
+<
+:
+ð4:1Þ
+where Fa
+max ≃ 0:3 is the upperbound on the torque estimated in appendix D. Finally, we calculate the total
+mechanical energy spent in the balancing task as
+UðR; mÞ ¼ ð1000
+0
+jFa  a_ jdt; ð4:2Þ
+where the absolute value of the mechanical power is used
+because muscles have to consume energy to perform negative work as well. The behaviour of these performance
+indices as functions of the sag R is summarized in
+figure 2c. We note that there is a range of R, centred
+around the equivalent body height, where all the performance indices show a global minimum. In this range,
+stabilization is achieved in a very short time ts ≃ 3 s, and
+the required torque is small maxðFa Þ ≃ 30 N, so that the
+required energy drops to a value as small as U ≃ 3 J. In
+the limit R ! 0, the balancing performances is severely
+degraded and the system can even become unstable. For
+large R, the system is actually stabilized by the controller,
+but the time needed for stabilization is larger than the total
+simulation time tf and therefore the performance index
+S ! 0 as R  3:2. We note that this behaviour is
+consistent with our linearized dynamic analysis in §3.1.
+5. ADDITIONAL EFFECTS: PARAMETER
+COUPLING, DELAY AND DECOUPLED
+MOTIONS
+So far, the two dimensionless variables in the model m and
+R have been assumed to be independent, and furthermore,
+we assumed that no delay was present. We now turn to
+address how balancing performance is affected by different
+choices for m, the potential dependence of the sag R on the
+mass m, as well as the singular limit R ! 0 where the horizontal and the vertical displacements of the rope become
+independent, and the presence of delay.
+5.1. Influence of mass-ratio m and normalized
+sag R
+In figure 3a,b, the behaviour of the total energy as a
+function of R and m is reported for two different
+2102 Balancing on tightropes and slacklines P. Paoletti and L. Mahadevan
+J. R. Soc. Interface (2012)
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013
+controllers used for stabilization (refer to appendix C
+for the LQ case). We note that the energy has a
+global minimum whose position and magnitude are
+quite insensitive to the value of m. These results justify
+the use of a rough estimate for m, especially as the
+qualitative results are not strongly influenced by this
+choice. We note also that smaller values of m, typical
+for example of highwiring on steel ropes, allows for
+stabilization over a wider range of the rope sag R. In
+this situation, the control task becomes easier because
+applying a stabilizing torque on the pendulum does
+not induce large oscillations of the cart, and therefore,
+the nonlinearities responsible for the failure at small
+values of R are not excited by the control action. At
+the same time, for R  1, the control torque cannot
+efficiently damp out the oscillations of the cart because
+it does not influence directly the cart dynamics, and
+therefore the time and thus the energy for stabilization
+increases, explaining why the energy for stabilization is
+not monotonic in m in the large sag limit.
+We now turn to the case of an easily stretchable rope,
+such as a bungee cord, when R and m are no longer
+independent. Assuming minimally that R ¼ gm with
+g constant, implies that the body weight characterizes
+the radius of curvature of the rope. Then, we find
+that the results of the linearized dynamic analysis in
+§3.1 remain pertinent. In fact, we still get fast oscillations (jl3j¼jl4j!þ1) as R ! 0 and fast unstable
+soft modes (jl1j¼jl2j!þ1) for R ! þ1. Similarly,
+the controllability and observability matrices show
+weak rank deficiency as R ! þ1 and R ! 0, and therefore the required control effort increases in both limits.
+Thus, we still expect the presence of an optimal sag R
+where the controller achieves best balancing performance. We also note that within this model, we can
+correctly recover the limiting case of a pendulum on a
+fixed base since m ! 0 as R ! 0, i.e. the inertia of the
+cart becomes much bigger than the pendulum inertia.
+In figure 3c,d, we plot the total control energy as a
+function of the radius R and the parameter g. Decreasing g, i.e. having larger m for a fixed radius R, forces the
+energy to increase as one can expect because it is easier
+balancing a light pendulum instead of an heavy one. We
+also note that as R ! 0 the control problem becomes
+trivial because we recover the limiting case of a pendulum on a fixed base and we control the angle a with a
+torque on a itself. The local maximum of the energy
+for small values of R arises form two competing factors:
+having small R and consequently small m makes the
+controller task easier, but at the same time the controllability and observability properties of the system
+become degenerate, and therefore, the controller
+cannot affect the dynamics efficiently. This is also the
+reason for the discrepancies between the LQ and LQG
+controllers behaviours for small R as the LQ controller
+does not suffer from the weak observability condition.
+It is worth noting that although fast oscillations are
+hard to observe and can be potentially damped out
+by viscous forces, the LQ controller still needs to compensate for them at the early stages of stabilization.
+However, owing to the reduced observability, the
+Kalman filter rate of convergence for R ! 0 becomes
+too slow and stabilization is precluded. Finally, for
+large R the degraded observability and controllability
+properties make the controller performance even worse
+than in the case of R independent by m, because the
+pendulum mass m increases as well and the system
+becomes more unstable.
+5.2. Alternative model when R1
+The presence of the rope implies a kinematic constraint
+on the cart motion by forcing it to move on a circular
+track, and is equivalent to approximating the dynamics
+of the rope in terms of its softest mode. As the pretension in the rope becomes large and concomittantly the
+relative rope sag becomes small, the simple kinematic
+assumption loses its validity for two reasons: the
+mode is no longer soft and furthermore rope motion in
+the horizontal and vertical directions become
+uncoupled. Therefore, the model shown in figure 1b
+must be replaced by that in figure 4a. Here, the rope
+acts as a linear spring that tends to push the cart
+towards the rest position and the motion of the cart is
+limited primarily to a horizontal plane.3
+0
+0.05
+0.10
+U (LQG)
+0 1 2 3 4 5
+0.05
+0.10
+R
+U (LQ)
+(c)
+(d)
+0
+0.05
+0.10
+U (LQ)
+0
+0.05
+0.10
+U (LQG)
+(a)
+(b)
+g =1
+g =0.1
+g =0.03
+m=0.1 m=1 m=30
+Figure 3. Total control energy spent for stabilization as a function of system parameters m and R. Data obtained by
+simulating the full nonlinear model (A 3) and (A 4) and
+(a) LQG controller based on measurement of f_ þ a_ (solid
+line, m ¼ 0.1; dotted line, m ¼ 1; dashed line, m ¼ 30; see
+§3.2) and (b) LQ controller with full state information
+(appendix B). For comparison, we also plot the total control
+energy spent for stabilization as a function of parameters R
+and g. Data obtained by simulating the full nonlinear model
+(A 3) and (A 4) with R ¼ gm and (c) LQG controller based
+on measurement of f_ þ a_ (solid line, g ¼ 1; dotted line,
+g ¼ 0:1; dashed line, g ¼ 0:03; see §3.2) and (d) LQ controller
+with full state information (appendix C). (Online version
+in colour.)
+3
+Here, we neglect the vertical displacement of the cart because in the
+linearized setting this quantity is neither controllable nor observable
+and therefore one has to rely only on the internal damping to
+stabilize this degree of freedom.
+Balancing on tightropes and slacklines P. Paoletti and L. Mahadevan 2103
+J. R. Soc. Interface (2012)
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013
+The equation of motion can be derived by considering as generalized coordinates qT ¼ ðxM ; aÞ
+T, thus
+defining the Lagrangian
+LT ¼ 1
+2
+ðM þ mÞ x_
+2
+M þ
+1
+2
+mðl
+2
+a_ 2 2la_ xM cosaÞ
+ 1
+2
+kx2
+M  mglcosa:
+ð5:1Þ
+Following the same procedure in §§2.1 and 3.1, we
+can write the linearized dynamics in dimensionless
+form as
+x˙ T ¼ AT xT þ BT uT ð5:2Þ
+and
+AT ¼
+01 0 0
+k 0 m 0
+00 0 1
+k 0 m þ 1 0
+2
+6
+6
+6
+4
+3
+7
+7
+7
+5
+BT ¼
+0
+m
+0
+m þ 1
+2
+6
+6
+6
+4
+3
+7
+7
+7
+5
+9
+>>>>>>>>>>>>>>=
+>>>>>>>>>>>>>>;
+ð5:3Þ
+where now xT ¼ ðxM ; x_ M ; a; a_Þ
+T and k has been normalized by Mg=l. We note that as R ! 0 for the case when
+the cart is placed on a circular track the natural frequency of the system scales as ffiffiffiffiffiffiffiffiffi
+1=R p , whereas in the
+current model the natural frequency scales as ffiffiffik
+p so
+that large values of k correspond to small sag, as
+desired. Assuming as before that only the total angular
+velocity is measured, then
+CT ¼ ½0001: ð5:4Þ
+Finally, in order to obtain a fair comparison of
+the controller performance, we chose the same weights
+Q, H and N for the LQ controller design and the
+same parameter values S, Q and G of the Kalman
+filter as in §3.2.
+In figure 4b, we report the total energy spent for
+stabilization as a function of the spring stiffness k. We
+note that the energy converges to a minimum as
+k ! 1 that corresponds to balancing on a rigid support. As the stiffness decreases, the control becomes
+more difficult because the cart displacement tends to
+be larger and thus the system can be driven out of the
+range of validity of the linearized model.
+5.3. Influence of delay
+Measurement of the body orientation show a natural
+delay due to processing time of the information by the
+nervous system. Moreover, once the measurement is
+obtained, additional delays are introduced by the
+neural feedback controller that has to calculate the correct amount of torque necessary for stabilization and by
+the motor control system due to the neural signal travelling time and muscle activation delay. A delay in the
+feedback loop can severely reduce controller performance during balancing [8]. There is no agreement on
+the magnitude of the delay t^ mainly because human
+sensors/controller tend to adapt it accordingly to different tasks and different accurate measurements available
+[13]. Common estimates from experimental data range
+from 25 ms to 200 ms depending on the experimental
+conditions, with the delay decreasing proportionally
+to the utilization of the vestibular system [9,13,16] corresponding to values of scaled delay t ¼ t^ ffiffiffiffiffiffi
+g=l p between
+0.07 and 0.63.
+In the presence of delay in the control loop, the
+dynamics reads
+x˙ðtÞ ¼ AxðtÞ þ Buðt  tÞ; ð5:5Þ
+i.e. it is represented by a delay differential equation,
+where we have lumped all the delays into a single
+term, using the linearity of our model to advantage.
+Since the magnitude of the delay is smaller than the
+typical timescale associated with the pendulum
+dynamics, i.e. t , 1, we approximate the delay variable
+uðt  tÞ with its Taylor expansion up to the second
+order [9]
+uðt  tÞ ≃ uðtÞ  tu_ðtÞ þ t2
+2
+u€ðtÞ ð5:6Þ
+thus obtaining an extended system
+x~_ðtÞ ¼ A˜ x˜ðtÞ þ B˜ u˜ðtÞ ð5:7Þ
+and
+y~ðtÞ ¼ C˜ x˜ðtÞ; ð5:8Þ
+0 0.02 0.04 0.06 0.08 0.10
+0.05
+0.10
+xM
+k
+M
+m
+k–1
+U
+(a)
+(b)
+a
+Figure 4. (a) Mechanical model for the motion on a tightrope
+with large pretension. The linearized equation of motion are
+reported in (5.2) and (5.3). (b) Total energy spent for stabilization as a function of spring stiffness k. Data obtained by
+simulating the full nonlinear model with LQG controller
+based on measurement of a_ . (Online version in colour.)
+2104 Balancing on tightropes and slacklines P. Paoletti and L. Mahadevan
+J. R. Soc. Interface (2012)
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013
+where
+x˜ ¼
+x
+u
+u_
+2
+4
+3
+5 and u~ ¼ u€; ð5:9Þ
+and
+A˜ ¼
+A B tB
+0 0 1
+0 0 0
+2
+4
+3
+5; B˜ t2=2B
+0
+1
+2
+4
+3
+5 and
+C˜ ¼ ½C 0 0:
+ð5:10Þ
+This allows us to design an LQG controller for the
+extended system that gives u~ as a function of x˜, and
+then we can integrate twice u~ to obtain the input u
+for the original system, as illustrated by the block
+diagram in figure 5a.
+However, observability analysis with A˜ and C˜ as in
+(5.10) shows that the system is no more completely
+observable, because the internal variables ðu; u_Þ do
+not directly influence the output. However, we can
+easily overcome this problem by considering
+y˜ðtÞ ¼
+a_ðtÞ þ f_ðtÞ
+uðtÞ
+u_ðtÞ
+2
+4
+3
+5 ) C˜ ¼
+C 0 0
+0 1 0
+0 0 1
+2
+4
+3
+5; ð5:11Þ
+i.e. by adding measurements of the controller internal
+variable [9]. This assumption is not restrictive since
+the controller generates these signals by itself, thus it
+even does not need to measure them.
+For the design of the extended system LQ regulator,
+we define a performance index as
+J~ðuÞ ¼ ðþ1
+0
+½10f2 þ 10a2 þ Fa2
+þ F_ a2þ 0:01 F€ a2dt; ð5:12Þ
+where we choose to add a weight on F_ a to obtain better
+performance. In fact, when delay is present it can be
+convenient to slow down the dynamics of the controlled
+system so that the delay remains small compared with
+the typical closed loop timescale and the controller
+can easily compensate for it.
+In figure 5b, we show the stability region as a
+function of the feedback delay t and the normalized
+sag R. We note that increasing the value of the delay
+makes the performance worse and can lead the system
+to instability, as expected [8,27]. Since the natural
+frequency of the system decreases as ffiffiffiffiffiffiffiffiffi1=R p as R  1,
+we expect the critical value of t to increase as
+R becomes larger. The counterintuitive behaviour
+reported in figure 5b can be explained by noticing
+that the controllability matrix condition number
+(a)
+0
+0.1
+0.2
+2
+4
+6
+8
+×105
+0
+0.1
+0.2
+0.1
+0.2
+0.3
+0.4
+R
+0 1 2 3 4 5
+0.2
+0.4
+0.6
+0.01
+0.02
+0.03
+(b)
+(c)
+(d)
+unstable
+unstable
+f(t) + a(t)
+t
+t
+t
+ü(t) u(t) u(t– t) x(t)
+absolute velocity sensor
+LQ regulator delay
+Kalman filter LQG controller
+x(t)
+Figure 5. (a) LQG control system structure in presence of feedback delay t. (b) Stability region and (c) controllability matrix
+condition number as a function of R and t. Data obtained by simulating the full nonlinear model (A 3) and (A 4) with m ¼
+30 and LQG controller based on measurement off_ þ a_ . The white region corresponds to unstable dynamics, whereas the grey
+levels in the stability region code for the total amount of energy U spent for stabilizing the system. (d) Stability region as a
+function of R and R ¼ gm with g ¼ 1 as in §5.1.
+Balancing on tightropes and slacklines P. Paoletti and L. Mahadevan 2105
+J. R. Soc. Interface (2012)
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013
+increases as t increases as shown in figure 5c, thus this
+fact makes the control task actually harder. The same
+plot shows that for each value of t the condition
+number reaches its minimum in a neighbourhood of
+R ¼ 1 and therefore the critical value of t reaches its
+maximum in that region. Finally, in figure 5d, we
+show the region of stability as a function of the feedback
+delay when the sag R is proportional to the mass m
+as in §5.1. We note that in this case, the stable region
+becomes larger and, in particular, it encloses the
+origin because as R ! 0 and t ! 0 the problem reduces
+to the trivial stabilization of an inverted pendulum on a
+fixed base. However, for every value of the sag R there
+still exists a critical delay above which stabilization
+cannot be achieved.
+5.4. Conclusions
+A minimal mechanical model for the combined system
+of a human on a wire—an inverted pendulum mounted
+on a cart that is moving on a circular track—allows us
+to pose the problem of postural balancing on a tightrope
+or a slackline as an optimal control problem. We show
+that the measurement of the absolute angular position
+alone is enough to generate a feedback corrective
+torque that stabilizes the upright position. Our analysis
+also shows that there exists an optimal range of the rope
+sag where the balancing task is accomplished with
+minimal energy effort, in agreement with empirical
+experimental evidence [28].
+More generally, tightrope walking and slacklining
+are just two examples of situations where the coupling
+of (active) internal body dynamics to (passive) external
+substrate dynamics both constrains and poses challenges
+for the neurophysiological performance of motor systems.
+Recent experimental studies have shown that postural
+sway analysis can be used to quantify changes in body
+or neural control due to pathologies [3], traumas [4] or
+ageing [29]. Complementing such data with mathematical models like the one we have proposed can help to
+devise tests with better discrimination while possibly
+uncovering the reason for performance degradation
+with age.
+We thank M. Venkadesan for fruitful discussions.
+APPENDIX A. FULL NONLINEAR MODEL
+The Euler–Lagrange equations (2.3) for f and a read,
+respectively,
+ðml2  mlRcosaÞa€ þ 2mRlsinaa_ f_
+þ ððM þ mÞR2  2mlRcosa þ ml2Þf€ þ mRlsina a_ 2
+ mglsinða þ fÞ þ MgRsinf ¼ Ff
+ðA 1Þ
+and
+ml2
+a€ þ ðml2  mlRcosaÞf€  mlRsinaf_ 2
+ mglsinða þ fÞ ¼ Fa : ðA 2Þ
+By normalizing the variables as described in §2.1, we
+can write the full nonlinear equations of motions as
+f€ ¼  msina
+D a_ 2 þ
+msinaðRcosa  1Þ
+D f_ 2
+2
+msina
+D a_ f_
+þ
+mcosasinða þ fÞ
+D  ð1 þ mÞsinf
+D
+þ
+mðRcosa  1Þ
+RD
+Fa þ
+m
+RD
+Ff ðA 3Þ
+and
+a€ ¼ msinað1  RcosaÞ
+D a_ 2
+þ
+R2sinað1 þ mÞ þ msinað1  2RcosaÞ
+D f_ 2
+þ ð1 þ mÞ½Rsinða þ fÞ þ sinf  Rsinðf  aÞ
+2D
+þ
+sinf  msinð2a þ fÞ
+2D þ
+2msinað1  RcosaÞ
+D a_ f_
+þ
+R2ð1 þ mÞ þ mð1  2RcosaÞ
+RD
+Fa
+ mð1  RcosaÞ
+DR
+Ff ; ðA 4Þ
+where D ¼ Rð1 þ m  mcos2aÞ.
+APPENDIX B. LINEAR SYSTEM ANALYSIS
+The spectrum of the uncontrolled dynamics (3.1) reads
+lðAÞ ¼
+1 ffiffiffiffiffiffi2R p ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi½L þ
+ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi
+L2 þ 4Rð1 þ mÞ
+q
+
+r
+1 ffiffiffiffiffiffi2R p ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi
+½L þ
+ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi
+L2 þ 4Rð1 þ mÞ
+q
+
+r
+1 ffiffiffiffiffiffi2R p ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi½L 
+ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi
+L2 þ 4Rð1 þ mÞ
+q
+
+r
+1 ffiffiffiffiffiffi2R p ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi
+½L 
+ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi
+L2 þ 4Rð1 þ mÞ
+q
+
+r
+2
+6
+6
+6
+6
+6
+6
+6
+6
+6
+6
+6
+6
+4
+3
+7
+7
+7
+7
+7
+7
+7
+7
+7
+7
+7
+7
+5
+ðB 1Þ
+and
+L ¼ 1 þ mR þ R  m: ðB 2Þ
+Note that for each value of R and M there are
+always one real positive eigenvalue, one real negative
+eigenvalue and two purely imaginary eigenvalues, consistently with the Hamiltonian (conservative) nature
+of the system.
+Finally, the controllability matrix J reads
+J ¼
+0 x2 0  x2
+R þ
+m
+R x1
+x2 0  x2
+R þ
+m
+R x1 0
+0 x1 0 x2
+R þ ð1 þ Rx2Þx1
+x1 0 x2
+R þ ð1 þ Rx2Þx1 0
+2
+6
+6
+6
+6
+6
+6
+6
+6
+4
+3
+7
+7
+7
+7
+7
+7
+7
+7
+5
+ðB 3Þ
+2106 Balancing on tightropes and slacklines P. Paoletti and L. Mahadevan
+J. R. Soc. Interface (2012)
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013
+and
+x1 ¼ 1 þ m þ m
+1  2R
+R2
+  and
+x2 ¼ m
+R  1
+R2 ;
+ðB 4Þ
+whereas the observability matrix V can be written as
+V ¼
+C
+CA
+.
+.
+.
+CAn1
+2
+6
+6
+6
+4
+3
+7
+7
+7
+5¼
+01 0 1
+0 0 v 0
+00 0 v
+v=R 0 v vð Þ  m=R 0
+2
+6
+6
+4
+3
+7
+7
+5
+ðB 5Þ
+and
+v ¼ 1 þ m: ðB 6Þ
+APPENDIX C. CONTROL WITH FULL
+STATE INFORMATION
+In order to check that the behaviour observed in the §4
+is not due to the lack of information about the true state
+of the system, we consider an ideal case where we have
+exact measurements of the all state variables, so that we
+can directly exploit the LQ regulator without any
+Kalman filter. The LQ design parameters are as in §4
+so that we are not changing anything except the
+measurement equation (3.3) that becomes y(t) ¼ x(t),
+i.e. C ¼ I.
+In figure 6, a comparison between the two different
+control schemes is reported. We note that the lack of
+complete measurements on the full state does not massively degrade the system performances. The main
+difference is in the small radius limit, where a full information about the system variables allows the controller
+to stabilize the system with smaller values of R with
+respect to the LQG case, although with large corrective
+torque. Therefore, we can conclude that in the limit
+when R1, a strong source of instability is due to the
+poor state estimate provided by the Kalman filter.
+This result is in agreement to the observation that for
+small R the linearization validity basin is very narrow
+and high-frequency oscillations are present in the
+system, so that the linear observer can easily fail.
+This analysis also shows that the difficulties that
+arise in the limits R ! 0 and R ! þ1 are intrinsic in
+the system dynamics and are not due to the particular
+choice of control scheme, in agreement with the discussion of §3.1 about the controllability/observability
+properties and the validity of linear design.
+APPENDIX D. TORQUE UPPERBOUND
+ESTIMATE
+The main limitation in human balancing ability comes
+from the maximum value that the torque Fa can
+assume. We can estimate an upperbound for this quantity by considering the case in which the human uses a
+pole of mass mp and length lp supported by the two
+hands exerting forces F1 and F2 at a distance a from
+the pole centre of mass.
+In order to support the weight mpg of the pole
+and generate a pure torque T, the forces F1 and F2
+must satisfy F1 þ F2 ¼ mpg, F1a  F2a ¼ T. Then
+T ¼ ð2Fmax  mpgÞa. For the purpose of upperbound
+estimate, we can neglect the pole weight mpg with
+respect to the maximum force Fmax. Reasonable
+values for the parameters are Fmax ≃ 250 N and
+a ≃ 0:5 m so that Tmax ≃ 250 Nm or, in dimensionless form, considering a body mass of about
+m þ M ≃ 80 kg and leg length l ≃ 1m,
+T ≃
+T
+mgl ¼ 25080 	 9:81 	 1
+≃ 0:3: ðD 1Þ
+The applied torque Fa is the negative of this quantity.
+Including potential torso and lateral leg movements in
+Fmax would increase this value, but these movements
+are likely to be only emergency manoeuvres used only
+when the deviation from the upright position reaches
+extreme values. In any case, the qualitative behaviour
+of the system is quite insensitive to the exact value
+chosen for Fmax and we can indeed increase it by an
+order of magnitude without severely affecting the
+observed behaviour, in accordance with the fact that
+the main difficulties for balancing on a rope are due
+to the structural property of the dynamics, such as controllability and observability, and not to the saturation
+on the control action. Here, we neglect potential ‘windup’ problems, i.e. situations when the arms or the pole
+start twirling, by assuming that the angular displacement of the pole from the horizontal position is
+always limited to a few degrees.
+REFERENCES
+1 Qu, X. & Nussbaum, M. A. 2009 Evaluation of the roles
+of passive and active control of balance using a balance
+control model. J. Biomech. 42, 1850–1855. (doi:10.1016/
+j.jbiomech.2009.05.036)
+2 Mahboobin, A., Loughlin, P. J., Redfern, M. S., Anderson,
+S. O., Atkeson, C. G. & Hodgins, J. K. 2008 Sensory adaptation in human balance control: lessons for biomimetic
+0
+500
+1000
+0
+0.5
+0 5
+0.5
+1.0
+R
+0 5
+0.05
+0.1
+R
+max(
+Fa
+)
+S U
+(a) (b)
+(c) (d)
+Fa
+max
+ts
+Figure 6. Influence of the normalized radius R on time to
+(a) steady-state ts, (b) maximum control torque maxðFa Þ,
+(c) stabilization success and (d) energy spent for control U.
+Data obtained by simulating the full nonlinear model (A 3)
+and (A 4) with m ¼ 30 and LQG controller (solid) or LQ
+controller (dashed). (Online version in colour.)
+Balancing on tightropes and slacklines P. Paoletti and L. Mahadevan 2107
+J. R. Soc. Interface (2012)
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013
+robotic bipeds. Neural Networks 21, 621–627. (doi:10.
+1016/j.neunet.2008.03.013)
+3 Blaszczyk, J. W. & Orawiec, R. 2011 Assessment of postural control in patients with Parkinson’s disease: sway
+ratio analysis. Hum. Mov. Sci. 30, 396 –404. (doi:10.
+1016/j.humov.2010.07.017)
+4 Wikstrom, E. A., Fournier, K. A. & McKeon, P. O. 2010
+Postural control differs between those with and without
+chronic ankle instability. Gait Posture 32, 82–86.
+(doi:10.1016/j.gaitpost.2010.03.015)
+5 Cabrera, J. L. & Milton, J. G. 2002 On –off intermittency
+in a human balancing task. Phys. Rev. Lett. 89, 158702.
+(doi:10.1103/PhysRevLett.89.158702)
+6 McDonald, J. H. G. 2009 Lateral excitation of bridges by
+balancing pedestrians. Proc. R. Soc. A 465, 1055–1073.
+(doi:10.1098/rspa.2008.0367)
+7 Peterka, R. J. & Loughlin, P. J. 2004 Dynamic regulation
+of sensorimotor integration in human postural control.
+J. Neurophys. 91, 410– 423. (doi:10.1152/jn.00516.2003)
+8 Stepan, G. 2009 Delay effects in the human sensory system
+during balancing. Phil. Trans. R. Soc. A 367, 1195–1212.
+(doi:10.1098/rsta.2008.0278)
+9 Qu, X., Nussbaum, M. A. & Madigan, M. L. 2007 A balance control model of quiet upright stance based on an
+optimal control strategy. J. Biomech. 40, 3590–3597.
+(doi:10.1016/j.jbiomech.2007.06.003)
+10 Kiemel, T., Oie, K. S. & Jeka, J. J. 2002 Multisensory
+fusion and the stochastic structure of postural sway.
+Biol. Cybern. 87, 262 –277. (doi:10.1007/s00422-002-
+0333-2)
+11 Otten, E. 1999 Balancing on a narrow ridge: biomechanics
+and control. Phil. Trans. R. Soc. Lond. B 354, 869 –875.
+(doi:10.1098/rstb.1999.0439)
+12 Schweigart, G. & Mergner, T. 2008 Human stance control
+beyond steady state response and inverted pendulum simplification. Exp. Brain Res. 185, 635– 653. (doi:10.1007/
+s00221-007-1189-4)
+13 Peterka, R. J. 2002 Sensorimotor integration in human
+postural control. J. Neurophys. 88, 1097– 1118. (doi:10.
+1152/jn.00605.2001)
+14 Stepan, G. & Ko´llar, L. 2000 Balancing with reflex delay.
+Math. Comp. Model. 31, 199 –205. (doi:10.1016/S0895-
+7177(00)00039-X)
+15 Cheng, S. P. & Perkins, N. C. 1992 Free vibration of a
+sagged cable supporting a discrete mass. J. Acoustical
+Soc. Am. 91, 2654–2662. (doi:10.1121/1.402973)
+16 Cenciarini, M. & Peterka, R. J. 2006 Stimulus-dependent
+changes in the vestibular contribution to human postural
+control. J. Neurophys. 95, 2733–2750. (doi:10.1152/jn.
+00856.2004)
+17 Jeka, J., Kiemel, T., Creath, R., Horak, F. & Peterka, R.
+2004 Controlling human upright posture: velocity information is more accurate than position or acceleration.
+J. Neurophys. 92, 2368 –2379. (doi:10.1152/jn.00983.2003)
+18 Collins, J. J. & De Luca, C. J. 1994 Random walking
+during quiet standing. Phys. Rev. Lett. 73, 764 –767.
+(doi:10.1103/PhysRevLett.73.764)
+19 Milton, J., Townsend, J. L., King, M. A. & Ohira, T. 2009
+Balancing with positive feedback: the case for discontinuous control. Phil. Trans. R. Soc. A 367, 1181– 1193.
+(doi:10.1098/rsta.2008.0257)
+20 Delignie´res, D., Torre, K. & Bernard, P.-L. 2011 Transition
+from persistent to anti-persistent correlations in postural
+sway indicates velocity-based control. PLoS Comput. Biol.
+7, e1001089. (doi:10.1371/journal.pcbi.1001089)
+21 Kowalczyk, P., Glendinning, P., Brown, M., MedranoCerda, G., Dallali, H. & Shapiro, J. 2011 Modelling
+human balance using switched systems with linear feedback control. J. R. Soc. Interface 9, 234– 245. (doi:10.
+1098/rsif.2011.0212)
+22 Asai, Y., Tasaka, Y., Nomura, K., Nomura, T., Casadio,
+M. & Morasso, P. 2009 A model of postural control in
+quiet standing: robust compensation of delay-induced
+instability using intermittent activation of feedback control. PLoS ONE 4, e6169. (doi:10.1371/journal.pone.
+0006169)
+23 Chen, C. 1999 Linear system theory and design, 3rd edn.
+New York, NY: Oxford University Press.
+24 Kiemel, T., Zhang, Y. & Jeka, J. J. 2011 Identification
+of neural feedback for upright stance in humans: stabilization rather than sway minimization. J. Neurosci. 31
+15 144 –15 153. (doi:10.1523/JNEUROSCI.1013-11.2011)
+25 Goodwin, G. C., Graebe, S. F. & Salgado, M. E. 2001 Control system design. Upper Saddle River, NJ: Prentice Hall.
+26 Boulet, J., Balasubramaniam, R., Daffertshofer, A. &
+Longtin, A. 2010 Stochastic two-delay differential model
+of delayed visual feedback effects on postural dynamics.
+Phil. Trans. R. Soc. A 368, 423 –438. (doi:10.1098/rsta.
+2009.0214)
+27 Milton, J., Cabrera, J. L., Ohira, T., Tajima, S., Tonosaki,
+Y., Eurich, C. W. & Campbell, S. A. 2009 The timedelayed inverted pendulum: implications for human balance control. Chaos 19, 026110. (doi:10.1063/1.3141429)
+28 Balcom, S. 2005 Walk the line: the art of balance and the
+craft of slackline. Ashland, Oregon: SlackDaddy Press.
+29 Du Pasquier, R. A., Blanc, Y., Sinnreich, M., Landis, T.,
+Burkhard, P. & Vingerhoets, F. J. G. 2003 The effect of
+aging on postural stability: a cross sectional and longitudinal study. Clin. Neurophysiol. 33, 213 –218. (doi:10.1016/
+j.neucli.2003.09.001)
+2108 Balancing on tightropes and slacklines P. Paoletti and L. Mahadevan
+J. R. Soc. Interface (2012)
+Downloaded from rsif.royalsocietypublishing.org on January 21, 2013

@@ -169,18 +169,37 @@ print(f"폐루프 max|eig| = {max(eigs_cl):.6f} → "
       f"{'✅ STABLE' if max(eigs_cl) < 1.0 else '❌ UNSTABLE'}")
 
 # ============================================================
-#  칼만 관측기 게인 L (관측: α, θ, α̇, θ̇)
+#  칼만 관측기 게인 L — ★단일 모델기반 칼만 (물리센서 직접 측정)
+# ------------------------------------------------------------
+#  옛 버전은 {α, θ, α̇, θ̇} 를 독립 측정으로 받았으나, 실물에서 α·α̇는
+#  센서로 직접 안 나온다(α=θ_cf−δ, α̇=θ̇−δ̇로 합성 → θ 오차가 α로 새고,
+#  CF와 칼만이 직렬 중첩). 여기서는 IMU·엔코더의 *물리 측정*을 그대로 쓴다:
+#    z0 = θ_acc   (가속도계 중력기울기, 절대 θ)        → C row e3
+#    z1 = θ̇_gyro  (자이로 Y축)                          → C row e6
+#    z2 = δ        (엔코더 위치 = θ − α)                 → C row (e3−e2)
+#    z3 = δ̇        (PRESENT_VELOCITY = θ̇ − α̇)           → C row (e6−e5)
+#  α, φ 는 측정하지 않고 모델 커플링(Ad)+엔코더 구속으로 칼만이 복원.
+#  → CF 제거, 단일 모델기반 칼만으로 통합 (입력=전류제어의 진짜 τ).
+#  게이팅: 가속도 크기가 1g에서 벗어나면(모터 구동 선형가속) 펌웨어가
+#         z0(θ_acc) innovation을 0으로 막는다. 정상상태 L은 z0 포함 가정.
 # ============================================================
 m_obs = 4
 C_obs = np.zeros((m_obs, n))
-C_obs[0, 1] = 1; C_obs[1, 2] = 1; C_obs[2, 4] = 1; C_obs[3, 5] = 1
+C_obs[0, 2] = 1.0                      # z0: θ_acc      = θ
+C_obs[1, 5] = 1.0                      # z1: θ̇_gyro     = θ̇
+C_obs[2, 2] = 1.0; C_obs[2, 1] = -1.0  # z2: δ          = θ − α
+C_obs[3, 5] = 1.0; C_obs[3, 4] = -1.0  # z3: δ̇          = θ̇ − α̇
 
 O = np.vstack([C_obs @ np.linalg.matrix_power(Ad, k) for k in range(n)])
-print(f"\n관측가능성 rank = {np.linalg.matrix_rank(O)}/{n} "
+print(f"\n[단일칼만] 측정 = [θ_acc, θ̇_gyro, δ, δ̇]")
+print(f"관측가능성 rank = {np.linalg.matrix_rank(O)}/{n} "
       f"→ {'✅' if np.linalg.matrix_rank(O)==n else '❌ 비관측'}")
 
+# 프로세스 잡음 Q_kf: 모델이 좋다(전류제어 진짜 τ). φ는 모델로만 보이므로
+#   φ·φ̇에 약간 더 신뢰. 측정 잡음 R_kf: 센서 특성(rad, rad/s) 기반.
 Q_kf = np.diag([1e-4, 1e-6, 1e-6, 1e-3, 1e-5, 1e-5])
-R_kf = np.diag([1e-4, 1e-4, 1e-3, 1e-3])
+#                θ_acc   θ̇_gyro   δ(enc)   δ̇(vel)
+R_kf = np.diag([1.2e-3,  1.0e-4,  1.0e-5,  1.0e-3])
 P_kf = solve_discrete_are(Ad.T, C_obs.T, Q_kf, R_kf)
 L = P_kf @ C_obs.T @ np.linalg.inv(C_obs @ P_kf @ C_obs.T + R_kf)
 eigs_obs = sorted(abs(e) for e in np.linalg.eigvals(Ad - L @ C_obs))
@@ -227,7 +246,13 @@ print(f"const float C2_PHI = {C2:.6f}f;")
 print(f"const float R_ARC  = {R:.2f}f;")
 print(f"// phi_est = -(C1_PHI*alpha + C2_PHI*theta) / R_ARC;")
 
-print(f"\n// ===== 칼만 게인 L (6×4) =====")
+print(f"const int   TAU_MAX_UNIT = {TAU_MAX_UNIT};   // = TAU_MAX*TAU2UNIT (CurrentLimit 1193 이내)")
+print(f"// 점진검증 권장: CUR_SAFE 600(≈1.6A)부터 시작해 단계적으로 올릴 것")
+
+print(f"\n// ===== 단일 칼만 게인 L (6×4) =====")
+print(f"// 측정 순서 z = [theta_acc, thetaDot_gyro, delta(enc), deltaDot(vel)]")
+print(f"//   C row0: theta      C row1: thetaDot")
+print(f"//   C row2: delta=theta-alpha   C row3: deltaDot=thetaDot-alphaDot")
 names = ['phi', 'alpha', 'theta', 'phiDot', 'alphaDot', 'thetaDot']
 print(f"const float L_kf[6][4] = {{")
 for i in range(n):

@@ -1,0 +1,2621 @@
+[출처] Mombaur 2020, Appl. Sci. 10(3):1094  https://www.mdpi.com/2076-3417/10/3/1094
+
+Whole-Body Dynamic Analysis of Challenging Slackline Jumping
+https://www.mdpi.com/2076-3417/10/3/1094
+→ https://www.mdpi.com/2076-3417/10/3/1094
+Content-Type: text/html; charset=UTF-8
+
+---
+meta-application-name: &nbsp;
+meta-citation_abstract_html_url: https://www.mdpi.com/2076-3417/10/3/1094
+meta-citation_author: Mombaur, Katja
+meta-citation_doi: 10.3390/app10031094
+meta-citation_firstpage: 1094
+meta-citation_fulltext_html_url: https://www.mdpi.com/2076-3417/10/3/1094/htm
+meta-citation_id: mdpi-app10031094
+meta-citation_issn: 2076-3417
+meta-citation_issue: 3
+meta-citation_journal_title: Applied Sciences
+meta-citation_online_date: 2020/02/06
+meta-citation_pdf_url: https://www.mdpi.com/2076-3417/10/3/1094/pdf?version=1580994283
+meta-citation_publication_date: 2020/1
+meta-citation_publisher: Multidisciplinary Digital Publishing Institute
+meta-citation_title: Whole-Body Dynamic Analysis of Challenging Slackline Jumping
+meta-citation_volume: 10
+meta-citation_xml_url: https://www.mdpi.com/2076-3417/10/3/1094/xml
+meta-dc.creator: Katja Mombaur
+meta-dc.date: 2020-02-06
+meta-dc.description: Maintaining balance on a slackline is a challenging task in itself. Walking on a high line, jumping and performing twists or somersaults seems nearly impossible. Contact forces are essential to understanding how humans maintain balance in such challenging situations, but they cannot always be measured directly. Therefore, we propose a contact model for slackline balancing that includes the interaction forces and torques as well as the position of the Center of Pressure. We apply this model within an optimization framework to perform a fully dynamic motion reconstruction of a jump with a rotation of approximately 180     °    . Newton’s equations of motions are implemented as constraints to the optimization, hence the optimized motion is physically feasible. We show that a conventional kinematic analysis results in dynamic inconsistencies. The advantage of our method becomes apparent during the flight phase of the motion and when comparing the center of mass and angular momentum dynamics. With our motion reconstruction method all momentum is conserved, whereas the conventional analysis shows momentum changes of up to 30%. Furthermore, we get additional and reliable information on the interaction forces and the joint torque that allow us to further analyze slackline balancing strategies.
+meta-dc.format: application/pdf
+meta-dc.identifier: 10.3390/app10031094
+meta-dc.language: en
+meta-dc.publisher: Multidisciplinary Digital Publishing Institute
+meta-dc.rights: http://creativecommons.org/licenses/by/3.0/
+meta-dc.source: Applied Sciences 2020, Vol. 10, Page 1094
+meta-dc.subject: subject-specific modeling
+meta-dc.title: Whole-Body Dynamic Analysis of Challenging Slackline Jumping
+meta-dc.type: Article
+meta-description: Maintaining balance on a slackline is a challenging task in itself. Walking on a high line, jumping and performing twists or somersaults seems nearly impossible. Contact forces are essential to understanding how humans maintain balance in such challenging situations, but they cannot always be measured directly. Therefore, we propose a contact model for slackline balancing that includes the interaction forces and torques as well as the position of the Center of Pressure. We apply this model within an optimization framework to perform a fully dynamic motion reconstruction of a jump with a rotation of approximately 180     °    . Newton’s equations of motions are implemented as constraints to the optimization, hence the optimized motion is physically feasible. We show that a conventional kinematic analysis results in dynamic inconsistencies. The advantage of our method becomes apparent during the flight phase of the motion and when comparing the center of mass and angular momentum dynamics. With our motion reconstruction method all momentum is conserved, whereas the conventional analysis shows momentum changes of up to 30%. Furthermore, we get additional and reliable information on the interaction forces and the joint torque that allow us to further analyze slackline balancing strategies.
+meta-facebook-domain-verification: mcoq8dtq6sb2hf7z29j8w515jjoof7
+meta-fb:app_id: 131189377574
+meta-fulltext_html: https://www.mdpi.com/2076-3417/10/3/1094/htm
+meta-fulltext_pdf: https://www.mdpi.com/2076-3417/10/3/1094/pdf?version=1580994283
+meta-fulltext_xml: https://www.mdpi.com/2076-3417/10/3/1094/xml
+meta-google-site-verification: PxTlsg7z2S00aHroktQd57fxygEjMiNHydKn3txhvwY
+meta-msapplication-TileImage: https://pub.mdpi-res.com/img/journals/applsci-logo-sq.png?c706cab522490ca4
+meta-og:description: Maintaining balance on a slackline is a challenging task in itself. Walking on a high line, jumping and performing twists or somersaults seems nearly impossible. Contact forces are essential to understanding how humans maintain balance in such challenging situations, but they cannot always be measured directly. Therefore, we propose a contact model for slackline balancing that includes the interaction forces and torques as well as the position of the Center of Pressure. We apply this model within an optimization framework to perform a fully dynamic motion reconstruction of a jump with a rotation of approximately 180     °    . Newton’s equations of motions are implemented as constraints to the optimization, hence the optimized motion is physically feasible. We show that a conventional kinematic analysis results in dynamic inconsistencies. The advantage of our method becomes apparent during the flight phase of the motion and when comparing the center of mass and angular momentum dynamics. With our motion reconstruction method all momentum is conserved, whereas the conventional analysis shows momentum changes of up to 30%. Furthermore, we get additional and reliable information on the interaction forces and the joint torque that allow us to further analyze slackline balancing strategies.
+meta-og:image: https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g001-550.jpg?1582207340
+meta-og:site_name: MDPI
+meta-og:title: Whole-Body Dynamic Analysis of Challenging Slackline Jumping
+meta-og:type: article
+meta-og:url: https://www.mdpi.com/2076-3417/10/3/1094
+meta-prism.issn: 2076-3417
+meta-prism.number: 3
+meta-prism.publicationDate: 2020-02-06
+meta-prism.publicationName: Applied Sciences
+meta-prism.section: Article
+meta-prism.startingPage: 1094
+meta-prism.volume: 10
+meta-robots: index, follow
+meta-sso-service: mdpi
+meta-theme-color: #ffffff
+meta-title: Whole-Body Dynamic Analysis of Challenging Slackline Jumping
+meta-twitter:card: summary
+meta-twitter:image: https://pub.mdpi-res.com/img/journals/applsci-logo-social.png?c706cab522490ca4
+meta-twitter:site: @MDPIOpenAccess
+meta-viewport: width=device-width, initial-scale=1.0
+title: Whole-Body Dynamic Analysis of Challenging Slackline Jumping
+---
+
+
+ >
+
+Next Article in Journal  
+
+
+[A Density Clustering Algorithm for Simultaneous Modulation Format Identification and OSNR Estimation](https://www.mdpi.com/2076-3417/10/3/1095)
+
+Next Article in Special Issue  
+
+
+[A Correlational Analysis of Shuttlecock Speed Kinematic Determinants in the Badminton Jump Smash](https://www.mdpi.com/2076-3417/10/4/1248)
+
+ >
+
+Previous Article in Journal  
+
+
+[Odour Emissions of Municipal Waste Biogas Plants—Impact of Technological Factors, Air Temperature and Humidity](https://www.mdpi.com/2076-3417/10/3/1093)
+
+Previous Article in Special Issue  
+
+
+[Effects of Soccer Training on Body Balance in Young Female Athletes Assessed Using Computerized Dynamic Posturography](https://www.mdpi.com/2076-3417/10/3/1003)
+
+## Journals
+
+[Active Journals](https://www.mdpi.com/about/journals) [Find a Journal](https://www.mdpi.com/about/journalfinder) [Journal Proposal](https://www.mdpi.com/about/journals/proposal) [Proceedings Series](https://www.mdpi.com/about/proceedings)
+
+## [Topics](https://www.mdpi.com/topics)
+
+## Information
+
+[For Authors](https://www.mdpi.com/authors) [For Reviewers](https://www.mdpi.com/reviewers) [For Editors](https://www.mdpi.com/editors) [For Librarians](https://www.mdpi.com/librarians) [For Publishers](https://www.mdpi.com/publishing_services) [For Societies](https://www.mdpi.com/societies) [For Conference Organizers](https://www.mdpi.com/conference_organizers)
+
+[Open Access Policy](https://www.mdpi.com/openaccess) [Institutional Open Access Program](https://www.mdpi.com/ioap) [Special Issues Guidelines](https://www.mdpi.com/special_issues_guidelines) [Editorial Process](https://www.mdpi.com/editorial_process) [Research and Publication Ethics](https://www.mdpi.com/ethics) [Article Processing Charges](https://www.mdpi.com/apc) [Awards](https://www.mdpi.com/awards) [Testimonials](https://www.mdpi.com/testimonials)
+
+## [Author Services](https://www.mdpi.com/authors/english)
+
+## Initiatives
+
+[Sciforum](https://sciforum.net) [MDPI Books](https://www.mdpi.com/books) [Preprints.org](https://www.preprints.org) [Scilit](https://www.scilit.com) [SciProfiles](https://sciprofiles.com) [Encyclopedia](https://encyclopedia.pub) [JAMS](https://jams.pub) [Proceedings Series](https://www.mdpi.com/about/proceedings)
+
+## About
+
+[Overview](https://www.mdpi.com/about) [Contact](https://www.mdpi.com/about/contact) [Careers](https://careers.mdpi.com) [News](https://www.mdpi.com/about/announcements) [Press](https://www.mdpi.com/about/press) [Blog](http://blog.mdpi.com/)
+
+[Sign In / Sign Up](https://www.mdpi.com/user/login)
+
+## Notice
+
+You can make submissions to other journals [here](https://susy.mdpi.com/user/manuscripts/upload).
+
+*clear*
+
+## Notice
+
+You are accessing a machine-readable page. In order to be human-readable, please install an RSS reader.
+
+Continue Cancel
+
+*clear*
+
+All articles published by MDPI are made immediately available worldwide under an open access license. No special
+ permission is required to reuse all or part of the article published by MDPI, including figures and tables. For
+ articles published under an open access Creative Common CC BY license, any part of the article may be reused without
+ permission provided that the original article is clearly cited. For more information, please refer to <https://www.mdpi.com/openaccess>.
+
+Feature papers represent the most advanced research with significant potential for high impact in the field. A Feature
+ Paper should be a substantial original Article that involves several techniques or approaches, provides an outlook for
+ future research directions and describes possible research applications.
+
+Feature papers are submitted upon individual invitation or recommendation by the scientific editors and must receive
+ positive feedback from the reviewers.
+
+Editor’s Choice articles are based on recommendations by the scientific editors of MDPI journals from around the world.
+ Editors select a small number of articles recently published in the journal that they believe will be particularly
+ interesting to readers, or important in the respective research area. The aim is to provide a snapshot of some of the
+ most exciting work published in the various research areas of the journal.
+
+Original Submission Date Received: .
+
+You seem to have javascript disabled. Please note that many of the page functionalities won't work as expected without javascript enabled.
+
+[![](https://pub.mdpi-res.com/img/design/mdpi-pub-logo-black-small1.svg?da3a8dcae975a41c?1779970059 "MDPI Open Access Journals")](https://www.mdpi.com/)
+
+[*clear*](#) [*zoom_out_map*](https://www.mdpi.com/toggle_desktop_layout_cookie "Toggle desktop layout") [*search*](#) [*menu*](# "MDPI main page")
+
+[![](https://pub.mdpi-res.com/img/design/mdpi-pub-logo-black-small1.svg?da3a8dcae975a41c?1779970059 "MDPI Open Access Journals")](https://www.mdpi.com/)
+
+- [Journals](https://www.mdpi.com/about/journals)
+  *     + [Active Journals](https://www.mdpi.com/about/journals)
+    + [Find a Journal](https://www.mdpi.com/about/journalfinder)
+    + [Journal Proposal](https://www.mdpi.com/about/journals/proposal)
+    + [Proceedings Series](https://www.mdpi.com/about/proceedings)
+
+- [Topics](https://www.mdpi.com/topics)
+- [Information](https://www.mdpi.com/authors)
+  *     + [For Authors](https://www.mdpi.com/authors)
+    + [For Reviewers](https://www.mdpi.com/reviewers)
+    + [For Editors](https://www.mdpi.com/editors)
+    + [For Librarians](https://www.mdpi.com/librarians)
+    + [For Publishers](https://www.mdpi.com/publishing_services)
+    + [For Societies](https://www.mdpi.com/societies)
+    + [For Conference Organizers](https://www.mdpi.com/conference_organizers)
+
+
+    + [Open Access Policy](https://www.mdpi.com/openaccess)
+    + [Institutional Open Access Program](https://www.mdpi.com/ioap)
+    + [Special Issues Guidelines](https://www.mdpi.com/special_issues_guidelines)
+    + [Editorial Process](https://www.mdpi.com/editorial_process)
+    + [Research and Publication Ethics](https://www.mdpi.com/ethics)
+    + [Article Processing Charges](https://www.mdpi.com/apc)
+    + [Awards](https://www.mdpi.com/awards)
+    + [Testimonials](https://www.mdpi.com/testimonials)
+
+- [Author Services](https://www.mdpi.com/authors/english)
+- [Initiatives](https://www.mdpi.com/about/initiatives)
+  *     + [Sciforum](https://sciforum.net)
+    + [MDPI Books](https://www.mdpi.com/books)
+    + [Preprints.org](https://www.preprints.org)
+    + [Scilit](https://www.scilit.com)
+    + [SciProfiles](https://sciprofiles.com)
+    + [Encyclopedia](https://encyclopedia.pub)
+    + [JAMS](https://jams.pub)
+    + [Proceedings Series](https://www.mdpi.com/about/proceedings)
+
+- [About](https://www.mdpi.com/about)
+  *     + [Overview](https://www.mdpi.com/about)
+    + [Contact](https://www.mdpi.com/about/contact)
+    + [Careers](https://careers.mdpi.com)
+    + [News](https://www.mdpi.com/about/announcements)
+    + [Press](https://www.mdpi.com/about/press)
+    + [Blog](http://blog.mdpi.com/)
+
+[Sign In / Sign Up](https://www.mdpi.com/user/login) [Submit](https://susy.mdpi.com/user/manuscripts/upload?journal=applsci)
+
+ 
+
+Search for Articles:
+
+Title / Keyword
+
+Author / Affiliation / Email
+
+Journal
+
+All Journals
+Accounting and Auditing
+Acoustics
+Acta Microbiologica Hellenica (AMH)
+Actuators
+Adhesives
+Administrative Sciences
+Adolescents
+Advances in Respiratory Medicine (ARM)
+Aerobiology
+Aerospace
+Agriculture
+AgriEngineering
+Agrochemicals
+Agronomy
+AI
+AI Chemistry
+AI for Engineering
+AI in Education
+AI in Medicine
+AI Materials
+AI Sensors
+Air
+Algorithms
+Allergies
+Alloys
+Analog
+Analytica
+Analytics
+Anatomia
+Anesthesia Research
+Animals
+Antibiotics
+Antibodies
+Antioxidants
+Applied Biosciences
+Applied Mechanics
+Applied Microbiology
+Applied Nano
+* Applied Sciences
+Applied System Innovation (ASI)
+AppliedChem
+AppliedMath
+AppliedPhys
+Aquaculture Journal
+Architecture
+Arthropoda
+Arts
+Astronautics
+Astronomy
+Atmosphere
+Atoms
+Audiology Research
+Automation
+Axioms
+Bacteria
+Batteries
+Behavioral Sciences
+Beverages
+Big Data and Cognitive Computing (BDCC)
+BioChem
+Bioengineering
+Biologics
+Biology
+Biology and Life Sciences Forum
+Biomass
+Biomechanics
+BioMed
+Biomedicines
+BioMedInformatics
+Biomimetics
+Biomolecules
+Biophysica
+Bioresources and Bioproducts
+Biosensors
+Biosphere
+BioTech
+Birds
+Blockchains
+Brain Sciences
+Buildings
+Businesses
+C (Journal of Carbon Research)
+Cancers
+Cardiogenetics
+Cardiovascular Medicine
+Catalysts
+Cells
+Ceramics
+Challenges
+ChemEngineering
+Chemistry
+Chemistry Proceedings
+Chemosensors
+Children
+Chips
+CivilEng
+Clean Technologies (Clean Technol.)
+Climate
+Clinical and Translational Neuroscience (CTN)
+Clinical Bioenergetics
+Clinics and Practice
+Clocks & Sleep
+Coasts
+Coatings
+Colloids and Interfaces
+Colorants
+Commodities
+Complexities
+Complications
+Compounds
+Computation
+Computer Sciences & Mathematics Forum
+Computers
+Condensed Matter
+Conservation
+Construction Materials
+Corrosion and Materials Degradation (CMD)
+Cosmetics
+COVID
+Craniomaxillofacial Trauma & Reconstruction (CMTR)
+Crops
+Cryo
+Cryptography
+Crystals
+Culture
+Current Issues in Molecular Biology (CIMB)
+Current Oncology
+Dairy
+Data
+Dentistry Journal
+Dermato
+Dermatopathology
+Designs
+Diabetology
+Diagnostics
+Dietetics
+Digital
+Digital Health and Innovation (DHI)
+Disabilities
+Diseases
+Diversity
+DNA
+Drones
+Drugs and Drug Candidates (DDC)
+Dynamics
+Earth
+Ecologies
+Econometrics
+Economies
+Education Sciences
+Electricity
+Electrochem
+Electronic Materials
+Electronics
+Emergency Care and Medicine
+Encyclopedia
+Endocrines
+Energies
+Energy Storage and Applications (ESA)
+Eng
+Engineering Proceedings
+Entropic and Disordered Matter (EDM)
+Entropy
+Environmental and Earth Sciences Proceedings
+Environmental Remediation
+Environments
+Epidemiologia
+Epigenomes
+European Burn Journal (EBJ)
+European Journal of Investigation in Health, Psychology and Education (EJIHPE)
+Family Sciences
+Fermentation
+Fibers
+FinTech
+Fire
+Fishes
+Fluids
+Foods
+Forecasting
+Forensic Sciences
+Forests
+Fossil Studies
+Foundations
+Fractal and Fractional (Fractal Fract)
+Freshwater
+Fuels
+Future
+Future Collections, Libraries, Archives, and Museums (FCLAM)
+Future Internet
+Future Pharmacology
+Future Transportation
+Galaxies
+Games
+Gases
+Gastroenterology Insights
+Gastrointestinal Disorders
+Gastronomy
+Gels
+Genealogy
+Genes
+Geographies
+GeoHazards
+Geomatics
+Geometry
+Geosciences
+Geotechnics
+Geriatrics
+Germs
+Glacies
+Gout, Urate, and Crystal Deposition Disease (GUCDD)
+Grasses
+Green
+Green Health
+Hardware
+Healthcare
+Hearts
+Hemato
+Hematology Reports
+Heritage
+Histories
+Horticulturae
+Hospitals
+Humanities
+Humans
+Hydrobiology
+Hydrogen
+Hydrology
+Hydropower
+Hygiene
+Immuno
+Industries
+Infectious Disease Reports
+Inflammation Journal
+Informatics
+Information
+Infrastructures
+Inorganics
+Insects
+Instruments
+Intelligent Infrastructure and Construction
+International Journal of Cognitive Sciences (IJCS)
+International Journal of Environmental Medicine (IJEM)
+International Journal of Environmental Research and Public Health (IJERPH)
+International Journal of Financial Studies (IJFS)
+International Journal of Medical Devices (IJMD)
+International Journal of Molecular Sciences (IJMS)
+International Journal of Neonatal Screening (IJNS)
+International Journal of Orofacial Myology and Myofunctional Therapy (IJOM)
+International Journal of Plant Biology (IJPB)
+International Journal of Topology
+International Journal of Translational Medicine (IJTM)
+International Journal of Turbomachinery, Propulsion and Power (IJTPP)
+International Medical Education (IME)
+Inventions
+IoT
+ISPRS International Journal of Geo-Information (IJGI)
+J
+Journal of Aesthetic Medicine (J. Aesthetic Med.)
+Journal of Ageing and Longevity (JAL)
+Journal of CardioRenal Medicine (JCRM)
+Journal of Cardiovascular Development and Disease (JCDD)
+Journal of Clinical & Translational Ophthalmology (JCTO)
+Journal of Clinical Medicine (JCM)
+Journal of Composites Science (J. Compos. Sci.)
+Journal of Cybersecurity and Privacy (JCP)
+Journal of Dementia and Alzheimer's Disease (JDAD)
+Journal of Developmental Biology (JDB)
+Journal of Experimental and Theoretical Analyses (JETA)
+Journal of Eye Movement Research (JEMR)
+Journal of Functional Biomaterials (JFB)
+Journal of Functional Morphology and Kinesiology (JFMK)
+Journal of Fungi (JoF)
+Journal of Genome Biotechnology and Genetics (JGBG)
+Journal of Gerontology and Geriatrics (JGG)
+Journal of Imaging (J. Imaging)
+Journal of Innovation
+Journal of Intelligence (J. Intell.)
+Journal of Interdisciplinary Research Applied to Medicine (JDReAM)
+Journal of Low Power Electronics and Applications (JLPEA)
+Journal of Manufacturing and Materials Processing (JMMP)
+Journal of Marine Science and Engineering (JMSE)
+Journal of Market Access & Health Policy (JMAHP)
+Journal of Mind and Medical Sciences (JMMS)
+Journal of Molecular Pathology (JMP)
+Journal of Nanotheranostics (JNT)
+Journal of Nuclear Engineering (JNE)
+Journal of Otorhinolaryngology, Hearing and Balance Medicine (JOHBM)
+Journal of Parks
+Journal of Personalized Medicine (JPM)
+Journal of Pharmaceutical and BioTech Industry (JPBI)
+Journal of Phytomedicine
+Journal of Respiration (JoR)
+Journal of Risk and Financial Management (JRFM)
+Journal of Sensor and Actuator Networks (JSAN)
+Journal of Superintelligence
+Journal of the American Podiatric Medical Association (JAPMA)
+Journal of the Oman Medical Association (JOMA)
+Journal of Theoretical and Applied Electronic Commerce Research (JTAER)
+Journal of Vascular Diseases (JVD)
+Journal of Xenobiotics (JoX)
+Journal of Zoological and Botanical Gardens (JZBG)
+Journalism and Media
+Kidney and Dialysis
+Kinases and Phosphatases
+Knowledge
+LabMed
+Laboratories
+Land
+Languages
+Laws
+Life
+Lights
+Limnological Review
+Lipidology
+Liquids
+Literature
+Livers
+Logics
+Logistics
+Low-Altitude Economy
+Lubricants
+Lymphatics
+Machine Learning and Knowledge Extraction (MAKE)
+Machines
+Macromol
+Magnetism
+Magnetochemistry
+Marine Drugs
+Materials
+Materials Proceedings
+Mathematical and Computational Applications (MCA)
+Mathematics
+Medical Sciences
+Medical Sciences Forum
+Medicina
+Medicines
+Membranes
+Merits
+Metabolites
+Metals
+Meteorology
+Methane
+Methods and Protocols (MPs)
+Metrics
+Metrology
+Micro
+Microbiology Research
+Microelectronics
+Micromachines
+Microorganisms
+Microplastics
+Microwave
+Minerals
+Mining
+Modelling
+Modern Mathematical Physics
+Molbank
+Molecules
+Multimedia
+Multimodal Technologies and Interaction (MTI)
+Muscles
+Nanoenergy Advances
+Nanomanufacturing
+Nanomaterials
+NDT
+Network
+Neuroglia
+Neuroimaging
+Neurology International
+NeuroSci
+Nitrogen
+Non-Coding RNA (ncRNA)
+Nursing Reports
+Nutraceuticals
+Nutrients
+Obesities
+Occupational Health
+Oceans
+Onco
+Optics
+Oral
+Organics
+Organoids
+Osteology
+Oxygen
+Pandemics
+Parasitologia
+Particles
+Pathogens
+Pathophysiology
+Peace Studies
+Pediatric Reports
+Pets
+Pharmaceuticals
+Pharmaceutics
+Pharmacoepidemiology
+Pharmacy
+Philosophies
+Photochem
+Photonics
+Phycology
+Physchem
+Physical Sciences Forum
+Physics
+Physiologia
+Plants
+Plasma
+Platforms
+Pollutants
+Polymers
+Polysaccharides
+Populations
+Poultry
+Powders
+Precision Oncology
+Primary and Hospital Care (PHC)
+Proceedings
+Processes
+Prosthesis
+Proteomes
+Psychiatry International
+Psychoactives
+Psychology International
+Publications
+Purification
+Quantum Beam Science (QuBS)
+Quantum Reports
+Quaternary
+Radiation
+Reactions
+Real Estate
+Receptors
+Recycling
+Regional Science and Environmental Economics (RSEE)
+Religions
+Remote Sensing
+Reports
+Reproductive Medicine (Reprod. Med.)
+Resources
+Rheumato
+Risks
+Robotics
+Romanian Journal of Preventive Medicine (RJPM)
+Ruminants
+Safety
+Sci
+Scientia Pharmaceutica (Sci. Pharm.)
+Sclerosis
+Seeds
+Semiconductors and Heterogeneous Integration
+Sensors
+Separations
+Sexes
+Signals
+Sinusitis
+Smart Cities
+Social Sciences
+Société Internationale d’Urologie Journal (SIUJ)
+Societies
+Software
+Soil Systems
+Solar
+Solids
+Spectroscopy Journal
+Sports
+Standards
+Stats
+Stratigraphy and Sedimentology
+Stresses
+Surfaces
+Surgeries
+Surgical Techniques Development
+Sustainability
+Sustainable Chemistry
+Swiss Archives of Neurology, Psychiatry and Psychotherapy (SANPP)
+Symmetry
+SynBio
+Systems
+Targets
+Taxonomy
+Technologies
+Telecom
+Textiles
+Thalassemia Reports
+Theoretical and Applied Ergonomics
+Therapeutics
+Thermo
+Time and Space
+Tomography
+Tourism and Hospitality
+Toxics
+Toxins
+Transplantology
+Trauma Care
+Trends in Higher Education
+Trends in Public Health
+Tropical Medicine and Infectious Disease (TropicalMed)
+Universe
+Urban Science
+Uro
+Vaccines
+Vehicles
+Venereology
+Veterinary Sciences
+Vibration
+Virtual Worlds
+Viruses
+Vision
+Waste
+Water
+Welding
+Wild
+Wind
+Women
+World
+World Electric Vehicle Journal (WEVJ)
+Youth
+Zoonotic Diseases
+
+Article Type
+
+All Article Types
+Article
+Review
+Communication
+Editorial
+Abstract
+Book Review
+Brief Communication
+Brief Report
+Case Report
+Clinicopathological Challenge
+Comment
+Commentary
+Concept Paper
+Conference Report
+Correction
+Creative
+Data Descriptor
+Discussion
+Entry
+Essay
+Expression of Concern
+Extended Abstract
+Field Guide
+Giants in Urology
+Guidelines
+Hypothesis
+Interesting Images
+Letter
+New Book Received
+Obituary
+Opinion
+Patent Summary
+Perspective
+Proceeding Paper
+Project Report
+Protocol
+Registered Report
+Reply
+Retraction
+Short Note
+Study Protocol
+Systematic Review
+Technical Note
+Tutorial
+Urology around the World
+Viewpoint
+
+ 
+
+ 
+
+[Advanced Search](#)
+
+ 
+
+Section
+
+Special Issue
+
+Volume
+
+Issue
+
+Number
+
+Page
+
+Logical OperatorOperator
+
+AND
+OR
+
+Search Text
+
+Search Type
+
+All fields
+Title
+Abstract
+Keywords
+Authors
+Affiliations
+Doi
+Full Text
+References
+
+ 
+
+*add_circle_outline*
+
+*remove_circle_outline*
+
+ 
+
+[Journals](https://www.mdpi.com/about/journals)
+
+[Applied Sciences](https://www.mdpi.com/journal/applsci)
+
+[Volume 10](https://www.mdpi.com/2076-3417/10)
+
+[Issue 3](https://www.mdpi.com/2076-3417/10/3)
+
+[10.3390/app10031094](#)
+
+[![applsci-logo](https://pub.mdpi-res.com/img/journals/applsci-logo.png?c706cab522490ca4 "Applied Sciences")](https://www.mdpi.com/journal/applsci)
+
+[Submit to this Journal](https://susy.mdpi.com/user/manuscripts/upload?form%5Bjournal_id%5D%3D90) [Review for this Journal](https://susy.mdpi.com/volunteer/journals/review) [Propose a Special Issue](https://www.mdpi.com/journalproposal/sendproposalspecialissue/applsci)
+
+[► ▼ Article Menu](#)
+
+## Article Menu
+
+- [Recommended Articles](#)
+- [Related Info Link](#related)
+
+  * [Google Scholar](http://scholar.google.com/scholar?q=Whole-Body%20Dynamic%20Analysis%20of%20Challenging%20Slackline%20Jumping)
+
+- [More by Authors Links](#authors)
+
+  * on DOAJ
+
+  + [Stein, K.](http://doaj.org/search/articles?source=%7B%22query%22%3A%7B%22query_string%22%3A%7B%22query%22%3A%22%5C%22Kevin%20Stein%5C%22%22%2C%22default_operator%22%3A%22AND%22%2C%22default_field%22%3A%22bibjson.author.name%22%7D%7D%7D)
+  +
+  + [Mombaur, K.](http://doaj.org/search/articles?source=%7B%22query%22%3A%7B%22query_string%22%3A%7B%22query%22%3A%22%5C%22Katja%20Mombaur%5C%22%22%2C%22default_operator%22%3A%22AND%22%2C%22default_field%22%3A%22bibjson.author.name%22%7D%7D%7D)
+  +
+  * on Google Scholar
+
+  + [Stein, K.](http://scholar.google.com/scholar?q=Kevin%20Stein)
+  +
+  + [Mombaur, K.](http://scholar.google.com/scholar?q=Katja%20Mombaur)
+  +
+  * on PubMed
+
+  + [Stein, K.](http://www.pubmed.gov/?cmd=Search&term=Kevin%20Stein)
+  +
+  + [Mombaur, K.](http://www.pubmed.gov/?cmd=Search&term=Katja%20Mombaur)
+  +
+
+[Article Views](#metrics)
+
+[Citations -](#metrics)
+
+- [Table of Contents](#table_of_contents)
+  
+
+Altmetric [*share* Share](# "Share") [*announcement* Help](# "Help") [*format_quote* Cite](javascript:void(0);) [*question_answer* Discuss in SciProfiles](https://sciprofiles.com/discussion-groups/public/10.3390/app10031094?utm_source=mpdi.com&utm_medium=publication&utm_campaign=discuss_in_sciprofiles "Discuss in Sciprofiles")
+
+## Need Help?
+
+### Support
+
+Find support for a specific problem in the support section of our website.
+
+[Get Support](https://www.mdpi.com/about/contactform)
+
+### Feedback
+
+Please let us know what you think of our products and services.
+
+[Give Feedback](https://www.mdpi.com/feedback/send)
+
+### Information
+
+Visit our dedicated information section to learn more about MDPI.
+
+[Get Information](https://www.mdpi.com/authors)
+
+*clear*
+
+## JSmol Viewer
+
+*clear*
+
+*first_page*
+
+[Download PDF](https://www.mdpi.com/2076-3417/10/3/1094/pdf?version=1580994283)
+
+*settings*
+
+[Order Article Reprints](https://www.mdpi.com/2076-3417/10/3/1094/reprints)
+
+Font Type:
+
+*Arial* *Georgia* *Verdana*
+
+Font Size:
+
+Aa Aa Aa
+
+Line Spacing:
+
+** ** **
+
+Column Width:
+
+** ** **
+
+Background:
+
+Open AccessArticle
+
+# Whole-Body Dynamic Analysis of Challenging Slackline Jumping
+
+by
+
+Kevin Stein
+
+![](https://www.mdpi.com/bundles/mdpisciprofileslink/img/unknown-user.png)Kevin Stein
+
+[SciProfiles](https://sciprofiles.com/profile/924094?utm_source=mdpi.com&utm_medium=website&utm_campaign=avatar_name)[Scilit](https://scilit.com/scholars?q=Kevin%20Stein)[Preprints.org](https://www.preprints.org/search?condition_blocks=[{%22value%22:%22Kevin+Stein%22,%22type%22:%22author%22,%22operator%22:null}]&sort_field=relevance&sort_dir=desc&page=1&exact_match=true)[Google Scholar](https://scholar.google.com/scholar?q=Kevin+Stein)
+
+ *[mailto:/cnd-cgi/l/email-protection#000e6b1d020545181f0e02052b11021f02451e050246030e020f0e07090e190c450f0e](mailto:/cnd-cgi/l/email-protection#000e6b1d020545181f0e02052b11021f02451e050246030e020f0e07090e190c450f0e)[![](https://pub.mdpi-res.com/img/design/orcid.png?0465bc3812adeb52?1779970059 "ORCID")](https://orcid.org/0000-0003-2222-8471) and
+
+Katja Mombaur
+
+![](https://www.mdpi.com/bundles/mdpisciprofileslink/img/unknown-user.png)Katja Mombaur
+
+[SciProfiles](https://sciprofiles.com/profile/author/TS9PdWFlNCtwRDU0OWgxRndKbm4zU3NEc0RtTkpLaEhLT1hqLzZsSUFUc1dWb2JwRzlLcDRLaTN2RkQvMDdjVA==?utm_source=mdpi.com&utm_medium=website&utm_campaign=avatar_name)[Scilit](https://scilit.com/scholars?q=Katja%20Mombaur)[Preprints.org](https://www.preprints.org/search?condition_blocks=[{%22value%22:%22Katja+Mombaur%22,%22type%22:%22author%22,%22operator%22:null}]&sort_field=relevance&sort_dir=desc&page=1&exact_match=true)[Google Scholar](https://scholar.google.com/scholar?q=Katja+Mombaur)
+
+[mailto:/cnd-cgi/l/email-protection#000a6b1f010a45060406090a1e192b11021f02451e050246030e020f0e07090e190c450f0e](mailto:/cnd-cgi/l/email-protection#000a6b1f010a45060406090a1e192b11021f02451e050246030e020f0e07090e190c450f0e)[![](https://pub.mdpi-res.com/img/design/orcid.png?0465bc3812adeb52?1779970059 "ORCID")](https://orcid.org/0000-0003-1353-0943)
+
+Optimization, Robotics and Biomechanics (ORB), Institute of Computer Engineering (ZITI), Heidelberg University, 69117 Heidelberg, Germany
+
+*
+
+Author to whom correspondence should be addressed.
+
+*Appl. Sci.* **2020**, *10*(3), 1094; <https://doi.org/10.3390/app10031094>
+
+Submission received: 31 December 2019 / Revised: 29 January 2020 / Accepted: 1 February 2020 / Published: 6 February 2020
+
+(This article belongs to the Special Issue [Biomechanical Spectrum of Human Sport Performance](<  
+    /journal/applsci/special_issues/Sport_Biomechanical_Spectrum
+>))  
+
+Download *keyboard_arrow_down*
+
+[Download PDF](https://www.mdpi.com/2076-3417/10/3/1094/pdf?version=1580994283)  
+[Download PDF with Cover](#)  
+[Download XML](#)  
+[Download Epub](https://www.mdpi.com/2076-3417/10/3/1094/epub)  
+
+[Browse Figures](#)
+
+[https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g001.png?1582207340](https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g001.png?1582207340 "
+                        &lt;strong&gt;Figure 1&lt;/strong&gt;&lt;br&gt;
+                                                    &lt;p&gt;Left: A subject balancing on a slackline. An elastic ribbon band is mounted between two anchor points. The foot contact is able to move sideways and in up and down direction. Right: Kinematic motion capture data of slackline balancing. The coordinate system definition is used throughout this work.&lt;/p&gt;
+                                                ") [https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g002.png?1582207340](https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g002.png?1582207340 "
+                        &lt;strong&gt;Figure 2&lt;/strong&gt;&lt;br&gt;
+                                                    &lt;p&gt;Center of Pressure recording of different single leg balancing tasks. We recorded both legs individually using Moticon Pressure Insoles. Left: Single leg balancing on regular surface. The CoP is moving in the anterior-posterior and in medial-lateral direction. Middle: Balancing on the slackline with aligned stance foot. Right: Balancing on the slackline with turned stance foot. The CoP is constrained by the direction of the slackline and to a single line.&lt;/p&gt;
+                                                ") [https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g003.png?1582207340](https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g003.png?1582207340 "
+                        &lt;strong&gt;Figure 3&lt;/strong&gt;&lt;br&gt;
+                                                    &lt;p&gt;Left: The static pose of the subject. Middle: The rigid body model in Puppeteer. Joint centers are visualized in white. Virtual markers were placed on the model following the static pose. Right: Inverse kinematic fit of the model to a slackline pose.&lt;/p&gt;
+                                                ") [https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g004.png?1582207340](https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g004.png?1582207340 "
+                        &lt;strong&gt;Figure 4&lt;/strong&gt;&lt;br&gt;
+                                                    &lt;p&gt;Feet positions are plotted against time. The rest height of the slackline is 31 cm. We determine the times of contact and flight phases when both feet are higher than the slackline. The flight phase is indicated in red.&lt;/p&gt;
+                                                ") [https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g005.png?1582207339](https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g005.png?1582207339 "
+                        &lt;strong&gt;Figure 5&lt;/strong&gt;&lt;br&gt;
+                                                    &lt;p&gt;The result of this work: A fully dynamic reconstruction of a jumping motion with rotation. The contact forces and torques are visualized.&lt;/p&gt;
+                                                ") [https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g006.png?1582207340](https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g006.png?1582207340 "
+                        &lt;strong&gt;Figure 6&lt;/strong&gt;&lt;br&gt;
+                                                    &lt;p&gt;Top: Average marker error for all 45 markers. Largest deviations occur for the shoulder markers. This is due to the fact that the model is based on a N-Pose capture and the slackline motion mainly had a T-Pose like arm positioning. Bottom: Frame by frame marker error.&lt;/p&gt;
+                                                ") [https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g007.png?1582207340](https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g007.png?1582207340 "
+                        &lt;strong&gt;Figure 7&lt;/strong&gt;&lt;br&gt;
+                                                    &lt;p&gt;Center of Mass velocity and acceleration in global coordinates during the motion. Results from the conventional method are plotted in green, the proposed method is plotted in purple. During the flight phase all horizontal accelerations are supposed to be zero and the according velocities should be constant. We see inconsistencies and changes in the range of 20% for the conventional method whereas the proposed method is physically feasible.&lt;/p&gt;
+                                                ") [https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g008.png?1582207340](https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g008.png?1582207340 "
+                        &lt;strong&gt;Figure 8&lt;/strong&gt;&lt;br&gt;
+                                                    &lt;p&gt;Angular Momentum and Change of Angular Momentum around the Center of Mass. Similar to &lt;a href=&quot;#applsci-10-01094-f007&quot; class=&quot;html-fig&quot;&gt;Figure 7&lt;/a&gt; we see constant values during the flight phase and zero values of the derivative for the proposed method. Values computed with the conventional method are not respecting Newtons EoM.&lt;/p&gt;
+                                                ") [https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g009.png?1582207340](https://pub.mdpi-res.com/applsci/applsci-10-01094/article_deploy/html/images/applsci-10-01094-g009.png?1582207340 "
+                        &lt;strong&gt;Figure 9&lt;/strong&gt;&lt;br&gt;
+                                                    &lt;p&gt;Left: Sum of contact forces and Center of Mass acceleration times subject mass. Right: Sum of contact torques and torques produced by the contact forces plotted against the change of angular momentum. Equations (&lt;a href=&quot;#FD11-applsci-10-01094&quot; class=&quot;html-disp-formula&quot;&gt;11&lt;/a&gt;) and (12) are satisfied throughout the motion.&lt;/p&gt;
+                                                ")
+
+[Review Reports](https://www.mdpi.com/2076-3417/10/3/1094/review_report) [Versions Notes](https://www.mdpi.com/2076-3417/10/3/1094/notes)
+
+## Abstract
+
+Maintaining balance on a slackline is a challenging task in itself. Walking on a high line, jumping and performing twists or somersaults seems nearly impossible. Contact forces are essential to understanding how humans maintain balance in such challenging situations, but they cannot always be measured directly. Therefore, we propose a contact model for slackline balancing that includes the interaction forces and torques as well as the position of the Center of Pressure. We apply this model within an optimization framework to perform a fully dynamic motion reconstruction of a jump with a rotation of approximately 180<!-- MathML: <math display="inline"><semantics>
+  <msup>
+    <mrow />
+    <mo>°</mo>
+  </msup>
+</semantics></math> --> °. Newton’s equations of motions are implemented as constraints to the optimization, hence the optimized motion is physically feasible. We show that a conventional kinematic analysis results in dynamic inconsistencies. The advantage of our method becomes apparent during the flight phase of the motion and when comparing the center of mass and angular momentum dynamics. With our motion reconstruction method all momentum is conserved, whereas the conventional analysis shows momentum changes of up to 30%. Furthermore, we get additional and reliable information on the interaction forces and the joint torque that allow us to further analyze slackline balancing strategies.
+
+Keywords:
+
+[slackline balancing](https://www.mdpi.com/search?q=slackline+balancing); [dynamics reconstruction](https://www.mdpi.com/search?q=dynamics+reconstruction); [contact force modeling](https://www.mdpi.com/search?q=contact+force+modeling); [optimal control](https://www.mdpi.com/search?q=optimal+control); [subject-specific modeling](https://www.mdpi.com/search?q=subject-specific+modeling)
+
+## 1. Introduction
+
+Slackline balancing is a recreational sport where the athlete tries to stand, walk or jump on a spring-like elastic ribbon band that is mounted between two anchor points as shown in [Figure 1](#applsci-10-01094-f001). Unlike balancing on a stiff beam or when performing a tandem walk on a regular surface, the slackline can swing both sideways and vertically, which increases the difficulty of maintaining an upright position [[1](#B1-applsci-10-01094)]. In ongoing work, we investigate how humans maintain balance on a slackline and, to date, motion captured over 20 subjects of different skill levels. This led to a big data set containing standing, walking and jumping motions from beginners, intermediate and expert subjects. We previously analyzed different performance indicators for standing and walking based on kinematic measurements and subject-specific rigid body modeling [[2](#B2-applsci-10-01094)] and found that experts show reduced angular momentum around the vertical axis and reduced Center of Mass (CoM) acceleration due to adjusted stance leg compliance. The analysis, however, lacks information on the interaction forces with the slackline. They are fundamental for understanding human locomotion [[3](#B3-applsci-10-01094)] and would allow us to further investigate the data. The measurement of Ground Reaction Forces (GRF) enables us to compute joint torques, assess stability parameters in balancing tasks and is therefore part of many gait analysis protocols [[4](#B4-applsci-10-01094),[5](#B5-applsci-10-01094)]. Pressure sensors and insoles are undergoing rapid development and are applied in various setups to measure interaction forces [[6](#B6-applsci-10-01094)], however, it is not always possible to measure all forces directly for every task. Slackline balancing is usually done barefoot as experts report higher contact friction with the slackline which is crucial when landing from jumping. Beginners also prefer barefoot balancing over wearing shoes because they get a better feedback and control of the contact force. In the literature there are no reports on instrumented slacklines that can measure all interaction forces between the slackline and the subject. Previous work by Karatsidis et al. [[7](#B7-applsci-10-01094)] estimated GRF for walking based only on inertial measurement data, a dynamic subject model and a heuristic on how the GRF are distributed during the double support phase. In previous work, we applied optimization methods and rigid body modeling to reconstruct GRF from kinematic data for sprinting motions with prostheses [[8](#B8-applsci-10-01094)] and for a gymnastic cartwheel motion [[9](#B9-applsci-10-01094)]. A dynamic model of the subject and a specific model of the interaction was crucial to obtain meaningful results. We now propose a new contact model specifically for balancing on a slackline and demonstrate its application by formulating and solving an optimal control problem (OCP) that reconstructs joint torques and forces of the slackline from marker-based motion capture and purely kinematic data. Newton’s equations of motions are implemented as constraints to the optimization and therefore the optimized motion is physically feasible. When analyzing jumping motions with the conventional kinematic method we found inconsistencies in the CoM and angular momentum dynamics during the flight phase. In this work, we show the advantage of the proposed analysis for a jump motion with rotation as an example.
+
+## 2. Materials and Methods
+
+### 2.1. Experimental Approach to the Problem
+
+We present an overview of the slackline measurements and the data acquisition in [Section 2.2](#sec2dot2-applsci-10-01094). The conventional way of analyzing the data is described in [Section 2.3](#sec2dot3-applsci-10-01094). In a pre-study we investigated the differences between a regular planar contact and the contact with the slackline using sensor insoles ([Section 2.4](#sec2dot4-applsci-10-01094)). The new analysis method is described in [Section 2.5](#sec2dot5-applsci-10-01094). It is based on the new contact model ([Section 2.5.1](#sec2dot5dot1-applsci-10-01094)) that takes the contact force, the contact torque and the position of the Center of Pressure (CoP) position into account. The subject-specific modeling and the formulation of the rigid body system dynamics with external contact forces are described in [Section 2.5.2](#sec2dot5dot2-applsci-10-01094). In [Section 2.5.3](#sec2dot5dot3-applsci-10-01094) we formulate and solve an OCP that tracks the recorded kinematic data by employing the proposed model. As a result we obtain a fully dynamic description of the motion, including joint torques and contact forces. We apply our approach to reconstruct the dynamics of one example motion where the subject jumps on the slackline and performs a rotation of approximately 180<!-- MathML: <math display="inline"><semantics>
+  <msup>
+    <mrow />
+    <mo>°</mo>
+  </msup>
+</semantics></math> --> °. A visualization of the resulting motion and the contact forces and torques is shown in [Section 3](#sec3-applsci-10-01094). We validate the OCP result by computing the CoM and angular momentum dynamics to show that the motion is physically feasible and follows Newton’s mechanics ([Section 2.5.4](#sec2dot5dot4-applsci-10-01094)). We then compare the proposed method to the results of a conventional analysis that is often used in the literature.
+
+### 2.2. Slackline Study and Data Acquisition
+
+The slackline was installed using the Gibbon Slackrack 300 (ID Sports GmbH, Gibbon Slacklines, Stuttgart, Germany) as shown in [Figure 1](#applsci-10-01094-f001). The slackline was 3 m in length, 5 cm in width and mounted 31 cm above the ground. The motions were recorded using the marker-based motion capture system Qualisys (Qualisys, Goeteborg, Sweden) consisting of 8 Oqus 500 cameras at a frame rate of 150 Hz. The subject was prepared with 49 spherical infrared-reflective markers of 14 mm diameter, following the bone landmarks of the Gait-IOR marker set [[10](#B10-applsci-10-01094)]. This marker set has originally been designed for gait analysis and was extended by two additional markers on the Medial Epicondyle of the Humerus to allow for better upper arm tracking and shoulder angle reconstruction. A static pose was recorded to create the subject-specific rigid body model. Six static markers were removed after this pose following the Gait-IOR guidelines, since the static markers were located at the medial side of the leg segments and are often occluded, thus tending to collide with other body parts and eventually hinder free movement. All dynamic motions were recorded using the remaining 45 markers. The slackline motion capture experiments were approved by the ethics committee of the Faculty of Behavioral and Cultural Studies of Heidelberg University according to the Helsinki Declaration (AZ Mom 2016 1/2-A1, 2016 with amendment 2019). Written informed consent was obtained from the subject. before the measurements. The subject was 1.9 m tall, weight 86 kg and was 27 years old and had considerable experience in slackline balancing.
+
+### 2.3. Conventional Analysis
+
+In conventional motion analysis the joint angles of the rigid body model are computed using whole-body inverse kinematics for every frame individually. We used the open source sofware tool Puppeteer by Martin Felis [[11](#B11-applsci-10-01094)] for this task. It employs a damped Levenberg-Marquardt algorithm, described by Sugihara [[12](#B12-applsci-10-01094)], to solve for the whole-body posture on a frame-by-frame basis. Afterwards, a low-pass filter was applied to generate smooth and differentiable joint trajectories. Joint velocities and joint accelerations are computed using finite central differences. The resulting trajectories represent the measured kinematics and we can compute different mechanical properties such as CoM acceleration or angular momentum when employing a dynamic subject model. The model is usually based on anthropomorphic measurements, e.g., by de Leva [[13](#B13-applsci-10-01094)] or Jensen [[14](#B14-applsci-10-01094)]. This kind of analysis is widely spread in the sports and biomechanics community and is also part of commercial motion analysis software like Visual3d (C-Motion, Germantown, MD). However, a frame-by-frame analysis in combination with an approximated model does not necessarily follow the laws of physics. Noise in the measurement, filtering and numerical derivation of joint velocities and accelerations, can result in violation of Newton’s Equations of Motion (EoM). Additionally, it does not provide information on the acting joint torques or any interaction forces. We used a conventional analysis of the example motion as a comparison to show the advantages of the proposed method.
+
+### 2.4. Experimental Foot Contact Analysis and Modeling—A Pre-Study
+
+The Center of Pressure (CoP) is often used to analyze balance capabilities [[5](#B5-applsci-10-01094)]. In this pre-study we performed CoP measurements using Moticon Pressure Insoles (Moticon GmbH, Munich, Germany) as we expected additional insight into the interaction from these measurements. We recorded standing on one leg in three different situations and for each foot individually. The following results are visualized in [Figure 2](#applsci-10-01094-f002):
+
+- **Left:** Single leg balancing on regular surface
+
+- **Middle:** Balancing on the slackline with aligned stance foot
+
+- **Right:** Balancing on the slackline with turned stance foot
+
+We see a clear difference between the cases: On flat ground the CoP moves in medial-lateral and in anterior-posterior direction, as is established in the literature. It is different on the slackline: we observe that the CoP does not move within the whole contact plane, but only on a single line. From the aligned and turned foot positioning we can conclude that the direction of this line is determined by the direction of the slackline. Even though the slackline measures 5 cm in width, we see from the measurement data that the CoP does not deviate from the very center of the slackline. We explain this with the fact that the ribbon band of the slackline is able to freely rotate around the center axis between the anchor points. This rotation is barely damped and therefore highly sensitive to shifting the CoP away from the slackline center. Rotating a contact surface, however, greatly reduces the normal force and therefore reduces the non-slipping threshold. We conclude that a small shift of the CoP away from the center of the slackline can already lead to the contact foot slipping off. The very narrow constraints on the CoP together with the continuous vertical and sideways movement of the stance foot explains the difficulty of slackline balancing especially in contrast to walking on a beam.
+
+### 2.5. Proposed Analysis Method
+
+#### 2.5.1. Slackline Contact Modeling
+
+A foot contact model is required to perform a dynamic motion analysis. A regular planar, non-slipping contact can be described using a total of 8 variables [[15](#B15-applsci-10-01094)]: The contact force <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">F</mi>
+</semantics></math> --> F acting in three directions, two variables for the CoP position <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">p</mi>
+</semantics></math> --> p in the contact plane and three contact torques <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">M</mi>
+</semantics></math> --> M. The forces are constrained by the friction cone to prevent slipping. Taking the measurements presented in [Section 2.4](#sec2dot4-applsci-10-01094) into account, we propose a new contact model for slackline balancing that includes 6 variables. Based on the slackline coordinate system shown in [Figure 1](#applsci-10-01094-f001) they are:
+
+
+
+<!-- MathML: <math display="block"><semantics>
+  <mtable displaystyle="true">
+    <mtr>
+      <mtd columnalign="right">
+        <mi mathvariant="bold-italic">F</mi>
+      </mtd>
+      <mtd columnalign="left">
+        <mrow>
+          <mo>=</mo>
+          <mo>[</mo>
+          <msub>
+            <mi>F</mi>
+            <mi>x</mi>
+          </msub>
+          <mo>,</mo>
+          <msub>
+            <mi>F</mi>
+            <mi>y</mi>
+          </msub>
+          <mo>,</mo>
+          <msub>
+            <mi>F</mi>
+            <mi>z</mi>
+          </msub>
+          <mo>]</mo>
+          <mo>:</mo>
+          <mspace width="4.pt" />
+          <mi>The</mi>
+          <mspace width="4.pt" />
+          <mi>contact</mi>
+          <mspace width="4.pt" />
+          <mi>forces</mi>
+        </mrow>
+      </mtd>
+    </mtr>
+  </mtable>
+</semantics></math> --> F
+  
+  
+  
+          =
+          [
+  
+            F
+            x
+  
+          ,
+  
+            F
+            y
+  
+          ,
+  
+            F
+            z
+  
+          ]
+          :
+  
+          The
+  
+          contact
+  
+          forces
+
+(1)
+
+
+
+<!-- MathML: <math display="block"><semantics>
+  <mtable displaystyle="true">
+    <mtr>
+      <mtd columnalign="right">
+        <mi mathvariant="bold-italic">p</mi>
+      </mtd>
+      <mtd columnalign="left">
+        <mrow>
+          <mo>=</mo>
+          <mo>[</mo>
+          <msub>
+            <mi>p</mi>
+            <mi>x</mi>
+          </msub>
+          <mo>,</mo>
+          <mn>0</mn>
+          <mo>]</mo>
+          <mo>:</mo>
+          <mspace width="4.pt" />
+          <mi>The</mi>
+          <mspace width="4.pt" />
+          <mi>CoP</mi>
+          <mspace width="4.pt" />
+          <mi>position</mi>
+          <mspace width="4.pt" />
+          <mi>in</mi>
+          <mspace width="4.pt" />
+          <mi>along</mi>
+          <mspace width="4.pt" />
+          <mi>the</mi>
+          <mspace width="4.pt" />
+          <mi>slackline</mi>
+        </mrow>
+      </mtd>
+    </mtr>
+  </mtable>
+</semantics></math> --> p
+  
+  
+  
+          =
+          [
+  
+            p
+            x
+  
+          ,
+          0
+          ]
+          :
+  
+          The
+  
+          CoP
+  
+          position
+  
+          in
+  
+          along
+  
+          the
+  
+          slackline
+
+(2)
+
+
+
+<!-- MathML: <math display="block"><semantics>
+  <mtable displaystyle="true">
+    <mtr>
+      <mtd columnalign="right">
+        <mi mathvariant="bold-italic">M</mi>
+      </mtd>
+      <mtd columnalign="left">
+        <mrow>
+          <mo>=</mo>
+          <mo>[</mo>
+          <mn>0</mn>
+          <mo>,</mo>
+          <msub>
+            <mi>M</mi>
+            <mi>y</mi>
+          </msub>
+          <mo>,</mo>
+          <msub>
+            <mi>M</mi>
+            <mi>z</mi>
+          </msub>
+          <mo>]</mo>
+          <mo>:</mo>
+          <mspace width="4.pt" />
+          <mi>The</mi>
+          <mspace width="4.pt" />
+          <mi>contact</mi>
+          <mspace width="4.pt" />
+          <mi>torques</mi>
+          <mspace width="4.pt" />
+          <mi>in</mi>
+          <mspace width="4.pt" />
+          <mi>the</mi>
+          <mspace width="4.pt" />
+          <mi>slackline</mi>
+          <mspace width="4.pt" />
+          <mi>coordinate</mi>
+          <mspace width="4.pt" />
+          <mi>system</mi>
+        </mrow>
+      </mtd>
+    </mtr>
+  </mtable>
+</semantics></math> --> M
+  
+  
+  
+          =
+          [
+          0
+          ,
+  
+            M
+            y
+  
+          ,
+  
+            M
+            z
+  
+          ]
+          :
+  
+          The
+  
+          contact
+  
+          torques
+  
+          in
+  
+          the
+  
+          slackline
+  
+          coordinate
+  
+          system
+
+(3)
+
+Zeros are placed where the regular contact model would have had an additional variable. The contact force can still act in all three directions and is still subject to the friction cone. As a consequence of the measurements presented in [Figure 2](#applsci-10-01094-f002), the CoP position is described by only one free variable instead of two. The Y-coordinate is always zero. The position can no longer be defined in the local coordinate system of the foot, but has to be transformed in the coordinate system of the slackline. Furthermore, we allow only two instead of three contact torques. Again, these are defined by the global position of the slackline and cannot be modeled locally. They act around the vertical axis and are perpendicular to the slackline. As described before, the slackline can freely rotate around the X-Axis and therefore no torque can be applied around this axis.
+
+#### 2.5.2. Subject Modeling and Dynamics Computations
+
+The subject model consists of 17 segments. The length of each segment and the joint locations were estimated from the marker positions of the static trial recording following the Gait-IOR marker set guidelines. [Figure 3](#applsci-10-01094-f003) shows the static pose recording of the subject at the left and the specific rigid body model in the middle. Joint center positions are visualized in white. Virtual markers are placed on each segment of the model according to the static pose. These virtual markers are used to track the recorded marker data as shown at the right. For the dynamic properties of the model, such as segment mass, inertia or the relative segment CoM position, we refer to the measurements by de Leva [[13](#B13-applsci-10-01094)] and linearly adjust them to the individual segment length. The degrees of freedom (DoF) and the kinematic structure is described in [Table 1](#applsci-10-01094-t001).
+
+The dynamics of a rigid body system with <!-- MathML: <math display="inline"><semantics>
+  <msub>
+    <mi>n</mi>
+    <mrow>
+      <mi>d</mi>
+      <mi>o</mi>
+      <mi>f</mi>
+    </mrow>
+  </msub>
+</semantics></math> --> n
+  
+      d
+      o
+      f DoF using generalized coordinates <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">q</mi>
+</semantics></math> --> q are described by the following equation [[16](#B16-applsci-10-01094)]:
+
+
+
+<!-- MathML: <math display="block"><semantics>
+  <mrow>
+    <mi mathvariant="bold-italic">H</mi>
+    <mrow>
+      <mo>(</mo>
+      <mi mathvariant="bold-italic">q</mi>
+      <mo>)</mo>
+    </mrow>
+    <mover accent="true">
+      <mi mathvariant="bold-italic">q</mi>
+      <mo>¨</mo>
+    </mover>
+    <mo>+</mo>
+    <mi mathvariant="bold-italic">C</mi>
+    <mrow>
+      <mo>(</mo>
+      <mi mathvariant="bold-italic">q</mi>
+      <mo>,</mo>
+      <mover accent="true">
+        <mi mathvariant="bold-italic">q</mi>
+        <mo>˙</mo>
+      </mover>
+      <mo>)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mi mathvariant="bold-italic">τ</mi>
+  </mrow>
+</semantics></math> --> H
+  
+      (
+      q
+      )
+  
+  
+      q
+      ¨
+  
+    +
+    C
+  
+      (
+      q
+      ,
+  
+        q
+        ˙
+  
+      )
+  
+    =
+    τ
+
+(4)
+
+where the matrix <!-- MathML: <math display="inline"><semantics>
+  <mrow>
+    <mi mathvariant="bold-italic">H</mi>
+    <mrow>
+      <mo>(</mo>
+      <mi mathvariant="bold-italic">q</mi>
+      <mo>)</mo>
+    </mrow>
+    <mo>∈</mo>
+    <msup>
+      <mi mathvariant="double-struck">R</mi>
+      <mrow>
+        <msub>
+          <mi>n</mi>
+          <mrow>
+            <mi>d</mi>
+            <mi>o</mi>
+            <mi>f</mi>
+          </mrow>
+        </msub>
+        <mo>×</mo>
+        <msub>
+          <mi>n</mi>
+          <mrow>
+            <mi>d</mi>
+            <mi>o</mi>
+            <mi>f</mi>
+          </mrow>
+        </msub>
+      </mrow>
+    </msup>
+  </mrow>
+</semantics></math> --> H
+  
+      (
+      q
+      )
+  
+    ∈
+  
+      R
+  
+  
+          n
+  
+            d
+            o
+            f
+  
+  
+        ×
+  
+          n
+  
+            d
+            o
+            f is the generalized inertia matrix that is constructed from the current configuration of the model and the inertia and CoM positions of each segment, <!-- MathML: <math display="inline"><semantics>
+  <mrow>
+    <mi mathvariant="bold-italic">C</mi>
+    <mrow>
+      <mo>(</mo>
+      <mi mathvariant="bold-italic">q</mi>
+      <mo>,</mo>
+      <mover accent="true">
+        <mi mathvariant="bold-italic">q</mi>
+        <mo>˙</mo>
+      </mover>
+      <mo>)</mo>
+    </mrow>
+    <mo>∈</mo>
+    <msup>
+      <mi mathvariant="double-struck">R</mi>
+      <msub>
+        <mi>n</mi>
+        <mrow>
+          <mi>d</mi>
+          <mi>o</mi>
+          <mi>f</mi>
+        </mrow>
+      </msub>
+    </msup>
+  </mrow>
+</semantics></math> --> C
+  
+      (
+      q
+      ,
+  
+        q
+        ˙
+  
+      )
+  
+    ∈
+  
+      R
+  
+        n
+  
+          d
+          o
+          f is the generalized bias force (e.g., gravity or the Coriolis force) and <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">τ</mi>
+</semantics></math> --> τ are the generalized forces applied at the joints. This equation holds when the subject is in the air and no external forces are applied. When the model is in contact with the slackline, a contact force <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">F</mi>
+</semantics></math> --> F and a contact torque <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">M</mi>
+</semantics></math> --> M are acting at the contact point <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">p</mi>
+</semantics></math> --> p as derived in [Section 2.5.1](#sec2dot5dot1-applsci-10-01094). We can compute the generalized forces <!-- MathML: <math display="inline"><semantics>
+  <msub>
+    <mi mathvariant="bold-italic">τ</mi>
+    <mi>c</mi>
+  </msub>
+</semantics></math> --> τ
+    c resulting from an external force using:
+
+
+
+<!-- MathML: <math display="block"><semantics>
+  <mrow>
+    <msub>
+      <mi mathvariant="bold-italic">τ</mi>
+      <mi>c</mi>
+    </msub>
+    <mo>=</mo>
+    <mi mathvariant="bold-italic">G</mi>
+    <msup>
+      <mrow>
+        <mo>(</mo>
+        <mi mathvariant="bold-italic">q</mi>
+        <mo>,</mo>
+        <mi mathvariant="bold-italic">p</mi>
+        <mo>)</mo>
+      </mrow>
+      <mi mathvariant="bold-italic">T</mi>
+    </msup>
+    <mo>∗</mo>
+    <mfenced close="]" separators="" open="[">
+      <mtable>
+        <mtr>
+          <mtd>
+            <mi mathvariant="bold-italic">M</mi>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mi mathvariant="bold-italic">F</mi>
+          </mtd>
+        </mtr>
+      </mtable>
+    </mfenced>
+  </mrow>
+</semantics></math> --> τ
+      c
+  
+    =
+    G
+  
+  
+        (
+        q
+        ,
+        p
+        )
+  
+      T
+  
+    ∗
+  
+  
+  
+  
+            M
+  
+  
+  
+  
+            F
+
+(5)
+
+where <!-- MathML: <math display="inline"><semantics>
+  <mrow>
+    <mi mathvariant="bold-italic">G</mi>
+    <mo>(</mo>
+    <mi mathvariant="bold-italic">q</mi>
+    <mo>,</mo>
+    <mi mathvariant="bold-italic">p</mi>
+    <mo>)</mo>
+  </mrow>
+</semantics></math> --> G
+    (
+    q
+    ,
+    p
+    ) is the 6D Jacobian for a point on a body that when multiplied with <!-- MathML: <math display="inline"><semantics>
+  <mover accent="true">
+    <mi mathvariant="bold-italic">q</mi>
+    <mo>˙</mo>
+  </mover>
+</semantics></math> --> q
+    ˙ gives a 6-D vector that has the global angular velocity as the first three entries and the global linear velocity as the last three entries. With external contact forces Equation ([4](#FD4-applsci-10-01094)) becomes:
+
+
+
+<!-- MathML: <math display="block"><semantics>
+  <mrow>
+    <mi mathvariant="bold-italic">H</mi>
+    <mrow>
+      <mo>(</mo>
+      <mi mathvariant="bold-italic">q</mi>
+      <mo>)</mo>
+    </mrow>
+    <mover accent="true">
+      <mi mathvariant="bold-italic">q</mi>
+      <mo>¨</mo>
+    </mover>
+    <mo>+</mo>
+    <mi mathvariant="bold-italic">C</mi>
+    <mrow>
+      <mo>(</mo>
+      <mi mathvariant="bold-italic">q</mi>
+      <mo>,</mo>
+      <mover accent="true">
+        <mi mathvariant="bold-italic">q</mi>
+        <mo>˙</mo>
+      </mover>
+      <mo>)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mi mathvariant="bold-italic">τ</mi>
+    <mo>+</mo>
+    <munder>
+      <mo>∑</mo>
+      <mrow>
+        <mi>c</mi>
+        <mi>o</mi>
+        <mi>n</mi>
+        <mi>t</mi>
+        <mi>a</mi>
+        <mi>c</mi>
+        <mi>t</mi>
+        <mi>s</mi>
+      </mrow>
+    </munder>
+    <msub>
+      <mi mathvariant="bold-italic">τ</mi>
+      <mi>c</mi>
+    </msub>
+  </mrow>
+</semantics></math> --> H
+  
+      (
+      q
+      )
+  
+  
+      q
+      ¨
+  
+    +
+    C
+  
+      (
+      q
+      ,
+  
+        q
+        ˙
+  
+      )
+  
+    =
+    τ
+    +
+  
+      ∑
+  
+        c
+        o
+        n
+        t
+        a
+        c
+        t
+        s
+  
+  
+  
+      τ
+      c
+
+(6)
+
+For known joint angles <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">q</mi>
+</semantics></math> --> q, joint velocities <!-- MathML: <math display="inline"><semantics>
+  <mover accent="true">
+    <mi mathvariant="bold-italic">q</mi>
+    <mo>˙</mo>
+  </mover>
+</semantics></math> --> q
+    ˙ and joint torques <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">τ</mi>
+</semantics></math> --> τ we are able to compute the joint acceleration <!-- MathML: <math display="inline"><semantics>
+  <mover accent="true">
+    <mi mathvariant="bold-italic">q</mi>
+    <mo>¨</mo>
+  </mover>
+</semantics></math> --> q
+    ¨. This is known as Forward dynamics and implemented in RBDL under the ForwardDynamics function. The contact Jacobean was computed using the CalcPointJacobian6D function. The exact recursive implementation is described in [[16](#B16-applsci-10-01094)].
+
+#### 2.5.3. Optimal Control Problem Formulation
+
+We formulate the dynamic reconstruction of the recorded motion as an OCP. The general multi-phase OCP formulation is derived for example in [[17](#B17-applsci-10-01094)]. We only describe the formulation that was used for the specific problem of motion reconstruction. Unlike our previous work [[8](#B8-applsci-10-01094),[9](#B9-applsci-10-01094)] where we tracked joint trajectories that were computed beforehand, we now formulate an OCP that tracks the marker positions directly. In the following cost function we minimize the distance between the positions <!-- MathML: <math display="inline"><semantics>
+  <mover accent="true">
+    <msub>
+      <mi>m</mi>
+      <mi>i</mi>
+    </msub>
+    <mo stretchy="false">→</mo>
+  </mover>
+</semantics></math> --> m
+      i
+  
+    → of the virtual markers on the model and the 45 recorded marker trajectories <!-- MathML: <math display="inline"><semantics>
+  <mover accent="true">
+    <msubsup>
+      <mi>m</mi>
+      <mi>i</mi>
+      <mo>*</mo>
+    </msubsup>
+    <mo stretchy="false">→</mo>
+  </mover>
+</semantics></math> --> m
+      i
+      *
+  
+    → over the time <!-- MathML: <math display="inline"><semantics>
+  <mrow>
+    <mi>t</mi>
+    <mo>∈</mo>
+    <mo>[</mo>
+    <mn>0</mn>
+    <mo>,</mo>
+    <mi>T</mi>
+    <mo>]</mo>
+  </mrow>
+</semantics></math> --> t
+    ∈
+    [
+    0
+    ,
+    T
+    ] of the motion:
+
+
+
+<!-- MathML: <math display="block"><semantics>
+  <mrow>
+    <munder>
+      <mo movablelimits="true" form="prefix">min</mo>
+      <mrow>
+        <mi mathvariant="bold">x</mi>
+        <mo>,</mo>
+        <mi mathvariant="bold">u</mi>
+      </mrow>
+    </munder>
+    <msubsup>
+      <mo>∫</mo>
+      <mn>0</mn>
+      <mi>T</mi>
+    </msubsup>
+    <munderover>
+      <mo>∑</mo>
+      <mrow>
+        <mi>i</mi>
+        <mo>=</mo>
+        <mn>0</mn>
+      </mrow>
+      <mn>45</mn>
+    </munderover>
+    <msup>
+      <mrow>
+        <mo stretchy="false">‖</mo>
+        <mover accent="true">
+          <msub>
+            <mi>m</mi>
+            <mi>i</mi>
+          </msub>
+          <mo stretchy="false">→</mo>
+        </mover>
+        <mrow>
+          <mo>(</mo>
+          <mi mathvariant="bold-italic">q</mi>
+          <mrow>
+            <mo>(</mo>
+            <mi>t</mi>
+            <mo>)</mo>
+          </mrow>
+          <mo>)</mo>
+        </mrow>
+        <mo>−</mo>
+        <mover accent="true">
+          <msubsup>
+            <mi>m</mi>
+            <mi>i</mi>
+            <mo>*</mo>
+          </msubsup>
+          <mo stretchy="false">→</mo>
+        </mover>
+        <mrow>
+          <mo>(</mo>
+          <mi>t</mi>
+          <mo>)</mo>
+        </mrow>
+        <mo stretchy="false">‖</mo>
+      </mrow>
+      <mn>2</mn>
+    </msup>
+    <mi>d</mi>
+    <mi>t</mi>
+  </mrow>
+</semantics></math> --> min
+  
+        x
+        ,
+        u
+  
+  
+  
+      ∫
+      0
+      T
+  
+  
+      ∑
+  
+        i
+        =
+        0
+  
+      45
+  
+  
+  
+        ‖
+  
+  
+            m
+            i
+  
+          →
+  
+  
+          (
+          q
+  
+            (
+            t
+            )
+  
+          )
+  
+        −
+  
+  
+            m
+            i
+            *
+  
+          →
+  
+  
+          (
+          t
+          )
+  
+        ‖
+  
+      2
+  
+    d
+    t
+
+(7)
+
+with respect to the state vector <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">x</mi>
+</semantics></math> --> x and control vector <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">u</mi>
+</semantics></math> --> u. They are the same for all phases. The state vector consists of joint angles and joint velocities: <!-- MathML: <math display="inline"><semantics>
+  <mrow>
+    <mi mathvariant="bold">x</mi>
+    <mrow>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+      <mo>[</mo>
+      <mi mathvariant="bold">q</mi>
+      <mo>,</mo>
+      <mover accent="true">
+        <mi mathvariant="bold">q</mi>
+        <mo>˙</mo>
+      </mover>
+      <mo>]</mo>
+    </mrow>
+  </mrow>
+</semantics></math> --> x
+  
+      (
+      t
+      )
+  
+    =
+  
+      [
+      q
+      ,
+  
+        q
+        ˙
+  
+      ]. The control vector represents the torques of the actuated joints and all variables of the slackline contact model: <!-- MathML: <math display="inline"><semantics>
+  <mrow>
+    <mi mathvariant="bold">u</mi>
+    <mrow>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>)</mo>
+    </mrow>
+    <mo>=</mo>
+    <mo>[</mo>
+    <mi mathvariant="bold-italic">τ</mi>
+    <mrow>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>)</mo>
+    </mrow>
+    <mo>,</mo>
+    <msub>
+      <mi>λ</mi>
+      <mi mathvariant="bold-italic">L</mi>
+    </msub>
+    <mo>,</mo>
+    <msub>
+      <mi>λ</mi>
+      <mi mathvariant="bold-italic">R</mi>
+    </msub>
+    <mo>]</mo>
+  </mrow>
+</semantics></math> --> u
+  
+      (
+      t
+      )
+  
+    =
+    [
+    τ
+  
+      (
+      t
+      )
+  
+    ,
+  
+      λ
+      L
+  
+    ,
+  
+      λ
+      R
+  
+    ] These are for each foot: three contact forces, two contact torques and the CoP position. All are given in the coordinate system of the slackline as it is shown in [Figure 1](#applsci-10-01094-f001).
+
+
+
+<!-- MathML: <math display="block"><semantics>
+  <mrow>
+    <msub>
+      <mi mathvariant="bold-italic">λ</mi>
+      <mrow>
+        <mi mathvariant="bold-italic">R</mi>
+        <mo>/</mo>
+        <mi mathvariant="bold-italic">L</mi>
+      </mrow>
+    </msub>
+    <mo>=</mo>
+    <mrow>
+      <mo>[</mo>
+      <msub>
+        <mi>F</mi>
+        <mi>x</mi>
+      </msub>
+      <mo>,</mo>
+      <msub>
+        <mi>F</mi>
+        <mi>y</mi>
+      </msub>
+      <mo>,</mo>
+      <msub>
+        <mi>F</mi>
+        <mi>z</mi>
+      </msub>
+      <mo>,</mo>
+      <msub>
+        <mi>T</mi>
+        <mi>y</mi>
+      </msub>
+      <mo>,</mo>
+      <msub>
+        <mi>T</mi>
+        <mi>z</mi>
+      </msub>
+      <mo>,</mo>
+      <mi>p</mi>
+      <mo>]</mo>
+    </mrow>
+  </mrow>
+</semantics></math> --> λ
+  
+        R
+        /
+        L
+  
+  
+    =
+  
+      [
+  
+        F
+        x
+  
+      ,
+  
+        F
+        y
+  
+      ,
+  
+        F
+        z
+  
+      ,
+  
+        T
+        y
+  
+      ,
+  
+        T
+        z
+  
+      ,
+      p
+      ]
+
+(8)
+
+Controls are approximated to be piecewise linear continuous. To retrieve a feasible motion, the EoM must be satisfied and are therefore handled as constraints in the OCP. We reformulate Equation ([4](#FD4-applsci-10-01094)) and ([6](#FD6-applsci-10-01094)) as first order differential equations for the state vector:
+
+
+
+<!-- MathML: <math display="block"><semantics>
+  <mrow>
+    <mover accent="true">
+      <mi mathvariant="bold-italic">x</mi>
+      <mo>˙</mo>
+    </mover>
+    <mrow>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>)</mo>
+    </mrow>
+    <mo>=</mo>
+    <msub>
+      <mi mathvariant="bold-italic">f</mi>
+      <mi>j</mi>
+    </msub>
+    <mrow>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>,</mo>
+      <mi mathvariant="bold-italic">q</mi>
+      <mrow>
+        <mo>(</mo>
+        <mi>t</mi>
+        <mo>)</mo>
+      </mrow>
+      <mo>,</mo>
+      <mi mathvariant="bold-italic">τ</mi>
+      <mrow>
+        <mo>(</mo>
+        <mi>t</mi>
+        <mo>)</mo>
+      </mrow>
+      <mo>)</mo>
+    </mrow>
+  </mrow>
+</semantics></math> --> x
+      ˙
+  
+  
+      (
+      t
+      )
+  
+    =
+  
+      f
+      j
+  
+  
+      (
+      t
+      ,
+      q
+  
+        (
+        t
+        )
+  
+      ,
+      τ
+  
+        (
+        t
+        )
+  
+      )
+
+(9)
+
+where <!-- MathML: <math display="inline"><semantics>
+  <mrow>
+    <mi>j</mi>
+    <mo>∈</mo>
+    <mi mathvariant="double-struck">N</mi>
+  </mrow>
+</semantics></math> --> j
+    ∈
+    N is the phase index. At this point we implemented two formulations: In the first implementation, we used the joint trajectories from the conventional inverse kinematics fit to determine the three different phases of the motion. [Figure 4](#applsci-10-01094-f004) shows the height of the feet above the ground plotted over time. The slackline is mounted at a rest height of 31 cm. Therefore, we can define a flight phase whenever both feet are above this height. This is indicated in red for the motion at hand. Hence, phases 1 and 3 are contact phases and subject to Equation ([6](#FD6-applsci-10-01094)), Phase 2 is a flight phase and subject to Equation ([4](#FD4-applsci-10-01094)).
+
+In the second implementation, we defined the whole motion as one phase subject to the contact dynamics (Equation ([6](#FD6-applsci-10-01094))). Additionally, we formulated the following discontinuous path constraint throughout the motion:
+
+
+
+<!-- MathML: <math display="block"><semantics>
+  <mrow>
+    <mrow>
+      <msup>
+        <mi>r</mi>
+        <mrow>
+          <mi>e</mi>
+          <mi>q</mi>
+        </mrow>
+      </msup>
+      <mrow>
+        <mo>(</mo>
+        <mi mathvariant="bold">u</mi>
+        <mrow>
+          <mo>(</mo>
+          <mn>0</mn>
+          <mo>)</mo>
+        </mrow>
+        <mo>,</mo>
+        <mo>.</mo>
+        <mo>.</mo>
+        <mo>,</mo>
+        <mi mathvariant="bold">u</mi>
+        <mrow>
+          <mo>(</mo>
+          <mi>T</mi>
+          <mo>)</mo>
+        </mrow>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+    <mo>=</mo>
+    <mo>{</mo>
+    <mtable columnalign="left">
+      <mtr>
+        <mtd>
+          <msub>
+            <mi>λ</mi>
+            <mi mathvariant="bold-italic">R</mi>
+          </msub>
+          <mo>,</mo>
+        </mtd>
+        <mtd>
+          <mrow>
+            <mi>if</mi>
+            <mtext>&nbsp;</mtext>
+            <mi>Right</mi>
+            <mtext>&nbsp;</mtext>
+            <mi>Foot</mi>
+            <mtext>&nbsp;</mtext>
+            <mi>Height</mi>
+            <mtext>&nbsp;</mtext>
+            <mo>&gt;</mo>
+            <mn>0.31</mn>
+            <mtext>&nbsp;</mtext>
+            <mi mathvariant="normal">m</mi>
+          </mrow>
+        </mtd>
+      </mtr>
+      <mtr>
+        <mtd>
+          <msub>
+            <mi>λ</mi>
+            <mi mathvariant="bold-italic">L</mi>
+          </msub>
+          <mo>,</mo>
+        </mtd>
+        <mtd>
+          <mi>if</mi>
+          <mtext>&nbsp;</mtext>
+          <mi>Left</mi>
+          <mtext>&nbsp;</mtext>
+          <mi>Foot</mi>
+          <mtext>&nbsp;</mtext>
+          <mi>Height</mi>
+          <mtext>&nbsp;</mtext>
+          <mo>&gt;</mo>
+          <mn>0.31</mn>
+          <mtext>&nbsp;</mtext>
+          <mi mathvariant="normal">m</mi>
+          <mtext> </mtext>
+          <mo>!</mo>
+          <mo>=</mo>
+          <mn>0</mn>
+        </mtd>
+      </mtr>
+      <mtr>
+        <mtd>
+          <mn>0</mn>
+          <mo>,</mo>
+        </mtd>
+        <mtd>
+          <mi>otherwise</mi>
+        </mtd>
+      </mtr>
+    </mtable>
+  </mrow>
+</semantics></math> --> r
+  
+          e
+          q
+  
+  
+  
+        (
+        u
+  
+          (
+          0
+          )
+  
+        ,
+        .
+        .
+        ,
+        u
+  
+          (
+          T
+          )
+  
+        )
+  
+  
+    =
+    {
+  
+  
+  
+  
+            λ
+            R
+  
+          ,
+  
+  
+  
+            if
+             
+            Right
+             
+            Foot
+             
+            Height
+             
+            >
+            0.31
+             
+            m
+  
+  
+  
+  
+  
+  
+            λ
+            L
+  
+          ,
+  
+  
+          if
+           
+          Left
+           
+          Foot
+           
+          Height
+           
+          >
+          0.31
+           
+          m
+           
+          !
+          =
+          0
+  
+  
+  
+  
+          0
+          ,
+  
+  
+          otherwise
+
+(10)
+
+This allows the optimizer to determine the exact timing of contact which is fixed within the other implementation. Additionally, this formulation allows for different contact timings, such as jumping or landing with one foot after the other. This should enable for better marker positions tracking. On the other hand, such a formulation results in non-differentiabilities in the model which might cause numerical problems.
+
+In both implementations, further boundary constraints <!-- MathML: <math display="inline"><semantics>
+  <mrow>
+    <mi>g</mi>
+    <mo>(</mo>
+    <mo>·</mo>
+    <mo>)</mo>
+  </mrow>
+</semantics></math> --> g
+    (
+    ·
+    ) are implemented for joint angles, velocities and torques and must be respected throughout the motion. The friction cone is implemented as an inequality constraint that requires the normal force to be larger than the horizontal forces. To determine reasonable upper limits for contact forces and torques, we performed a similar jumping motion on two force plates (Bertec, Columbus, OH, USA) and recorded the acting GRF. Limits were set to 1.5 times the measured maximum values. We solve both implementations of the OCP numerically using MUSCOD-II [[17](#B17-applsci-10-01094),[18](#B18-applsci-10-01094)]. It was developed at the Interdisciplinary Center for Scientific Computing, IWR, Heidelberg University. The state variables are parameterized by the direct multiple-shooting method as it is derived in [[19](#B19-applsci-10-01094)]. The control variables were discretized by piecewise linear continuous functions. On all multiple-shooting intervals, the dynamics of the system are computed in parallel. The same intervals are apply for states and controls. We ensure a continuous solution by imposing continuity constraints at the shooting interval transitions for all state variables. This way, a large but structured nonlinear programming problem (NLP) is obtained. It is solved by an adapted sequential quadratic programming (SQP) method. Further detail can be found in [[17](#B17-applsci-10-01094)]. We expect the first implementation to show better convergence, since discontinuities in the dynamics are supposed to be formulated as phase changes and constraints should be differentiable throughout one phase. However, in practical tests we observed that formulating phase changes as constraints also works in the present case. We did not use a regularization term, which is often used to account for possible redundancies in the contact forces during the double support phases.
+
+#### 2.5.4. Validation
+
+We validate our method by showing that important mechanical properties of the overall system are satisfied due to the fact that Newton’s EoM have been formulated as constraints to the OCP. This includes:
+
+- Horizontal momentum is conserved during the flight phase
+
+- Gravity is the only acceleration acting on the CoM during the flight phase
+
+- Angular momentum is conserved during the flight phase
+
+- The change of momentum is proportional to the sum of external forces
+
+- The change of angular momentum is equal to the sum of all acting torques.
+
+With the change of momentum being equal to the CoM acceleration <!-- MathML: <math display="inline"><semantics>
+  <mover accent="true">
+    <mi mathvariant="bold-italic">c</mi>
+    <mo>¨</mo>
+  </mover>
+</semantics></math> --> c
+    ¨ times the subject mass m and <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">L</mi>
+</semantics></math> --> L being the angular momentum, we reformulate Newton’s EoM:
+
+
+
+<!-- MathML: <math display="block"><semantics>
+  <mtable displaystyle="true">
+    <mtr>
+      <mtd columnalign="right">
+        <mrow>
+          <mover accent="true">
+            <mi mathvariant="bold-italic">c</mi>
+            <mo>¨</mo>
+          </mover>
+          <mo>∗</mo>
+          <mi>m</mi>
+        </mrow>
+      </mtd>
+      <mtd columnalign="left">
+        <mrow>
+          <mo>=</mo>
+          <munder>
+            <mo>∑</mo>
+            <msub>
+              <mi>λ</mi>
+              <mrow>
+                <mi>L</mi>
+                <mo>/</mo>
+                <mi>R</mi>
+              </mrow>
+            </msub>
+          </munder>
+          <mi mathvariant="bold-italic">F</mi>
+        </mrow>
+      </mtd>
+    </mtr>
+  </mtable>
+</semantics></math> --> c
+            ¨
+  
+          ∗
+          m
+  
+  
+  
+  
+          =
+  
+            ∑
+  
+              λ
+  
+                L
+                /
+                R
+  
+  
+  
+          F
+
+(11)
+
+
+
+<!-- MathML: <math display="block"><semantics>
+  <mtable displaystyle="true">
+    <mtr>
+      <mtd columnalign="right">
+        <mover accent="true">
+          <mi mathvariant="bold-italic">L</mi>
+          <mo>˙</mo>
+        </mover>
+      </mtd>
+      <mtd columnalign="left">
+        <mrow>
+          <mo>=</mo>
+          <munder>
+            <mo>∑</mo>
+            <msub>
+              <mi>λ</mi>
+              <mrow>
+                <mi>L</mi>
+                <mo>/</mo>
+                <mi>R</mi>
+              </mrow>
+            </msub>
+          </munder>
+          <mrow>
+            <mo>(</mo>
+            <mi mathvariant="bold-italic">M</mi>
+            <mo>+</mo>
+            <mrow>
+              <mo>(</mo>
+              <msub>
+                <mi mathvariant="bold-italic">p</mi>
+                <mi>i</mi>
+              </msub>
+              <mo>−</mo>
+              <mi mathvariant="bold-italic">c</mi>
+              <mo>)</mo>
+            </mrow>
+            <mo>×</mo>
+            <mi mathvariant="bold-italic">F</mi>
+            <mo>)</mo>
+          </mrow>
+        </mrow>
+      </mtd>
+    </mtr>
+  </mtable>
+</semantics></math> --> L
+          ˙
+  
+  
+  
+  
+          =
+  
+            ∑
+  
+              λ
+  
+                L
+                /
+                R
+  
+  
+  
+  
+            (
+            M
+            +
+  
+              (
+  
+                p
+                i
+  
+              −
+              c
+              )
+  
+            ×
+            F
+            )
+
+(12)
+
+where <!-- MathML: <math display="inline"><semantics>
+  <mi mathvariant="bold-italic">p</mi>
+</semantics></math> --> p is the point where the force is acting. During all phases Equations ([11](#FD11-applsci-10-01094)) and (12) must hold. For the contact phases we can compute the left hand side of Equations ([11](#FD11-applsci-10-01094)) and (12) using the CalcCenterOfMass function of RBDL and the right hand side from result values of <!-- MathML: <math display="inline"><semantics>
+  <msub>
+    <mi>λ</mi>
+    <mrow>
+      <mi>L</mi>
+      <mo>/</mo>
+      <mi>R</mi>
+    </mrow>
+  </msub>
+</semantics></math> --> λ
+  
+      L
+      /
+      R of the OCP result.
+
+## 3. Results and Discussion
+
+Both implementations converged. Due to the problem’s complexity, we were numerically limited to ≈80 shooting nodes. We chose 40 multiple-shooting intervals per 1 s of motion and reconstructed around 2 s of motion. Other choices are possible, but we found that the computation time drastically increases with more shooting nodes and that the solver is not always able to find solutions for less shooting nodes per second of motion. As expected, the single-phase implementation resulted in a slightly lower tracking error. Therefore we present the results for the single-phase implementation. The resulting motion and the interaction forces (visualized as yellow arrows) are shown in [Figure 5](#applsci-10-01094-f005). Contact and flight phases are clearly distinguished. We see that the subject equally used both feet to initiate and land the jump and that contact torques were acting to build the necessary angular momentum for the rotation. The feet were aligned with the Slackline during the first contact phase and were turned perpendicular for landing.
+
+We present the fitting error of our model to the measured marker data: [Figure 6](#applsci-10-01094-f006) shows the average marker residuum on the top and the frame by frame error on the bottom. Overall we achieved an average tracking error of 3 cm per marker. This accuracy is similar to the least squares kinematic fit of the conventional analysis that was used to initialize the OCP and to what is reported in the literature. The largest deviations occur for the two shoulder markers (L_SAE and R_SAE). One reason for this is that the arms were aligned to the upper body during the static pose on which the model is based. During slacklining, however, the arms are turned 90<!-- MathML: <math display="inline"><semantics>
+  <msup>
+    <mrow />
+    <mo>°</mo>
+  </msup>
+</semantics></math> --> ° compared to this pose and mainly parallel to the ground which results in skin and marker movement relative to the bone and shoulder joint. This offset is visible throughout the motion. Additionally, the shoulder is modeled as a spherical joint with only three DoF. In reality this joint is much more complex and also has translational DoF. This currently limits the tracking accuracy; however, a more precise kinematic shoulder model could be used.
+
+[Figure 7](#applsci-10-01094-f007) shows the CoM velocity and acceleration throughout the motion. The conventional motion analysis is plotted in green, the OCP result of the proposed method in purple. The most apparent differences occur during the flight phase when no forces are acting. As derived in [Section 2.5.4](#sec2dot5dot4-applsci-10-01094), we expect constant accelerations and conservation of momentum in horizontal direction. Gravity should be the only force acting in vertical direction. This is indeed the case for the OCP result but is not given for the conventional analysis. Looking at the CoM acceleration we see values of up to 0.5 <!-- MathML: <math display="inline"><semantics>
+  <mfrac>
+    <mi>m</mi>
+    <msup>
+      <mi>s</mi>
+      <mn>2</mn>
+    </msup>
+  </mfrac>
+</semantics></math> --> m
+  
+      s
+      2 in X direction and 0.7 <!-- MathML: <math display="inline"><semantics>
+  <mfrac>
+    <mi>m</mi>
+    <msup>
+      <mi>s</mi>
+      <mn>2</mn>
+    </msup>
+  </mfrac>
+</semantics></math> --> m
+  
+      s
+      2 in Y direction during the flight phase. With the maximum values during the whole motion being 2.5 <!-- MathML: <math display="inline"><semantics>
+  <mfrac>
+    <mi>m</mi>
+    <msup>
+      <mi>s</mi>
+      <mn>2</mn>
+    </msup>
+  </mfrac>
+</semantics></math> --> m
+  
+      s
+      2 and 3.5 <!-- MathML: <math display="inline"><semantics>
+  <mfrac>
+    <mi>m</mi>
+    <msup>
+      <mi>s</mi>
+      <mn>2</mn>
+    </msup>
+  </mfrac>
+</semantics></math> --> m
+  
+      s
+      2, respectively, this leads to an estimated relative error of up to about 20% for the conventional analysis.
+
+Angular momentum is plotted in [Figure 8](#applsci-10-01094-f008). It should also be conserved during the flight phase and the change should be equal to zero when no external torques are acting. Again, we observe the desired properties for the optimized motion. The conventional analysis shows high variability during the flight phase and errors in the range of 30% in the horizontal plane.
+
+On the left of [Figure 9](#applsci-10-01094-f009) we plotted the contact forces for each foot stacked on top of each other and the CoM acceleration times the subject mass as a dashed line. We can see that they exactly match and that Equation ([11](#FD11-applsci-10-01094)) holds. On the right we have the same result for the contact torques. Again, Equation (12) is satisfied throughout the motion. This shows that the optimization result follows Newton’s EoM also during the contact phases. The resulting forces are consistent with the CoM acceleration and the resulting contact torques and CoP position are consistent with the change of angular momentum. We have established that the dynamics of our optimization framework are physically feasible and can further analyze the motion itself.
+
+We do so by looking at the sideways and vertical direction and forces and torques individually. As shown in [Figure 1](#applsci-10-01094-f001) the X-Axis is aligned with the slackline, the Y-Axis perpendicular and the Z-Axis in vertical direction. The Y direction is particularly interesting since the subject is very unstable due to the slackline and torques can only be applied controlling the contact force. Looking at the CoM acceleration we see spring-like behavior before and after the jump. The subject is constantly swinging sideways. Amplitudes are small when the subject is in balance, larger after the landing and decreasing during the stabilization process. The oscillation frequency appears to be the same throughout the motion. The interaction forces of both feet point into the same direction, back towards the center of the anchor points of the slackline. We also observe spring spring-like properties before and after the jump in the vertical direction. The slackline model proposed by Paoletti and Mahadevan [[1](#B1-applsci-10-01094)] models the force of the slackline also as a spring with the direction towards the resting position. However, they only considered sideways movement and did not take vertical movement of the subject into account. The lower left plot of [Figure 9](#applsci-10-01094-f009) shows the sum of contact torques and the sum of the torque generated from the contact forces. We see that the subject initiates the rotation applying contact torques when the feet are parallel during the first contact phase. After landing, the feet are perpendicular to the slackline and the contact forces are used to decrease the rotation.
+
+In the future, we plan to apply the method to several other slackline tricks such as front or backflips, chest or pelvis bounces. For this task we plan to introduce other contact points for example at the hands, the chest or the pelvis. Another possibility would be a thorough gait analysis of slackline walking and the comparison to flat ground walking regarding stability parameters. We intend to reconstruct a full gait cycle and gain more insight in human balancing strategies. Furthermore, we want to analyze the resulting contact forces relative to the foot positions and develop a thorough spring model of the slackline. We showed that the current model by Paoletti and Mahadevan [[1](#B1-applsci-10-01094)] is oversimplified as it does not take the whole range of motion of the slackline into account.
+
+## 4. Conclusions
+
+In this work we derived a general contact model for slackline balancing and demonstrated how it can be applied to analyze jumping on slackline. We employed the model inside an optimization framework to reconstruct the dynamics of a slackline jump with <!-- MathML: <math display="inline"><semantics>
+  <msup>
+    <mn>180</mn>
+    <mo>°</mo>
+  </msup>
+</semantics></math> --> 180
+    ° rotation. We successfully implemented a multi-phase and a single-phase formulation leading to almost equivalent results. We found that the resulting motion has similar fitting error to the markers when compared to the inverse kinematics approach, but is physically feasible and time consistent. The advantage of our approach becomes apparent during the flight phase of the motion and when comparing the CoM and angular momentum dynamics. We found variations of up to 30% for the conventional method. Due to numeric complexity and the high amount of variables necessary to formulate the OCP, this method is limited to a few seconds of motion. This might limit the application to compare longer slackline motions of beginners and experts as initially intended. However, we can apply it to interesting parts of motion and analyze specific movements connected to balance recovery.
+
+## Author Contributions
+
+Conceptualization, K.S. and K.M.; Formal analysis, K.S.; Funding acquisition, K.M.; Investigation, K.S.; Project administration, K.M.; Supervision, K.M.; Writing—original draft, K.S.; Writing—review & editing, K.M. All authors have read and agreed to the published version of the manuscript.
+
+## Funding
+
+Funding by the Carl Zeiss Foundation within the “Heidelberg Center for Motion Research” is gratefully acknowledged.
+
+## Acknowledgments
+
+We want to thank the Simulation and Optimization research group of the IWR at Heidelberg University for giving us the possibility to work with MUSCOD-II. We also want to acknowledge financial support by the Baden-Württemberg Ministry of Science, Research and the Arts and by Ruprecht-Karls-Universität Heidelberg.
+
+## Conflicts of Interest
+
+The authors declare no conflict of interest.
+
+## Abbreviations
+
+The following abbreviations are used in this manuscript:
+
+| CoM                                                                                                                                                                                                                | Center of Mass                   |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
+| CoP                                                                                                                                                                                                                | Center of Pressure               |
+| DoF                                                                                                                                                                                                                | Degrees of Freedom               |
+| EoM                                                                                                                                                                                                                | Equation of Motion               |
+| GRF                                                                                                                                                                                                                | Ground Reaction Forces           |
+| L\_SAE                                                                                                                                                                                                             | Left Scapula Acromial Edge       |
+| <!-- MathML: <math display="inline"><semantics>   <msub>     <mi>n</mi>     <mrow>       <mi>d</mi>       <mi>o</mi>       <mi>f</mi>     </mrow>   </msub> </semantics></math> --> n            d       o       f | Number of Degrees of Freedom     |
+| NLP                                                                                                                                                                                                                | Nonlinear Programming Problem    |
+| RBDL                                                                                                                                                                                                               | The Rigid Body Dynamics Library  |
+| R\_SAE                                                                                                               

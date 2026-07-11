@@ -37,7 +37,7 @@
 #define DXL_SERIAL   Serial3
 #define DXL_DIR_PIN  84
 #define DXL_ID       1
-#define DXL_BAUD     57600
+#define DXL_BAUD     1000000   // ★v2가 모터를 1Mbps로 승격시켜 놓았으므로 맞춤 (구 57600)
 
 Dynamixel2Arduino dxl(DXL_SERIAL, DXL_DIR_PIN);
 using namespace ControlTableItem;
