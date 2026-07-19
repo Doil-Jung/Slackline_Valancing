@@ -20,26 +20,23 @@
 //     through the window, two M3 screws. PCB first, then bearings, then
 //     axles. No lock collars at the ankle: the two hub stops retain the
 //     carrier axially (0.15 mm play per side).
-//   - AXIAL RETENTION (v5.1 revised after review): the hub-stop sandwich
-//     alone is NOT enough. The 530 mm carbon diagonal is a soft
-//     cantilever (k = 3EI/L^3 ~ 0.36 N/mm), so pulling a crank out of
-//     its ankle bearing (13 mm) takes only ~5 N - and vibrating slip-fit
-//     shafts WALK axially over thousands of fold cycles. v4 was safe
-//     because the continuous glued bar closed the bottom chord; v5
-//     removed it. THEREFORE: each ankle axle is GLUED into its 608
-//     INNER RING with retaining compound (Loctite 603/648, thin band on
-//     the middle of the 7 mm engagement only - keep it out of the
-//     balls). The inner ring turns with the axle anyway; escape now
-//     requires pulling the ring off the ball race (hundreds of N) or
-//     shearing the 7.8x7 glue band (>1000 N). Hub stops still set the
-//     glue-up position and take compression. Disassembly: heat, or cut
-//     and reprint the cheap socket.
-//     BRING-UP CHECK: pen line across each axle-ring interface; verify
-//     zero migration after the first fold-cycle test sessions.
-//     ASSEMBLY ORDER: PCB lid -> bearings -> glue band on axles ->
-//     slide both socket axles in against the hub stops; then the crank
-//     top shafts through the pivot bearings; TOP LOCK COLLARS LAST
-//     (they set the whole chain's axial play).
+//   - AXIAL RETENTION (v5.2, user redesign): the carrier center is OPEN
+//     (two bearing housings + top bridge), so INNER LOCK COLLARS are
+//     back. Each crank's inner ring is sandwiched hub-stop | ring |
+//     inner collar -> positive mechanical retention BOTH ways, per
+//     crank, no glue required (retaining compound stays optional).
+//     Rationale kept from the v5.1 review: the 530 mm carbon diagonal is
+//     a ~0.36 N/mm cantilever, so a bare slip fit walks out under
+//     fold-cycle vibration (~5 N for the full 13 mm) - a hard stop is
+//     mandatory. The collar nose is extended (2.6) to reach the ring
+//     through the housing land bore; the clamp body sits in free space.
+//     ASSEMBLY ORDER: bearings pressed -> slide both socket axles in
+//     against the hub stops -> clamp the two INNER collars (this locks
+//     the ankle) -> glue magnets -> screw the PCB T-bracket up into the
+//     bridge -> crank top shafts through the pivot bearings -> TOP LOCK
+//     COLLARS LAST (set the top chain's axial play).
+//     BRING-UP CHECK: pen line across axle/collar/ring; re-check after
+//     the first fold-cycle sessions.
 //   - Wiring: pivot PCB is frame-fixed (SPI 6-wire to OpenCR crosses
 //     top service loop -> rear diagonal bore -> lower loop, as before,
 //     (*) 6-wire ribbon must pass the 5-6 mm bores - check). Ankle PCB
@@ -961,10 +958,16 @@ module carbon_tube_between(p1, p2, od=carbon_od) {
 }
 
 module lock_collar_at_y(face_y, dir=1) {
+    lock_collar_at_y_n(face_y, dir, inner_ring_contact_len);
+}
+
+module lock_collar_at_y_n(face_y, dir, nose_len) {
     // Shaft lock collar. Only the small yellow nose touches the 608 inner ring;
-    // the larger clamp body sits outside the bearing face.
-    body_y = face_y + dir * (inner_ring_contact_len + lock_collar_t/2);
-    total_t = inner_ring_contact_len + lock_collar_t;
+    // the larger clamp body sits outside the bearing face. nose_len is
+    // extended for the v5.2 ankle inner collars (reaches the ring through
+    // the housing land bore, 11.4 OD inside the 19 bore).
+    body_y = face_y + dir * (nose_len + lock_collar_t/2);
+    total_t = nose_len + lock_collar_t;
     total_y = face_y + dir * total_t/2;
     lug_x = lock_slit_w/2 + lock_lug_w/2 - lock_lug_inset;
     lug_z = lock_collar_od/2 - lock_lug_bite + lock_lug_h/2;
@@ -975,8 +978,8 @@ module lock_collar_at_y(face_y, dir=1) {
     color([1.0, 0.74, 0.10])
     difference() {
         union() {
-            translate([0, face_y + dir * inner_ring_contact_len/2, 0])
-                cyl_y(inner_ring_contact_len, inner_ring_contact_d);
+            translate([0, face_y + dir * nose_len/2, 0])
+                cyl_y(nose_len, inner_ring_contact_d);
 
             translate([0, body_y, 0])
                 cyl_y(lock_collar_t, lock_collar_od);
@@ -989,8 +992,8 @@ module lock_collar_at_y(face_y, dir=1) {
                     cube([lock_lug_w, lock_lug_t, lock_lug_h], center=true);
         }
 
-        translate([0, face_y + dir * (inner_ring_contact_len + lock_collar_t)/2, 0])
-            cyl_y(inner_ring_contact_len + lock_collar_t + 0.4, shaft_d + 0.25);
+        translate([0, face_y + dir * (nose_len + lock_collar_t)/2, 0])
+            cyl_y(nose_len + lock_collar_t + 0.4, shaft_d + 0.25);
 
         // Clamp bolt hole. It sits above the shaft bore and pulls the split
         // collar closed instead of passing through the shaft.
@@ -1151,7 +1154,10 @@ module lower_corner_socket(p_corner, p_top, p_other, cutaway=show_lower_socket_c
     //                       only the FRONT side carries the PCB)
     ax_hub  = (lower_w - carrier_len) / 2 - 0.15;  // hub CONTACT face
     ax_hub0 = ax_hub - inner_ring_contact_len;
-    ax_tip  = ax_hub + 0.15 + brg_w + 6;           // tip inside the cavity
+    // v5.2: axle runs through bearing + land + inner collar clamp zone;
+    // tip lands in the OPEN center at carrier-local +/-20 (magnet there).
+    ax_tip  = lower_w/2 + akc_tip_y;               // corner->tip distance (57)
+
 
     color(c_socket)
     difference() {
@@ -1284,71 +1290,73 @@ module taper_box(sx, y0, y1, z0, z1, wx, wy) {
     }
 }
 
-// -------- v5 ankle sensor bay parameters --------
-akc_cav_xz   = 26;                 // center cavity, X and Z
-akc_cav_y0   = -carrier_len/2 + brg_w + 4;   // 4 mm outer-race land each side
-akc_cav_y1   =  carrier_len/2 - brg_w - 4;
-akc_pad_y0   = -33; akc_pad_y1 = -13;        // flat bottom pad span (Y)
-akc_pad_x    = 33;
-akc_pad_z    = -carrier_boss_d/2 - 2;        // pad face 2 mm proud of the boss
-akc_win_x    = 25;                 // lid window (PCB slides through)
-akc_win_y0   = -28; akc_win_y1 = -18;
-akc_lid_t    = 3;
-akc_lid_screw_y = [-30.5, -15.5];  // 2 x M3 self-tap on the pad centerline
-akc_lid_screw_pilot = 2.7;
+// -------- v5.2 OPEN ankle carrier (2026-07-19, user redesign) --------
+// The full cylinder + internal cavity + bottom lid is RETIRED. The
+// carrier is now OPEN in the middle: two short bearing housings tied by
+// a top bridge under the flange. Everything between them - inner lock
+// collars, magnet, PCB - assembles in free space with full hand access.
+akc_hous_len = brg_w + 2;          // one housing: 7 pocket + 2 land wall
+akc_inner_wall = carrier_len/2 - akc_hous_len;   // housing inner face (31)
+akc_ring_face  = carrier_len/2 - brg_w;          // inner-ring inner face (33)
+akc_bridge_z0 = 14;                // clears collar lugs (~11) and PCB top
+akc_bridge_z1 = carrier_flange_z0; // meets the flange underside
+akc_bridge_x  = 28;
+// Inner lock collars (extended nose reaches the ring through the land):
+akc_collar_nose = akc_ring_face - akc_inner_wall + 0.6;   // 2.6
 // Ankle magnet/PCB stations, carrier-local Y (front axle from -Y side):
-akc_tip_y    = -carrier_len/2 + brg_w + 6;        // axle tip face (-27)
-akc_mag_face = akc_tip_y + mag_proud;             // magnet face (-26.7)
-akc_pcb_y    = akc_mag_face + as_gap;             // PCB front/chip face
-akc_post_y0  = akc_pcb_y + as_pcb_t;              // post front face
-akc_post_t   = 3;
+akc_tip_y    = -20;                              // axle tip face
+akc_mag_face = akc_tip_y + mag_proud;            // magnet face (-19.7)
+akc_pcb_y    = akc_mag_face + as_gap;            // PCB front/chip face
+akc_brk_t    = 3;                                // T-bracket plate thickness
+akc_brk_bar_y0 = -20; akc_brk_bar_y1 = -4;       // T top bar span under bridge
+// Screw row BEHIND the vertical plate (plate occupies y -16.6..-13.6):
+// M3 CLEARANCE through-holes in the bar, self-tap PILOTS in the bridge.
+akc_brk_screw = [[-8, -8], [8, -8]];             // clear of the plate zone
+akc_brk_pilot = 2.7;                             // pilot in the BRIDGE
+akc_brk_clr_d = 3.4;                             // clearance in the BAR
 
 module robot_ankle_carrier_part(cutaway=false) {
-    // Origin: bar axis center. Two 608 pockets open from both end faces;
-    // 4 mm lands behind each pocket touch only the outer races, then the
-    // v5 26x26 sensor cavity opens between them. Flat bottom pad with a
-    // window: the ankle_pcb_lid slides the AS5047P in from below.
-    // ASSEMBLY ORDER: lid+PCB in and screwed -> bearings pressed ->
-    // socket axles slid in from both sides (hub stops retain axially).
+    // v5.2 OPEN carrier: two short bearing housings (pocket + 2 mm land
+    // wall) at the bar ends, tied by a top bridge under the spine flange.
+    // The center is fully open - inner lock collars, magnet and the PCB
+    // T-bracket all assemble in free space with hand access.
     color(c_rlow)
     difference() {
         union() {
-            cyl_y(carrier_len, carrier_boss_d);
+            // Two bearing housings.
+            for (sy = [-1, 1])
+                translate([0, sy*(carrier_len/2 - akc_hous_len/2), 0])
+                    cyl_y(akc_hous_len, carrier_boss_d);
 
-            // v5 flat bottom pad around the lid window.
-            translate([-akc_pad_x/2, akc_pad_y0, akc_pad_z])
-                cube([akc_pad_x, akc_pad_y1 - akc_pad_y0, -akc_pad_z]);
+            // Top bridge tying the housings, under the flange.
+            translate([-akc_bridge_x/2, -akc_inner_wall, akc_bridge_z0])
+                cube([akc_bridge_x, 2*akc_inner_wall, akc_bridge_z1 - akc_bridge_z0]);
 
             translate([-carrier_flange_x/2, -carrier_flange_y/2, carrier_flange_z0])
                 cube([carrier_flange_x, carrier_flange_y, carrier_flange_t]);
 
-            for (sx = [-1, 1])
+            // Gussets: housing tops -> flange, one per side per housing.
+            for (sx = [-1, 1]) for (sy = [-1, 1])
                 hull() {
-                    translate([sx*(carrier_flange_x/2 - 5), 0, carrier_flange_z0 + 2])
+                    translate([sx*(carrier_flange_x/2 - 5),
+                               sy*(carrier_len/2 - 6), carrier_flange_z0 + 2])
                         sphere(d=6);
-                    translate([sx*12, 0, 6])
+                    translate([sx*12, sy*(carrier_len/2 - akc_hous_len/2), 8])
                         sphere(d=12);
                 }
         }
 
+        // 608 pockets from the outer faces + land bores (outer-race stop).
         for (yoff = [-rb_spacing/2, rb_spacing/2])
             translate([0, yoff, 0]) cyl_y(brg_w + 0.35, brg_od + 0.35);
-
-        // Outer-race lands (19 bore) behind each pocket, then the cavity.
-        cyl_y(rb_spacing - brg_w + 0.35, top_center_bore_d);
-        translate([-akc_cav_xz/2, akc_cav_y0, -akc_cav_xz/2])
-            cube([akc_cav_xz, akc_cav_y1 - akc_cav_y0, akc_cav_xz]);
-
-        // Lid window through the pad into the cavity.
-        translate([-akc_win_x/2, akc_win_y0, akc_pad_z - 1])
-            cube([akc_win_x, akc_win_y1 - akc_win_y0, akc_cav_xz]);
-
-        // Lid screw pilots, vertical into the pad.
-        for (yy = akc_lid_screw_y)
-            translate([0, yy, akc_pad_z - 0.2])
-                cylinder(h=10, d=akc_lid_screw_pilot);
+        cyl_y(2*akc_ring_face - brg_w + 0.7, top_center_bore_d);
 
         cyl_y(carrier_len + 2, shaft_clearance_d);
+
+        // T-bracket screw pilots, up into the bridge underside.
+        for (p = akc_brk_screw)
+            translate([p[0], p[1], akc_bridge_z0 - 0.2])
+                cylinder(h=6, d=akc_brk_pilot);
 
         for (sx = [-1, 1]) for (sy = [-1, 1])
             translate([sx*carrier_bolt_dx, sy*carrier_bolt_dy, carrier_flange_z0 - 1])
@@ -1358,6 +1366,40 @@ module robot_ankle_carrier_part(cutaway=false) {
             translate([-carrier_boss_d/2 - 1, -carrier_len/2 - 1, 0])
                 cube([carrier_boss_d + 2, carrier_len + 2, carrier_boss_d]);
     }
+}
+
+module ankle_pcb_bracket_part(with_pcb_vis=false) {
+    // v5.2: T-bracket carrying the AS5047P. The top bar screws UP into
+    // the bridge underside: M3 CLEARANCE (3.4) through the bar, self-tap
+    // PILOTS (2.7) live in the bridge. Screw row sits BEHIND the vertical
+    // plate so the driver has a straight shot from below. The plate hangs
+    // down to the axis and presents the PCB front face at akc_pcb_y.
+    // PCB screws to the plate front (2 x M2 self-tap) BEFORE mounting.
+    plate_y0 = akc_pcb_y + as_pcb_t;             // plate front face
+    color([0.95, 0.62, 0.15])
+    difference() {
+        union() {
+            // Top bar under the bridge.
+            translate([-12.5, akc_brk_bar_y0, akc_bridge_z0 - akc_brk_t])
+                cube([25, akc_brk_bar_y1 - akc_brk_bar_y0, akc_brk_t]);
+            // Vertical plate down to the axis (PCB back support).
+            translate([-12.5, plate_y0, -as_pcb_h/2 - 1])
+                cube([25, akc_brk_t, as_pcb_h/2 + 1 + akc_bridge_z0 - akc_brk_t + 0.01]);
+        }
+        // M3 clearance through the bar (threads bite in the bridge only).
+        for (p = akc_brk_screw)
+            translate([p[0], p[1], akc_bridge_z0 - akc_brk_t - 0.2])
+                cylinder(h=akc_brk_t + 0.6, d=akc_brk_clr_d);
+        // PCB M2 self-tap pilots into the plate front face.
+        for (sx = [-1, 1])
+            translate([sx * as_hole_dx/2, plate_y0 - 0.2, 0])
+                rotate([-90, 0, 0]) cylinder(h=akc_brk_t + 0.4, d=as_hole_d);
+        // Ribbon slot at the plate bottom edge.
+        translate([0, plate_y0 + akc_brk_t/2, -as_pcb_h/2 + 1])
+            cube([12, akc_brk_t + 2, 6], center=true);
+    }
+    if (with_pcb_vis)
+        translate([0, akc_pcb_y, 0]) as5047_pcb_vis();
 }
 
 module ankle_section_demo(cut=true) {
@@ -1374,7 +1416,9 @@ module ankle_section_demo(cut=true) {
     difference() {
         union() {
             robot_ankle_carrier_part();
-            ankle_pcb_lid_part(with_pcb_vis=true);
+            ankle_pcb_bracket_part(with_pcb_vis=true);
+            lock_collar_at_y_n(-akc_ring_face,  1, akc_collar_nose);
+            lock_collar_at_y_n( akc_ring_face, -1, akc_collar_nose);
             for (yoff = [-rb_spacing/2, rb_spacing/2])
                 translate([0, yoff, 0]) bearing_608_y();
             lower_corner_socket(p_front, p_front + v_diag_f, p_rear);
@@ -1388,41 +1432,6 @@ module ankle_section_demo(cut=true) {
             translate([0, -lower_w/2 - 60, -80])
                 cube([80, lower_w + 120, 220]);
     }
-}
-
-module ankle_pcb_lid_part(with_pcb_vis=false) {
-    // v5: printed lid closing the carrier bottom window. A vertical post
-    // rises through the window and presents the AS5047P PCB (front face
-    // at akc_pcb_y) to the front-axle magnet. The PCB screws to the post
-    // front with 2 x M2 self-taps BEFORE the lid goes in.
-    // Carrier-local coordinates (origin = bar axis center).
-    color([0.95, 0.62, 0.15]) {
-        difference() {
-            union() {
-                // Lid plate on the pad face.
-                translate([-akc_pad_x/2, akc_pad_y0, akc_pad_z - akc_lid_t])
-                    cube([akc_pad_x, akc_pad_y1 - akc_pad_y0, akc_lid_t]);
-                // Post up through the window, behind the PCB plane.
-                translate([-(akc_win_x - 2)/2, akc_post_y0,
-                           akc_pad_z - akc_lid_t + 1])
-                    cube([akc_win_x - 2, akc_post_t,
-                          -(akc_pad_z - akc_lid_t + 1) + as_pcb_h/2 - 2]);
-            }
-            // Lid screw clearance holes (M3).
-            for (yy = akc_lid_screw_y)
-                translate([0, yy, akc_pad_z - akc_lid_t - 0.2])
-                    cylinder(h=akc_lid_t + 0.6, d=3.4);
-            // PCB M2 self-tap pilots into the post front face.
-            for (sx = [-1, 1])
-                translate([sx * as_hole_dx/2, akc_post_y0 - 0.2, 0])
-                    rotate([-90, 0, 0]) cylinder(h=akc_post_t + 0.4, d=as_hole_d);
-            // Ribbon slot through the lid plate, below the post.
-            translate([0, (akc_win_y0 + akc_win_y1)/2, akc_pad_z - akc_lid_t - 0.2])
-                cube([12, 5, akc_lid_t + 2], center=true);
-        }
-    }
-    if (with_pcb_vis)
-        translate([0, akc_pcb_y, 0]) as5047_pcb_vis();
 }
 
 module robot_lower_spine_part() {
@@ -1755,15 +1764,19 @@ module robot_assembly(p_ankle) {
     rel2 = rigid_rod_demo ? 0   : theta_demo - alpha_demo;
 
     translate(p_ankle) {
-        // v5: bearings only - NO ankle lock collars. The socket hub stops
-        // press on the inner rings from both sides (0.15 mm play/side).
+        // v5.2: bearings + INNER lock collars (extended nose through the
+        // land bore). Outer side = socket hub stops -> each crank's inner
+        // ring is sandwiched hub|ring|collar: positive retention BOTH
+        // ways, no glue needed. Collars ride in the open center.
         for (yoff = [-rb_spacing/2, rb_spacing/2])
             translate([0, yoff, 0]) bearing_608_y();
+        lock_collar_at_y_n(-akc_ring_face,  1, akc_collar_nose);
+        lock_collar_at_y_n( akc_ring_face, -1, akc_collar_nose);
 
         // Robot lower body.
         rotate([0, rel1, 0]) {
             robot_ankle_carrier_part();
-            ankle_pcb_lid_part(with_pcb_vis=true);   // v5 ankle encoder
+            ankle_pcb_bracket_part(with_pcb_vis=true);   // v5.2 ankle encoder
             robot_lower_spine_part();
 
             // FR12-H101 hinge: fixed to the lower body via the web, driven
@@ -1943,15 +1956,17 @@ if (is_undef(part_mode) || part_mode == "assembly") {
              " | air gap ", as_gap,
              " | PCB face ", as_pivot_pcb_y,
              " | plate ", enc_plate_in_y, "..", enc_plate_out_y));
-    echo("Lower side v5: BAR-LESS - socket-integrated 7.8 axles into the carrier 608s, hub stops retain (no collars)");
+    echo("Lower side v5.2: OPEN carrier - housings+bridge; hub|ring|inner-collar sandwich retains each crank");
     echo(str("Ankle chain [carrier-local y]: hub ", -carrier_len/2 - 0.15,
+             " | ring face ", -akc_ring_face, " | collar body ",
+             -akc_ring_face + akc_collar_nose, "..",
+             -akc_ring_face + akc_collar_nose + lock_collar_t,
              " | axle tip ", akc_tip_y, " | magnet ", akc_mag_face,
-             " | gap ", as_gap, " | PCB ", akc_pcb_y,
-             " | cavity ", akc_cav_y0, "..", akc_cav_y1));
+             " | gap ", as_gap, " | PCB ", akc_pcb_y));
     echo("(*) MEASURE on arrival: AS5047P module PCB size / hole grid / chip height -> as_* params");
     echo(str("Robot L1/L2 [mm] = ", robot_l1, " / ", robot_l2,
              "  head top world z = ", axis_z - sag + robot_l1 + robot_l2));
-    echo("Robot alpha: FREE (no stop; v5 retention = socket hub stops, no ankle collars)");
+    echo("Robot alpha: FREE (no stop). v5.2 retention: hub|ring|inner-collar per crank + top collars");
     echo(str("Inverted hang (alpha=180, phi=0) floor clearance [mm] = ",
              axis_z - sag - usp_z1));
     robot_half_x = usp_x/2 + door_t + 2;  // v4: door face + screw heads
@@ -1979,7 +1994,7 @@ if (is_undef(part_mode) || part_mode == "assembly") {
     echo(str("OpenCR (IMU) center above hip [mm] = ", ocr_center_z - hip_z,
              "  -> firmware ELL_IMU candidate (v4 internal mount: update FW)"));
     echo("Robot mass estimate: lower ~230 g / upper ~550 g+ (re-weigh: measured 84x34x25 pack) -> ~30:70");
-    echo("Printed robot parts v5: ankle_carrier(+cavity), ankle_pcb_lid, lower_spine, upper_body_a/b, door");
+    echo("Printed robot parts v5.2: ankle_carrier(OPEN), ankle_pcb_bracket, ankle_collar x2, lower_spine, upper_body a/b");
     echo("Printed rope parts v5: lower_socket front/rear (WITH integrated axles), upper sockets (rear tip = magnet pocket)");
     echo("============================================================");
 } else if (part_mode == "lower_socket") {
@@ -2009,9 +2024,14 @@ if (is_undef(part_mode) || part_mode == "assembly") {
     // VIEWING ONLY - assembled ankle cutaway (not for printing).
     ankle_section_demo(cut=is_undef(part_cutaway) ? true : part_cutaway);
 } else if (part_mode == "ankle_pcb_lid") {
-    // Print flat: plate on the bed (flip so the pad face is up).
-    rotate([180, 0, 0]) translate([0, 0, -(akc_pad_z - akc_lid_t)])
-        ankle_pcb_lid_part(with_pcb_vis=false);
+    echo("DEPRECATED (v5.2): ankle_pcb_lid is retired - use ankle_pcb_bracket.");
+} else if (part_mode == "ankle_pcb_bracket") {
+    // Print with the T bar on the bed (flip: bar face up -> down).
+    rotate([180, 0, 0]) translate([0, 0, -(akc_bridge_z0)])
+        ankle_pcb_bracket_part(with_pcb_vis=false);
+} else if (part_mode == "ankle_collar") {
+    // v5.2 ankle INNER collar (extended 2.6 nose). Print 2.
+    lock_collar_at_y_n(0, 1, akc_collar_nose);
 } else if (part_mode == "ankle_carrier") {
     robot_ankle_carrier_part(
         cutaway=is_undef(part_cutaway) ? false : part_cutaway
