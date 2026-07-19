@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>슬랙라인 시뮬레이터 V19 — MuJoCo 전물리</title>
+<style>
+:root{--bg:#0d1017;--panel:#151a24;--border:rgba(255,255,255,.09);--fg:#dde2ea;--dim:rgba(255,255,255,.45);
+--blue:#3a86ff;--cyan:#4cc9f0;--pink:#ff006e;--green:#06d6a0;--purple:#8338ec;--yellow:#ffbe0b;--red:#ef4444;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:'Segoe UI','Malgun Gothic',sans-serif;font-size:13px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{padding:8px 16px;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:12px}
+.header h1{font-size:16px}.header .subtitle{font-size:12px;color:var(--dim)}
+#conn{margin-left:auto;font-size:11px;color:var(--dim)}
+.main{flex:1;display:flex;min-height:0}
+.canvas-area{flex:1;display:flex;flex-direction:column;min-width:0}
+.sim{flex:3;position:relative;border-bottom:1px solid var(--border);min-height:0}
+#c3d{width:100%;height:100%;display:block}
+#overlay{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);
+ border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-family:Consolas,monospace;font-size:12px;line-height:1.65;pointer-events:none;white-space:pre}
+#fallen{position:absolute;top:10px;right:10px;background:rgba(239,68,68,.85);border-radius:8px;padding:6px 12px;font-weight:bold;display:none}
+.viewbtns{position:absolute;bottom:10px;right:10px;display:flex;gap:4px}
+.graphs{flex:2;display:flex;flex-direction:column;min-height:120px}
+.graphs canvas{flex:1;width:100%;min-height:0}
+.panel{width:320px;overflow-y:auto;border-left:1px solid var(--border);background:var(--panel);padding:10px}
+.sec{border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px}
+.sec h3{font-size:12px;margin-bottom:8px;color:var(--cyan);letter-spacing:.5px}
+.btn{background:#232a38;color:var(--fg);border:1px solid var(--border);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:12px}
+.btn:hover{background:#2d3648}.btn.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.danger{border-color:rgba(239,68,68,.5)}
+.row{display:flex;gap:5px;margin-bottom:6px}.row .btn{flex:1}
+.sl{margin-bottom:7px}
+.sl .lab{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:2px}
+.sl .lab .v{color:var(--cyan);font-family:Consolas,monospace}
+input[type=range]{width:100%;accent-color:var(--blue);height:18px}
+label.chk{display:flex;align-items:center;gap:6px;margin-bottom:5px;cursor:pointer;font-size:12px}
+.hint{font-size:10.5px;color:var(--dim);line-height:1.45;margin:4px 0 6px}
+#minfo{font-family:Consolas,monospace;font-size:11px;line-height:1.6;color:var(--dim);white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="header"><h1>🎪 슬랙라인 시뮬레이터 V19</h1>
+<span class="subtitle">MuJoCo 전물리 · 서보/마찰/센서 현실화 · v19 재설계 실기(카본 사다리꼴 크랭크)</span>
+<span id="conn">연결 중…</span></div>
+
+<div class="main">
+ <div class="canvas-area">
+  <div class="sim">
+   <canvas id="c3d"></canvas>
+   <div id="overlay"></div>
+   <div id="fallen">낙하!</div>
+   <div class="viewbtns">
+    <button class="btn" id="bSide">📐 사이드</button>
+    <button class="btn" id="b3d">🎥 3D</button>
+   </div>
+   <div style="position:absolute;bottom:10px;left:10px;font-size:11px;color:rgba(255,255,255,.35);pointer-events:none">🖱 드래그: 회전 · 우클릭 드래그(또는 Shift+드래그): 이동 · 휠: 줌</div>
+  </div>
+  <div class="graphs"><canvas id="g1"></canvas><canvas id="g2"></canvas></div>
+ </div>
+
+ <div class="panel">
+  <div class="sec">
+   <h3>시뮬레이션</h3>
+   <div class="row"><button class="btn" id="bPreset" style="background:linear-gradient(135deg,#3a86ff,#8338ec);color:#fff;font-weight:bold">★ FWE 시연 (원클릭 최적설정)</button></div>
+   <div class="hint">스윕 최적 시간표(60/20/90/60ms·0.6°) + 발목엔코더 + 줄감쇠 0.008 + γ 자동노브로 즉시 재생.</div>
+   <div class="row"><button class="btn on" id="bRun">▶ 시작</button><button class="btn" id="bReset">⟲ 리셋</button></div>
+   <div class="row"><button class="btn danger" id="bPL">← 교란</button><button class="btn danger" id="bPR">교란 →</button></div>
+   <div class="sl"><div class="lab"><span>교란 강도 φ̇킥 (rad/s)</span><span class="v" id="vPert">0.30</span></div>
+    <input type="range" id="sPert" min="0.05" max="2" step="0.05" value="0.3"></div>
+   <div class="sl"><div class="lab"><span>재생 속도</span><span class="v" id="vSpeed">1.00×</span></div>
+    <input type="range" id="sSpeed" min="0.02" max="2" step="0.02" value="1"></div>
+   <div class="row"><button class="btn" id="bBack">⏮ 1장 뒤로</button><button class="btn" id="bStep">⏭ 1장 전진</button></div>
+  </div>
+
+  <div class="sec">
+   <h3>제어기</h3>
+   <div class="row"><button class="btn" data-mode="off">OFF</button><button class="btn on" data-mode="lqr">LQR</button></div>
+   <div class="row"><button class="btn" data-mode="fwe1">FWE 접기</button><button class="btn" data-mode="fwe2">FWE 사이클</button><button class="btn" data-mode="fwe3">반복 FEW</button></div>
+   <div class="sl"><div class="lab"><span>LQR gain scale (브링업식)</span><span class="v" id="vGain">1.00</span></div>
+    <input type="range" id="sGain" min="0" max="1.5" step="0.05" value="1"></div>
+   <div class="sl"><div class="lab"><span>ρ (접기 게인 비)</span><span class="v" id="vRho">0.90</span></div>
+    <input type="range" id="sRho" min="0.3" max="1.2" step="0.05" value="0.9"></div>
+   <div class="hint">이론 최적 0.8~1.0. ★전물리에서는 접기 킥이 선형 맵보다 강해 ρ≈0.7 부근이 유계(전물리 γ 보정 — 연구 과제).</div>
+   <div class="sl"><div class="lab"><span>A 트리거 (β환산 °)</span><span class="v" id="vTrig">0.60</span></div>
+    <input type="range" id="sTrig" min="0.1" max="2" step="0.05" value="0.6"></div>
+   <div class="sl"><div class="lab"><span>T_fold (ms)</span><span class="v" id="vTf">60</span></div>
+    <input type="range" id="sTf" min="30" max="200" step="5" value="60"></div>
+   <div class="sl"><div class="lab"><span>T_wait (ms)</span><span class="v" id="vTw">20</span></div>
+    <input type="range" id="sTw" min="10" max="300" step="5" value="20"></div>
+   <div class="sl"><div class="lab"><span>T_extend (ms)</span><span class="v" id="vTe">90</span></div>
+    <input type="range" id="sTe" min="30" max="200" step="5" value="90"></div>
+   <div class="sl"><div class="lab"><span>T_rest (ms)</span><span class="v" id="vTr">60</span></div>
+    <input type="range" id="sTr" min="10" max="300" step="5" value="60"></div>
+   <div class="sl"><div class="lab"><span>Kp 프로파일 추종</span><span class="v" id="vKp">25</span></div>
+    <input type="range" id="sKp" min="5" max="60" step="1" value="25"></div>
+   <div class="sl"><div class="lab"><span>Kd</span><span class="v" id="vKd">0.40</span></div>
+    <input type="range" id="sKd" min="0.05" max="1" step="0.05" value="0.4"></div>
+  </div>
+
+  <div class="sec">
+   <h3>추정기 · 게인 모델</h3>
+   <div class="row"><button class="btn on" data-est="kalman">칼만 5측정</button><button class="btn" data-est="cf">상보(CF)</button></div>
+   <div class="row"><button class="btn" data-est="enc">발목 엔코더 3개 ★</button><button class="btn" data-est="true">참값</button></div>
+   <div class="hint">★야간연구: 발목 엔코더(절대각 3개, IMU 미사용)가 최강 — 포획영역 3°+, 몬테카를로 8/8. FWE는 γ*=18.6 실행 캘리브 필요(현실화 패널).</div>
+   <label class="chk"><input type="checkbox" id="cAware" checked>게인 설계에 서보 관성·감쇠 반영 ★</label>
+   <div class="hint">끄면 현행 펌웨어 파이프라인(compute_gains_v19) 그대로 — armature 미반영으로 폐루프가 발산하는 갭을 재현.</div>
+   <div class="sl"><div class="lab"><span>CUR_SAFE (unit)</span><span class="v" id="vCur">600</span></div>
+    <input type="range" id="sCur" min="100" max="1193" step="10" value="600"></div>
+  </div>
+
+  <div class="sec">
+   <h3>현실화 (플랜트)</h3>
+   <label class="chk"><input type="checkbox" id="cServo" checked>서보 모델 (양자화·Kt·토크-속도·데드밴드)</label>
+   <label class="chk"><input type="checkbox" id="cSensor" checked>센서 양자화·노이즈</label>
+   <div class="sl"><div class="lab"><span>armature 기어관성 (kg·m²)</span><span class="v" id="vArm">0.0045</span></div>
+    <input type="range" id="sArm" min="0" max="0.01" step="0.0005" value="0.0045"></div>
+   <div class="sl"><div class="lab"><span>b_gear 기어점성 (N·m·s)</span><span class="v" id="vBg">0.010</span></div>
+    <input type="range" id="sBg" min="0" max="0.05" step="0.002" value="0.01"></div>
+   <div class="sl"><div class="lab"><span>f_hip 기어 쿨롱 (N·m)</span><span class="v" id="vFh">0.050</span></div>
+    <input type="range" id="sFh" min="0" max="0.15" step="0.005" value="0.05"></div>
+   <div class="hint">★f_hip 이 LQR 리밋사이클(±13°)의 원인 — 0으로 낮추면 0.5° 수렴 (7/11 이론의 스틱션 리스크 확인).</div>
+   <div class="sl"><div class="lab"><span>f_phi 상단베어링 쿨롱</span><span class="v" id="vFp">0.002</span></div>
+    <input type="range" id="sFp" min="0" max="0.02" step="0.001" value="0.002"></div>
+   <div class="sl"><div class="lab"><span>f_ankle 발목베어링 쿨롱</span><span class="v" id="vFa">0.002</span></div>
+    <input type="range" id="sFa" min="0" max="0.02" step="0.001" value="0.002"></div>
+   <div class="sl"><div class="lab"><span>전류 데드밴드 (unit)</span><span class="v" id="vDb">5</span></div>
+    <input type="range" id="sDb" min="0" max="20" step="1" value="5"></div>
+   <div class="sl"><div class="lab"><span>무부하 속도 (°/s)</span><span class="v" id="vWn">276</span></div>
+    <input type="range" id="sWn" min="100" max="600" step="10" value="276"></div>
+   <div class="sl"><div class="lab"><span>기어 효율 η (1=끔, 비대칭)</span><span class="v" id="vEta">1.00</span></div>
+    <input type="range" id="sEta" min="0.5" max="1" step="0.01" value="1"></div>
+   <div class="hint">부하 비례 이빨 마찰: 구동 시 τ×η, 역구동·제동 시 τ/η (η_back=2−1/η, η≤0.5면 셀프락).</div>
+   <div class="sl"><div class="lab"><span>thAcc 노이즈 σ (rad)</span><span class="v" id="vAn">0.020</span></div>
+    <input type="range" id="sAn" min="0" max="0.1" step="0.005" value="0.02"></div>
+   <div class="sl"><div class="lab"><span>자이로 노이즈 σ (rad/s)</span><span class="v" id="vGn">0.002</span></div>
+    <input type="range" id="sGn" min="0" max="0.02" step="0.001" value="0.002"></div>
+  </div>
+
+  <div class="sec">
+   <h3>물리 파라미터 (공칭 — 변경 시 리셋)</h3>
+   <div class="sl"><div class="lab"><span>R 크랭크 수직처짐 (m)</span><span class="v" id="vR">0.433</span></div>
+    <input type="range" id="sR" min="0.3" max="0.6" step="0.005" value="0.433"></div>
+   <div class="sl"><div class="lab"><span>m₁ 하체 (kg)</span><span class="v" id="vM1">0.15</span></div>
+    <input type="range" id="sM1" min="0.05" max="0.4" step="0.01" value="0.15"></div>
+   <div class="sl"><div class="lab"><span>m₂ 상체 (kg)</span><span class="v" id="vM2">0.55</span></div>
+    <input type="range" id="sM2" min="0.2" max="1.2" step="0.01" value="0.55"></div>
+   <div class="sl"><div class="lab"><span>L₁ 하체 (m)</span><span class="v" id="vL1">0.25</span></div>
+    <input type="range" id="sL1" min="0.15" max="0.35" step="0.005" value="0.25"></div>
+   <div class="sl"><div class="lab"><span>L₂ 상체 (m)</span><span class="v" id="vL2">0.40</span></div>
+    <input type="range" id="sL2" min="0.25" max="0.55" step="0.005" value="0.4"></div>
+   <div class="sl"><div class="lab"><span>빗변 1개 질량 (g)</span><span class="v" id="vMc">22</span></div>
+    <input type="range" id="sMc" min="5" max="50" step="1" value="22"></div>
+   <div class="sl"><div class="lab"><span>하단 하드웨어 (g)</span><span class="v" id="vMb">60</span></div>
+    <input type="range" id="sMb" min="20" max="150" step="5" value="60"></div>
+   <div class="sl"><div class="lab"><span>c_φ 상단 점성감쇠</span><span class="v" id="vCp">0.000</span></div>
+    <input type="range" id="sCp" min="0" max="0.02" step="0.001" value="0"></div>
+   <div class="sl"><div class="lab"><span>LQR R_COST</span><span class="v" id="vRc">0.001</span></div>
+    <input type="range" id="sRc" min="-3" max="-0.3" step="0.1" value="-3"></div>
+   <div class="sl"><div class="lab"><span>초기 α₀=θ₀ (°)</span><span class="v" id="vA0">2.0</span></div>
+    <input type="range" id="sA0" min="-5" max="5" step="0.1" value="2"></div>
+   <div class="sl"><div class="lab"><span>초기 φ₀ (°)</span><span class="v" id="vP0">0.0</span></div>
+    <input type="range" id="sP0" min="-10" max="10" step="0.5" value="0"></div>
+  </div>
+
+  <div class="sec">
+   <h3>플랜트 편차 (제어기는 모름)</h3>
+   <div class="sl"><div class="lab"><span>m₂ 편차 (%)</span><span class="v" id="vDm2">0</span></div>
+    <input type="range" id="sDm2" min="-30" max="30" step="1" value="0"></div>
+   <div class="sl"><div class="lab"><span>m₁ 편차 (%)</span><span class="v" id="vDm1">0</span></div>
+    <input type="range" id="sDm1" min="-30" max="30" step="1" value="0"></div>
+   <div class="sl"><div class="lab"><span>R 편차 (%)</span><span class="v" id="vDR">0</span></div>
+    <input type="range" id="sDR" min="-30" max="30" step="1" value="0"></div>
+   <div class="sl"><div class="lab"><span>Kt 편차 (%)</span><span class="v" id="vDkt">0</span></div>
+    <input type="range" id="sDkt" min="-30" max="30" step="1" value="0"></div>
+   <div class="hint">★시뮬 발견: m₂ −10%는 유계, +5%는 낙하 — 상체 질량 과소평가 방향이 위험.</div>
+  </div>
+
+  <div class="sec"><h3>모델 정보</h3><div id="minfo">—</div></div>
+ </div>
+</div>
+
+<script src="/three.min.js"></script>
+<script>
+"use strict";
+// ============================== WebSocket ==============================
+let ws, wsOK=false;
+function connect(){
+  ws = new WebSocket((location.protocol==="https:"?"wss://":"ws://")+location.host+"/ws");
+  ws.onopen = ()=>{ wsOK=true; el("conn").textContent="● 연결됨"; el("conn").style.color="#06d6a0"; send({cmd:"hello"}); };
+  ws.onclose = ()=>{ wsOK=false; el("conn").textContent="○ 재연결 중…"; el("conn").style.color="#ef4444"; setTimeout(connect,1500); };
+  ws.onmessage = ev=>{ handle(JSON.parse(ev.data)); };
+}
+function send(m){ if(wsOK) ws.send(JSON.stringify(m)); }
+function el(id){ return document.getElementById(id); }
+
+// ============================== 상태 ==============================
+let geom = {R:0.433, L1:0.25, L2:0.40};
+let hist = [];              // [t, φ, α, θ, δ, A, Ae, τ, cur, α̂, θ̂]
+let running=false, lastView=null;
+const WIN = 8.0;            // 그래프 창 [s]
+
+function handle(m){
+  if(m.type==="init"){
+    geom = m.geom; rebuildRobot();
+    const b=m.build;
+    el("minfo").textContent =
+      `ω_eff=${b.w_eff}  λ_u=${b.lam_u}  ε*=${b.eps_star}\n`+
+      `γ_fold=${b.gamma_fold}  γ_cycle=${b.gamma_cycle}\n`+
+      `K=[${b.K.join(", ")}]\n`+
+      `I_r 막대근사=${b.I_r_calc} / MuJoCo=${b.I_r_mj}`;
+    syncSettings(m.settings);
+  }else if(m.type==="frame"){
+    if(m.pts) for(const p of m.pts) hist.push(p);
+    const cut = (hist.length? hist[hist.length-1][0] : 0) - WIN;
+    while(hist.length && hist[0][0] < cut) hist.shift();
+    lastView = m.view; running = m.view.running;
+    el("bRun").textContent = running? "⏸ 정지" : "▶ 시작";
+  }else if(m.type==="clear"){ hist=[]; }
+  else if(m.type==="rewind"){ const t=m.t; while(hist.length && hist[hist.length-1][0]>t+1e-9) hist.pop(); }
+  else if(m.type==="error"){ console.error(m.msg); alert("시뮬 오류: "+m.msg); }
+}
+
+function syncSettings(s){
+  // 서버 상태를 UI에 반영 (초기 접속 시)
+  document.querySelectorAll("[data-mode]").forEach(b=>b.classList.toggle("on", b.dataset.mode===s.mode));
+  document.querySelectorAll("[data-est]").forEach(b=>b.classList.toggle("on", b.dataset.est===s.estimator));
+  el("cAware").checked = s.servo_aware;
+  el("cServo").checked = s.real.servo_on; el("cSensor").checked = s.real.sensor_on;
+  el("sSpeed").value = s.speed; el("vSpeed").textContent = (+s.speed).toFixed(2)+"×";
+  el("sGain").value = s.gain; el("vGain").textContent = (+s.gain).toFixed(2);
+  el("sKp").value=s.kp; el("vKp").textContent=s.kp;
+  el("sKd").value=s.kd; el("vKd").textContent=(+s.kd).toFixed(2);
+  el("sRho").value=s.nominal.RHO; el("vRho").textContent=(+s.nominal.RHO).toFixed(2);
+  el("sCur").value=s.nominal.CUR_SAFE_UNIT; el("vCur").textContent=s.nominal.CUR_SAFE_UNIT;
+  el("sA0").value=s.x0.alpha0; el("vA0").textContent=(+s.x0.alpha0).toFixed(1);
+  el("sP0").value=s.x0.phi0; el("vP0").textContent=(+s.x0.phi0).toFixed(1);
+}
+
+// ============================== three.js (z-up) ==============================
+const AXIS_Z=1.245, PIV=0.30, BARH=0.05;
+const canvas = el("c3d");
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0d1017);
+const camera = new THREE.PerspectiveCamera(42, 2, 0.05, 60);
+camera.up.set(0,0,1);
+let az=0.9, elv=0.35, dist=2.6;
+const target = new THREE.Vector3(0,0,0.85);
+function camUpdate(){
+  camera.position.set(target.x+dist*Math.cos(elv)*Math.sin(az),
+                      target.y-dist*Math.cos(elv)*Math.cos(az),
+                      target.z+dist*Math.sin(elv));
+  camera.lookAt(target);
+}
+camUpdate();
+scene.add(new THREE.AmbientLight(0xffffff,0.55));
+const dl=new THREE.DirectionalLight(0xffffff,0.8); dl.position.set(2,1,4); scene.add(dl);
+const grid=new THREE.GridHelper(6,30,0x2a3242,0x1c2230); grid.rotation.x=Math.PI/2; scene.add(grid);
+
+function mat(c){ return new THREE.MeshLambertMaterial({color:c}); }
+function box(w,d,h,c){ return new THREE.Mesh(new THREE.BoxGeometry(w,d,h), mat(c)); }
+function rod(p1,p2,r,c){
+  const a=new THREE.Vector3(...p1), b=new THREE.Vector3(...p2);
+  const d=b.clone().sub(a), len=d.length();
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,10), mat(c));
+  m.position.copy(a.clone().add(b).multiplyScalar(0.5));
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), d.normalize());
+  return m;
+}
+// 프레임 (고정)
+const frameG=new THREE.Group();
+for(const sx of [-1,1]) for(const sy of [-1,1]){ const p=box(0.02,0.02,1.22,0x555a63); p.position.set(sx*0.2,sy*0.3,0.61); frameG.add(p); }
+for(const sy of [-1,1]){ const b1=box(0.42,0.02,0.02,0x555a63); b1.position.set(0,sy*0.3,1.22); frameG.add(b1);
+  const b2=box(0.42,0.02,0.02,0x555a63); b2.position.set(0,sy*0.3,0.13); frameG.add(b2); }
+for(const sy of [-1,1]){ const m=box(0.05,0.03,0.05,0xb8bcc6); m.position.set(0,sy*PIV,AXIS_Z); frameG.add(m); }
+scene.add(frameG);
+
+// 로봇 체인 (리빌드 가능)
+let crankG=null, lowerG=null, upperG=null;
+function rebuildRobot(){
+  if(crankG) scene.remove(crankG);
+  const R=geom.R, L1=geom.L1, L2=geom.L2;
+  crankG=new THREE.Group(); crankG.position.set(0,0,AXIS_Z);
+  crankG.add(rod([0,PIV,0],[0,BARH,-R],0.004,0x23262b));
+  crankG.add(rod([0,-PIV,0],[0,-BARH,-R],0.004,0x23262b));
+  crankG.add(rod([0,-BARH,-R],[0,BARH,-R],0.006,0xe6a817));
+  for(const sy of [-1,1]){ const s=new THREE.Mesh(new THREE.SphereGeometry(0.013,12,8),mat(0x4c9fe8)); s.position.set(0,sy*PIV,-0.02); crankG.add(s); }
+  lowerG=new THREE.Group(); lowerG.position.set(0,0,-R);
+  // CAD v7 치수: 하체 폭 80 / 상체 90 / 머리(C 배터리 헤드) 98, 두께 38 — 폭은 Y(좌우)
+  const lb=box(0.038,0.080,L1,0x06b98c); lb.position.set(0,0,L1/2); lowerG.add(lb);
+  const hip=new THREE.Mesh(new THREE.CylinderGeometry(0.016,0.016,0.13,14),mat(0xffbe0b)); hip.position.set(0,0,L1); lowerG.add(hip);
+  upperG=new THREE.Group(); upperG.position.set(0,0,L1);
+  const ub=box(0.038,0.090,L2,0x7a35d6); ub.position.set(0,0,L2/2); upperG.add(ub);
+  const hd=box(0.038,0.098,0.046,0xf2c14e); hd.position.set(0,0,L2+0.023); upperG.add(hd);
+  const imu=new THREE.Mesh(new THREE.SphereGeometry(0.009,10,8),mat(0xff2d2d)); imu.position.set(0,0,0.2005); upperG.add(imu);
+  lowerG.add(upperG); crankG.add(lowerG); scene.add(crankG);
+}
+rebuildRobot();
+
+// 카메라 조작: 좌드래그 회전, 우드래그(또는 Shift+좌드래그) 이동, 휠 줌
+let drag=false,btn=0,lx=0,ly=0;
+canvas.addEventListener("mousedown",e=>{drag=true;btn=e.button;lx=e.clientX;ly=e.clientY;});
+window.addEventListener("mouseup",()=>drag=false);
+canvas.addEventListener("contextmenu",e=>e.preventDefault());
+window.addEventListener("mousemove",e=>{ if(!drag)return;
+  const dx=e.clientX-lx, dy=e.clientY-ly;
+  if(btn===2 || btn===1 || e.shiftKey){          // 이동(팬)
+    const s=dist*0.0011;
+    const right=new THREE.Vector3().setFromMatrixColumn(camera.matrix,0);
+    const upv=new THREE.Vector3().setFromMatrixColumn(camera.matrix,1);
+    target.addScaledVector(right,-dx*s); target.addScaledVector(upv,dy*s);
+  }else{                                          // 회전
+    az-=dx*0.008; elv=Math.min(1.5,Math.max(-0.3,elv+dy*0.008));
+  }
+  lx=e.clientX;ly=e.clientY; camUpdate(); });
+canvas.addEventListener("wheel",e=>{e.preventDefault();
+  dist=Math.min(8,Math.max(0.6,dist*(e.deltaY>0?1.025:0.976))); camUpdate();},{passive:false});
+el("bSide").onclick=()=>{az=0; elv=0.02; dist=2.4; target.set(0,0,0.85); camUpdate();};
+el("b3d").onclick=()=>{az=0.9; elv=0.35; dist=2.6; target.set(0,0,0.85); camUpdate();};
+
+// ============================== 그래프 ==============================
+const G1=el("g1").getContext("2d"), G2=el("g2").getContext("2d");
+function drawChart(ctx, series, colors, labels, unit, fixedRange){
+  const cv=ctx.canvas, W=cv.width=cv.clientWidth*devicePixelRatio, H=cv.height=cv.clientHeight*devicePixelRatio;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#10141d"; ctx.fillRect(0,0,W,H);
+  if(!hist.length) return;
+  const t1=hist[hist.length-1][0], t0=t1-WIN;
+  let ymax=fixedRange||0;
+  if(!fixedRange){ for(const s of series) for(const p of hist){ const v=Math.abs(p[s]); if(v>ymax) ymax=v; }
+    ymax=Math.max(ymax*1.15, 1); }
+  const X=t=>( (t-t0)/WIN )*W, Y=v=>H/2 - (v/ymax)*(H/2-8*devicePixelRatio);
+  ctx.strokeStyle="rgba(255,255,255,.12)"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,H/2); ctx.lineTo(W,H/2); ctx.stroke();
+  series.forEach((s,si)=>{
+    ctx.strokeStyle=colors[si]; ctx.lineWidth=1.4*devicePixelRatio; ctx.beginPath();
+    let first=true;
+    for(const p of hist){ if(p[0]<t0) continue;
+      const x=X(p[0]), y=Y(p[s]); if(first){ctx.moveTo(x,y);first=false;} else ctx.lineTo(x,y); }
+    ctx.stroke();
+  });
+  ctx.font=`${11*devicePixelRatio}px Consolas`; let lx=8*devicePixelRatio;
+  series.forEach((s,si)=>{ ctx.fillStyle=colors[si];
+    const v=hist[hist.length-1][s];
+    const txt=`${labels[si]}=${v.toFixed(2)}${unit}`;
+    ctx.fillText(txt, lx, 14*devicePixelRatio); lx += ctx.measureText(txt).width+14*devicePixelRatio; });
+  ctx.fillStyle="rgba(255,255,255,.35)";
+  ctx.fillText(`±${ymax.toFixed(1)}${unit}`, W-70*devicePixelRatio, 14*devicePixelRatio);
+}
+// ============================== 렌더 루프 ==============================
+function frame(){
+  requestAnimationFrame(frame);
+  const w=canvas.clientWidth*devicePixelRatio, h=canvas.clientHeight*devicePixelRatio;
+  if(canvas.width!==w||canvas.height!==h){ renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+  if(lastView){
+    const q=lastView.q;
+    crankG.rotation.y=q[0]; lowerG.rotation.y=q[1]; upperG.rotation.y=q[2];
+    const v=lastView;
+    el("overlay").textContent =
+`t = ${v.t.toFixed(3)} s   [${v.fwe}${v.cyc?` ×${v.cyc}`:""}]
+φ = ${v.x[0].toFixed(2)}°   (추정 ${v.xh[0].toFixed(2)}°)
+α = ${v.x[1].toFixed(2)}°   (추정 ${v.xh[1].toFixed(2)}°)
+θ = ${v.x[2].toFixed(2)}°   (추정 ${v.xh[2].toFixed(2)}°)
+δ = ${(v.x[2]-v.x[1]).toFixed(2)}°
+A = ${v.A.toFixed(3)}° (β환산)
+τ = ${v.tau.toFixed(3)} N·m   전류 ${v.cur} unit
+step ${v.step}`;
+    el("fallen").style.display = v.fallen? "block":"none";
+  }
+  renderer.render(scene,camera);
+  drawChart(G1,[1,2,3,4],["#3a86ff","#06d6a0","#8338ec","#ffbe0b"],["φ","α","θ","δ"],"°",0);
+  drawChart(G2,[5,6,7],["#ff006e","#ff9f43","#4cc9f0"],["A","Â","τ"],"",0);
+}
+frame();
+
+// ============================== 컨트롤 배선 ==============================
+el("bRun").onclick=()=>{ send({cmd: running? "pause":"run"}); };
+el("bPreset").onclick=()=>send({cmd:"fwe_preset"});
+el("bReset").onclick=()=>send({cmd:"reset"});
+el("bStep").onclick=()=>send({cmd:"step",n:1});
+el("bBack").onclick=()=>send({cmd:"back",n:1});
+el("bPL").onclick=()=>send({cmd:"perturb",v:-parseFloat(el("sPert").value)});
+el("bPR").onclick=()=>send({cmd:"perturb",v:+parseFloat(el("sPert").value)});
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT")return;
+  if(e.code==="Space"){e.preventDefault();el("bRun").click();}
+  else if(e.key==="ArrowRight"){el("bStep").click();}
+  else if(e.key==="ArrowLeft"){el("bBack").click();}
+  else if(e.key==="r"||e.key==="R"){el("bReset").click();}
+});
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-mode]").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); send({cmd:"mode",v:b.dataset.mode});
+});
+document.querySelectorAll("[data-est]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-est]").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); send({cmd:"estimator",v:b.dataset.est});
+});
+el("cAware").onchange=e=>send({cmd:"servo_aware",v:e.target.checked});
+el("cServo").onchange=e=>send({cmd:"real",k:"servo_on",v:e.target.checked});
+el("cSensor").onchange=e=>send({cmd:"real",k:"sensor_on",v:e.target.checked});
+
+function slider(id, vid, fmt, fire){
+  const s=el(id);
+  s.addEventListener("input",()=>{ el(vid).textContent=fmt(parseFloat(s.value)); });
+  s.addEventListener("change",()=>fire(parseFloat(s.value)));
+  return s;
+}
+slider("sPert","vPert",v=>v.toFixed(2),()=>{});
+slider("sSpeed","vSpeed",v=>v.toFixed(2)+"×",v=>send({cmd:"speed",v}));
+slider("sGain","vGain",v=>v.toFixed(2),v=>send({cmd:"gain",v}));
+slider("sKp","vKp",v=>v.toFixed(0),v=>send({cmd:"pd",kp:v,kd:parseFloat(el("sKd").value)}));
+slider("sKd","vKd",v=>v.toFixed(2),v=>send({cmd:"pd",kp:parseFloat(el("sKp").value),kd:v}));
+slider("sRho","vRho",v=>v.toFixed(2),v=>send({cmd:"nominal",k:"RHO",v}));
+slider("sTrig","vTrig",v=>v.toFixed(2),v=>send({cmd:"nominal",k:"A_TRIGGER_DEG",v}));
+slider("sTf","vTf",v=>v.toFixed(0),v=>send({cmd:"nominal",k:"T_FOLD",v:v/1000}));
+slider("sTw","vTw",v=>v.toFixed(0),v=>send({cmd:"nominal",k:"T_WAIT",v:v/1000}));
+slider("sTe","vTe",v=>v.toFixed(0),v=>send({cmd:"nominal",k:"T_EXTEND",v:v/1000}));
+slider("sTr","vTr",v=>v.toFixed(0),v=>send({cmd:"nominal",k:"T_REST",v:v/1000}));
+slider("sCur","vCur",v=>v.toFixed(0),v=>send({cmd:"nominal",k:"CUR_SAFE_UNIT",v}));
+slider("sArm","vArm",v=>v.toFixed(4),v=>send({cmd:"real",k:"armature",v}));
+slider("sBg","vBg",v=>v.toFixed(3),v=>send({cmd:"real",k:"b_gear",v}));
+slider("sFh","vFh",v=>v.toFixed(3),v=>send({cmd:"real",k:"f_hip",v}));
+slider("sFp","vFp",v=>v.toFixed(3),v=>send({cmd:"real",k:"f_phi",v}));
+slider("sFa","vFa",v=>v.toFixed(3),v=>send({cmd:"real",k:"f_ankle",v}));
+slider("sDb","vDb",v=>v.toFixed(0),v=>send({cmd:"real",k:"cur_deadband",v}));
+slider("sWn","vWn",v=>v.toFixed(0),v=>send({cmd:"real",k:"w_noload_dps",v}));
+slider("sEta","vEta",v=>v.toFixed(2),v=>send({cmd:"real",k:"gear_eta",v}));
+slider("sAn","vAn",v=>v.toFixed(3),v=>send({cmd:"real",k:"acc_noise",v}));
+slider("sGn","vGn",v=>v.toFixed(3),v=>send({cmd:"real",k:"gyro_noise",v}));
+slider("sR","vR",v=>v.toFixed(3),v=>send({cmd:"nominal",k:"R",v}));
+slider("sM1","vM1",v=>v.toFixed(2),v=>send({cmd:"nominal",k:"m1",v}));
+slider("sM2","vM2",v=>v.toFixed(2),v=>send({cmd:"nominal",k:"m2",v}));
+slider("sL1","vL1",v=>v.toFixed(3),v=>send({cmd:"nominal",k:"L1",v}));
+slider("sL2","vL2",v=>v.toFixed(3),v=>send({cmd:"nominal",k:"L2",v}));
+slider("sMc","vMc",v=>v.toFixed(0),v=>send({cmd:"nominal",k:"crank_m_each",v:v/1000}));
+slider("sMb","vMb",v=>v.toFixed(0),v=>send({cmd:"nominal",k:"bottom_m",v:v/1000}));
+slider("sCp","vCp",v=>v.toFixed(3),v=>send({cmd:"nominal",k:"c_phi",v}));
+slider("sRc","vRc",v=>Math.pow(10,v).toFixed(3),v=>send({cmd:"nominal",k:"R_COST",v:Math.pow(10,v)}));
+slider("sA0","vA0",v=>v.toFixed(1),v=>send({cmd:"x0",alpha0:v,theta0:v,phi0:parseFloat(el("sP0").value)}));
+slider("sP0","vP0",v=>v.toFixed(1),v=>send({cmd:"x0",phi0:v,alpha0:parseFloat(el("sA0").value),theta0:parseFloat(el("sA0").value)}));
+slider("sDm1","vDm1",v=>v.toFixed(0),v=>send({cmd:"mismatch",k:"m1",v}));
+slider("sDm2","vDm2",v=>v.toFixed(0),v=>send({cmd:"mismatch",k:"m2",v}));
+slider("sDR","vDR",v=>v.toFixed(0),v=>send({cmd:"mismatch",k:"R",v}));
+slider("sDkt","vDkt",v=>v.toFixed(0),v=>send({cmd:"mismatch",k:"kt",v}));
+
+connect();
+</script>
+</body>
+</html>

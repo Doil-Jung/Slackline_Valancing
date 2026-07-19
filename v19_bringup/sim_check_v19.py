@@ -83,13 +83,14 @@ def run():
     A_after = Gf*A0 - gf*dfold
     results["3 단일접기 소거"] = abs(A_after) < 1e-9*max(1, abs(A0))
     # [3b] 서보 속도 여유 — 실제 운용점(트리거 문턱 A_TRIG)에서 평가.
-    #      삼각 프로파일 피크 속도 = 2·δf/T_F vs XM430-W210 무부하 276°/s
+    #      삼각 프로파일 피크 속도 = 2·δf/T_F vs 무부하 속도(params W_NOLOAD_DPS, 여유율 0.83)
     df_trig = fwe["GAMMA_FOLD"]*np.deg2rad(p["A_TRIGGER_DEG"])
     vpk = 2*np.rad2deg(df_trig)/p["T_FOLD"]
-    results["3b 서보속도 여유(트리거점)"] = vpk < 230.0
+    v_allow = 0.83 * p["W_NOLOAD_DPS"]
+    results["3b 서보속도 여유(트리거점)"] = vpk < v_allow
     print(f"[3] A0={np.rad2deg(A0):.2f}° → fold {np.rad2deg(dfold):.1f}° → A={A_after:.2e} "
           f"(δ한계 {p['DELTA_MAX_DEG']}° {'OK' if abs(np.rad2deg(dfold))<p['DELTA_MAX_DEG'] else '초과!'})")
-    print(f"[3b] 트리거점(A={p['A_TRIGGER_DEG']}°) 접기 {np.rad2deg(df_trig):.1f}° 피크속도 {vpk:.0f}°/s (무부하 276, 권장<230)")
+    print(f"[3b] 트리거점(A={p['A_TRIGGER_DEG']}°) 접기 {np.rad2deg(df_trig):.1f}° 피크속도 {vpk:.0f}°/s (무부하 {p['W_NOLOAD_DPS']:.0f}, 허용<{v_allow:.0f})")
 
     # [4] 반복 FEW: 명목/+20% 접기오차
     Gc, gc = fwe["G_cyc"], fwe["g_cyc"]
