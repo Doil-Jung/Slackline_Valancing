@@ -50,6 +50,7 @@ label.chk{display:flex;align-items:center;gap:6px;margin-bottom:5px;cursor:point
    <div id="overlay"></div>
    <div id="fallen">낙하!</div>
    <div class="viewbtns">
+    <button class="btn" id="bRecord" style="background:#dc2626;color:white;font-weight:bold;">🔴 녹화 시작</button>
     <button class="btn" id="bSide">📐 사이드</button>
     <button class="btn" id="b3d">🎥 3D</button>
    </div>
@@ -442,6 +443,54 @@ slider("sDm1","vDm1",v=>v.toFixed(0),v=>send({cmd:"mismatch",k:"m1",v}));
 slider("sDm2","vDm2",v=>v.toFixed(0),v=>send({cmd:"mismatch",k:"m2",v}));
 slider("sDR","vDR",v=>v.toFixed(0),v=>send({cmd:"mismatch",k:"R",v}));
 slider("sDkt","vDkt",v=>v.toFixed(0),v=>send({cmd:"mismatch",k:"kt",v}));
+
+let mediaRecorder = null;
+let recordedChunks = [];
+
+el("bRecord").onclick = function() {
+  const btn = this;
+  const canvas = el("c3d");
+  
+  if (!mediaRecorder || mediaRecorder.state === "inactive") {
+    recordedChunks = [];
+    const stream = canvas.captureStream(60);
+    let options = { mimeType: "video/webm;codecs=vp9" };
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+      options = { mimeType: "video/webm" };
+    }
+    try {
+      mediaRecorder = new MediaRecorder(stream, options);
+    } catch(e) {
+      mediaRecorder = new MediaRecorder(stream);
+    }
+    
+    mediaRecorder.ondataavailable = function(e) {
+      if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+    };
+    
+    mediaRecorder.onstop = function() {
+      const blob = new Blob(recordedChunks, { type: "video/webm" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "slackline_v19_simulation_recording.webm";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+    };
+    
+    mediaRecorder.start(100);
+    btn.textContent = "⏹ 녹화 완료 & 다운로드";
+    btn.style.background = "#2563eb";
+  } else {
+    mediaRecorder.stop();
+    btn.textContent = "🔴 녹화 시작";
+    btn.style.background = "#dc2626";
+  }
+};
 
 connect();
 </script>
