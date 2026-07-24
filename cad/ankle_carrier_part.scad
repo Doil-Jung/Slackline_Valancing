@@ -1,7 +1,10 @@
-// Standalone robot ankle bearing carrier part (v5.2: OPEN carrier -
-// two 608 bearing housings + top bridge, center removed so the encoder
-// PCB / magnet / inner lock collars are assembled from the open middle).
-// The AS5047P rides on the T-bracket (ankle_pcb_bracket_part) screwed
+// Standalone robot ankle bearing carrier part (v5.3: OPEN carrier -
+// two 608 bearing housings + top bridge RAISED to z 23..31 so the 42 mm
+// AS5047P board (top edge z=+21) passes 2 mm under it; bridge end walls
+// weld the raised bridge onto the housings. Flange z0 = 31 (+9 vs v5.2)
+// -> the lower body grew 9 mm; robot_l1/sim L1 updated to match, the
+// printed lower spine is reused unchanged.
+// The AS5047P rides on the L-bracket (ankle_pcb_bracket_part) screwed
 // to the underside of the top bridge.
 // Edit shared dimensions in frame_v5.scad so the assembly stays linked.
 

@@ -24,9 +24,12 @@ G_GRAV = 9.81
 BODY = dict(
     m1   = dict(v=0.15,  MEASURED=False, how="하체(발축 베어링~힙, 프레임+발목하우징 포함) 저울"),
     m2   = dict(v=0.55,  MEASURED=False, how="상체(힙~머리, XM430+OpenCR+배터리 매립 포함) 저울"),
-    L1   = dict(v=0.25,  MEASURED=False, how="발축 중심 → 힙축 중심 [m] 자"),
+    # v5.3 CAD (2026-07-19): 발목 캐리어 플랜지 +9mm 상승(42mm AS5047P 보드
+    # 수용) → 발축~힙축 250 → 259mm. 하체 스파인 출력물은 그대로 재사용,
+    # 힙이 통째로 +9mm. 실측 전 공칭값만 갱신.
+    L1   = dict(v=0.259, MEASURED=False, how="발축 중심 → 힙축 중심 [m] 자"),
     L2   = dict(v=0.40,  MEASURED=False, how="힙축 중심 → 상체 끝 [m] 자"),
-    ell1 = dict(v=0.125, MEASURED=False, how="발축 → 하체 CoM [m] 균형점"),
+    ell1 = dict(v=0.13,  MEASURED=False, how="발축 → 하체 CoM [m] 균형점"),
     ell2 = dict(v=0.20,  MEASURED=False, how="힙축 → 상체 CoM [m] 균형점 (장비 매립 후!)"),
     # 관성모멘트: None 이면 균일막대 근사 mL²/12 사용. 복합진자 실측 후 I_cm 값 입력.
     I1_cm = dict(v=None, MEASURED=False, how="하체 복합진자: 발축에 매달아 미소진동 주기 T 측정"),

@@ -42,6 +42,23 @@
 //     (*) 6-wire ribbon must pass the 5-6 mm bores - check). Ankle PCB
 //     is ROBOT-fixed: exits the lid, straight up the lower spine - no
 //     joint crossing at all.
+//   - v5.3 (2026-07-19 evening): REAL MODULE = Coupang "AS5047P 14bit
+//     SPI 42mm" (하이제니스), magnet included, side SMT 6-pin SPI socket
+//     (P3) -> no soldering if a matching cable is sourced. 42x42 board,
+//     4-corner hole grid (37x37 assumed, M3 pilot 2.7) - (*) MEASURE on
+//     arrival. Consequences:
+//       ANKLE: board top edge z=+21 -> bridge raised to z 23..31,
+//       flange z0 22 -> 31, LOWER BODY +9 mm (robot_l1 250 -> 259, sim
+//       L1 0.259; the printed lower spine is reused, the hip just rides
+//       +9). Bridge end walls (z14..31) weld the raised bridge onto the
+//       housings. Bracket is now an L: 46-wide plate on the full board
+//       (4x M3) + aft bar under the bridge; the board's SMT connector
+//       exits -X sideways through the open center.
+//       PIVOT: bracket window couldn't hold a 42 board (+-20 interior)
+//       -> frame goes asymmetric (bottom stays on the profile, top bar
+//       raised to axis+35); board mounted connector-UP (down would hit
+//       the profile). Old 2xM2 pilots + wire slot replaced by the 4xM3
+//       grid, no slot.
 // (previous v4 header follows)
 // ---------------------------------------------------------------------
 // Slackline balancing robot frame and rope system v4
@@ -248,14 +265,22 @@ coupler_lug_inset = 1.0;
 // Generic parametric outline for an AS5047P breakout module.
 // (*) MEASURE the real module on arrival (PCB size, hole grid, hole dia,
 //     chip height, connector side) and update - all brackets follow these.
-as_pcb_w  = 22;    // PCB width across X (*)
-as_pcb_h  = 22;    // PCB height across Z (*)
+// v5.3: Coupang 하이제니스 "자기식 엔코더 모듈 AS5047P 14bit SPI 42mm"
+// purple board, magnet included. 42 x 42 board, chip centered, FOUR
+// corner mounting holes, side-mounted SMT connector (P3, 6-pin SPI) on
+// the LEFT edge + unpopulated through-hole headers P1(SPI)/P2(ABI).
+as_pcb_w  = 42;    // PCB width across X (*)
+as_pcb_h  = 42;    // PCB height across Z (*)
 as_pcb_t  = 1.6;
-as_hole_dx = 16;   // two mounting holes on a horizontal line (*)
-as_hole_d  = 1.7;  // M2 SELF-TAP PILOT in printed plastic (*).
-                   // Convention check (v4-proven): pilot = bolt OD - 0.3
-                   // (M3 -> 2.7). 2.0 would equal the M2 OD = no bite.
+as_hole_dx = 37;   // 4-corner hole grid pitch across X (*)
+as_hole_dy = 37;   // 4-corner hole grid pitch across Z (*)
+as_hole_d  = 2.7;  // M3 SELF-TAP PILOT in printed plastic (*).
+                   // Convention (v4-proven): pilot = bolt OD - 0.3.
+                   // Corner holes on the photo look M3-sized - MEASURE.
                    // The PCB's own holes are on the module, not printed.
+as_conn_out = 6;   // SMT connector protrusion beyond the PCB edge (*)
+as_conn_w   = 16;  // SMT connector width along the edge (*)
+as_conn_t   = 6;   // SMT connector height off the chip-side face (*)
 as_gap     = 1.5;  // magnet face -> chip/PCB face air gap (0.5..3 ok)
 mag_d = 6;             // diametral magnet 6 x 2.5 (glued)
 mag_t = 2.5;
@@ -287,7 +312,14 @@ enc_bracket_w = max(
     enc_mount_bcd + 22,
     2 * (enc_rail_bolt_x + enc_driver_access_d/2 + enc_driver_access_edge_meat)
 );
-enc_bracket_h = 2 * mount_rise; // bottom face sits on the top profile top face
+// v5.3: the bracket window must clear the 42 mm AS5047P board (edge at
+// axis +-21) AND its SMT connector, which is mounted rotated so it exits
+// UP (tip ~ axis+27; DOWN would stab the aluminum profile the bracket
+// sits on). The frame goes asymmetric: bottom face stays on the profile
+// top (axis - mount_rise), the top bar rises to clear board + connector.
+enc_bracket_h_dn = mount_rise;               // 25, bottom face on profile
+enc_bracket_h_up = as_pcb_h/2 + as_conn_out + 3 + enc_bracket_t;  // 35
+enc_bracket_h = enc_bracket_h_dn + enc_bracket_h_up;  // total 60
 
 rear_outer_bearing_y = rear_pivot_y + top_bearing_offset + brg_w / 2;
 rear_shaft_tip_y     = rear_outer_bearing_y + rear_shaft_out;
@@ -311,7 +343,11 @@ coupler_start_y = rear_shaft_tip_y;
 // Robot local frame: origin at the ankle (lower bar) axis, +Z up to the head.
 // Mass targets (shape optimization 2026-06-15): lower:upper ~ 30:70,
 // equipment high on the upper body, ankle kept light.
-robot_l1 = 250;            // ankle axis -> hip axis [mm]
+robot_l1 = 259;            // ankle axis -> hip axis [mm]. v5.3: 250 -> 259,
+                           // the ankle carrier flange rose +9 mm for the
+                           // 42 mm AS5047P board; the printed lower spine
+                           // is reused unchanged, so the hip moves up by
+                           // the same 9 mm. Sim params_v19 L1 = 0.259.
 robot_l2 = 350;            // hip axis -> head top, battery included [mm]
 hip_z    = robot_l1;
 
@@ -359,7 +395,11 @@ rb_spacing = 73;                          // 608 pair spacing on the bar:
                                           // 73 + 7 = 80 = the body width
 carrier_len = rb_spacing + brg_w;         // pockets open to the end faces
 carrier_boss_d = 44;   // v5: 40 -> 44, room for the 26x26 center cavity
-carrier_flange_z0 = carrier_boss_d / 2;
+carrier_flange_z0 = as_pcb_h/2 + 2 + 8;   // v5.3: 31. Raised so the 42 mm
+                       // AS5047P board (top edge z=+21) clears the bridge
+                       // (2 mm air) with an 8 mm bridge on top. Was
+                       // boss_d/2 = 22 -> the LOWER BODY GREW +9 mm;
+                       // robot_l1 and the sim L1 were bumped to match.
 carrier_flange_t = 6;
 carrier_flange_x = 52;
 carrier_flange_y = 80;     // flange flush with the 80 mm foot (= boss
@@ -734,19 +774,20 @@ module rear_pivot_encoder_mount() {
     color(c_mount)
     difference() {
         union() {
-            // Clean side-view square frame. The sides stay open for assembly;
-            // no old bracket geometry is reused here.
-            translate([axis_x - w/2, y0, axis_z + h/2 - t])
+            // Clean side-view frame, v5.3 asymmetric: bottom face on the
+            // profile top, top bar raised to clear board + connector.
+            // The sides stay open for assembly.
+            translate([axis_x - w/2, y0, axis_z + enc_bracket_h_up - t])
                 cube([w, len_y, t]);
-            translate([axis_x - w/2, y0, axis_z - h/2])
+            translate([axis_x - w/2, y0, axis_z - enc_bracket_h_dn])
                 cube([w, len_y, t]);
 
             // Bearing-side vertical plate, merged into the bearing housing.
-            translate([axis_x - w/2, y0, axis_z - h/2])
+            translate([axis_x - w/2, y0, axis_z - enc_bracket_h_dn])
                 cube([w, t, h]);
 
             // Encoder face: the rear surface is the encoder reference plane.
-            translate([axis_x - w/2, y1 - t, axis_z - h/2])
+            translate([axis_x - w/2, y1 - t, axis_z - enc_bracket_h_dn])
                 cube([w, t, h]);
 
             // Integrated 608 bearing housing on the rope side.
@@ -766,26 +807,29 @@ module rear_pivot_encoder_mount() {
         translate([axis_x, rear_pivot_y, axis_z])
             cyl_y(top_boss_len + 2, shaft_clearance_d);
 
-        // v5: AS5047P PCB mount on the plate INNER face - two M2
-        // self-tap pilots on the horizontal centerline, plus a wire slot
-        // below the PCB for the module connector/ribbon.
-        for (sx = [-1, 1])
-            translate([axis_x + sx * as_hole_dx/2, y1 - t/2, axis_z])
+        // v5.3: AS5047P PCB mount on the plate INNER face - FOUR M3
+        // self-tap pilots on the 37 mm corner grid. The board is mounted
+        // rotated +90 deg so its SMT connector (P3) points UP through the
+        // open frame (tip ~ axis+27 < top bar interior +30); DOWN would
+        // stab the aluminum profile. The old wire slot is gone - the
+        // cable exits upward, then loops down the rear diagonal path.
+        for (sx = [-1, 1]) for (sz = [-1, 1])
+            translate([axis_x + sx * as_hole_dx/2, y1 - t/2,
+                       axis_z + sz * as_hole_dy/2])
                 cyl_y(t + 0.4, as_hole_d);
-
-        translate([axis_x, y1 - t/2, axis_z - as_pcb_h/2 - 5])
-            cube([14, t + 0.4, 8], center=true);
 
         // M5 rail bolts down through the BOTTOM bar into the rear rail top
         // slot (the bracket now sits on top of the profile).
         for (xoff = [-enc_rail_bolt_x, enc_rail_bolt_x])
-            translate([axis_x + xoff, frame_y - profile/2, axis_z - h/2 - 0.2])
+            translate([axis_x + xoff, frame_y - profile/2,
+                       axis_z - enc_bracket_h_dn - 0.2])
                 cylinder(h=t + 0.4, d=5.5);
 
         // Matching access holes through the TOP bar so a driver can reach
         // the M5 rail bolts from above during assembly.
         for (xoff = [-enc_rail_bolt_x, enc_rail_bolt_x])
-            translate([axis_x + xoff, frame_y - profile/2, axis_z + h/2 - t - 0.2])
+            translate([axis_x + xoff, frame_y - profile/2,
+                       axis_z + enc_bracket_h_up - t - 0.2])
                 cylinder(h=t + 0.4, d=enc_driver_access_d);
 
     }
@@ -804,21 +848,32 @@ module upper_fixed_hardware() {
     translate([axis_x, rear_pivot_y, axis_z])  upper_bearing_pair_y();
 
     // v5: AS5047P module on the plate inner face + magnet in the shaft
-    // tip. Non-contact - no coupler.
+    // tip. Non-contact - no coupler. v5.3: connector points UP.
     translate([axis_x, as_pivot_pcb_y, axis_z])
-        as5047_pcb_vis();
+        as5047_pcb_vis(rot=90);
     translate([axis_x, rear_shaft_tip_y - mag_pocket_depth + mag_t/2, axis_z])
         color([0.45, 0.45, 0.48]) cyl_y(mag_t, mag_d);
 }
 
 // -------------------- v5: AS5047P module visual --------------------
-module as5047_pcb_vis() {
+module as5047_pcb_vis(rot=0) {
     // Local origin = PCB FRONT (chip) face center, chip toward -Y.
-    color([0.05, 0.35, 0.20])
-        translate([-as_pcb_w/2, 0, -as_pcb_h/2])
-            cube([as_pcb_w, as_pcb_t, as_pcb_h]);
-    color([0.1, 0.1, 0.1])                       // chip
-        translate([0, -0.6, 0]) cube([5, 1.2, 5], center=true);
+    // v5.3: 42 x 42 board with the SMT connector (P3) on the -X edge,
+    // chip side. rot spins the board about its normal (holes are on a
+    // symmetric 4-corner grid, so any 90-degree step is valid):
+    //   rot=0   connector exits -X (ankle: sideways through the open center)
+    //   rot=-90 connector exits -Z (pivot: straight down past the plate edge)
+    rotate([0, rot, 0]) {
+        color([0.55, 0.15, 0.55])                // purple PCB
+            translate([-as_pcb_w/2, 0, -as_pcb_h/2])
+                cube([as_pcb_w, as_pcb_t, as_pcb_h]);
+        color([0.1, 0.1, 0.1])                   // chip, board center
+            translate([0, -0.6, 0]) cube([5, 1.2, 5], center=true);
+        color([0.9, 0.9, 0.9])                   // SMT connector, -X edge (*)
+            translate([-as_pcb_w/2 - as_conn_out, -as_conn_t,
+                       -as_conn_w/2])
+                cube([as_conn_out + 4, as_conn_t, as_conn_w]);
+    }
 }
 
 // -------------------- AN25 analog encoder and printed coupling --------------------
@@ -1298,19 +1353,36 @@ module taper_box(sx, y0, y1, z0, z1, wx, wy) {
 akc_hous_len = brg_w + 2;          // one housing: 7 pocket + 2 land wall
 akc_inner_wall = carrier_len/2 - akc_hous_len;   // housing inner face (31)
 akc_ring_face  = carrier_len/2 - brg_w;          // inner-ring inner face (33)
-akc_bridge_z0 = 14;                // clears collar lugs (~11) and PCB top
+akc_bridge_z0 = carrier_flange_z0 - 8;  // v5.3: 23. Board top edge is at
+                                   // z = as_pcb_h/2 = 21; 2 mm air below
+                                   // the 8 mm bridge. (v5.2 was 14 for
+                                   // the 22 mm board.)
 akc_bridge_z1 = carrier_flange_z0; // meets the flange underside
 akc_bridge_x  = 28;
+akc_wall_t   = 5;                  // v5.3 bridge end walls: drop from the
+                                   // bridge ends down onto the housings
+                                   // (z 14..flange) so the raised bridge
+                                   // is welded to the housings, not only
+                                   // to the flange. y = +-(inner_wall-2
+                                   // .. inner_wall+3) overlaps the boss.
+akc_wall_z0  = 14;                 // wall bottom: 3 mm over collar lugs (~11)
 // Inner lock collars (extended nose reaches the ring through the land):
 akc_collar_nose = akc_ring_face - akc_inner_wall + 0.6;   // 2.6
 // Ankle magnet/PCB stations, carrier-local Y (front axle from -Y side):
 akc_tip_y    = -20;                              // axle tip face
 akc_mag_face = akc_tip_y + mag_proud;            // magnet face (-19.7)
 akc_pcb_y    = akc_mag_face + as_gap;            // PCB front/chip face
-akc_brk_t    = 3;                                // T-bracket plate thickness
-akc_brk_bar_y0 = -20; akc_brk_bar_y1 = -4;       // T top bar span under bridge
-// Screw row BEHIND the vertical plate (plate occupies y -16.6..-13.6):
-// M3 CLEARANCE through-holes in the bar, self-tap PILOTS in the bridge.
+akc_brk_t    = 3;                                // L-bracket wall thickness
+akc_brk_w    = 46;                               // v5.3 bracket width across X
+                                                 // (covers the 37 hole grid)
+// v5.3: the bar CANNOT start in front of the plate anymore - the 42 mm
+// board's top edge (z=+21) sweeps right under the bar zone. The bar now
+// begins exactly at the plate front plane (= board back plane) and runs
+// aft, so nothing hangs over the board.
+akc_brk_bar_y0 = akc_pcb_y + as_pcb_t;           // -16.6, plate front plane
+akc_brk_bar_y1 = -4;
+// Screw row BEHIND the vertical plate: M3 CLEARANCE through-holes in the
+// bar, self-tap PILOTS in the bridge.
 akc_brk_screw = [[-8, -8], [8, -8]];             // clear of the plate zone
 akc_brk_pilot = 2.7;                             // pilot in the BRIDGE
 akc_brk_clr_d = 3.4;                             // clearance in the BAR
@@ -1331,6 +1403,16 @@ module robot_ankle_carrier_part(cutaway=false) {
             // Top bridge tying the housings, under the flange.
             translate([-akc_bridge_x/2, -akc_inner_wall, akc_bridge_z0])
                 cube([akc_bridge_x, 2*akc_inner_wall, akc_bridge_z1 - akc_bridge_z0]);
+
+            // v5.3 bridge end walls: the raised bridge floats above the
+            // housing cylinders (top z=22 < bridge z0=23), so drop a wall
+            // from each bridge end onto/into the housing (2 mm overlap in
+            // Y) to weld bridge and housings directly.
+            for (sy = [-1, 1])
+                translate([-akc_bridge_x/2,
+                           sy == -1 ? -akc_inner_wall - 2 : akc_inner_wall + 2 - akc_wall_t,
+                           akc_wall_z0])
+                    cube([akc_bridge_x, akc_wall_t, carrier_flange_z0 - akc_wall_z0]);
 
             translate([-carrier_flange_x/2, -carrier_flange_y/2, carrier_flange_z0])
                 cube([carrier_flange_x, carrier_flange_y, carrier_flange_t]);
@@ -1369,37 +1451,40 @@ module robot_ankle_carrier_part(cutaway=false) {
 }
 
 module ankle_pcb_bracket_part(with_pcb_vis=false) {
-    // v5.2: T-bracket carrying the AS5047P. The top bar screws UP into
-    // the bridge underside: M3 CLEARANCE (3.4) through the bar, self-tap
-    // PILOTS (2.7) live in the bridge. Screw row sits BEHIND the vertical
-    // plate so the driver has a straight shot from below. The plate hangs
-    // down to the axis and presents the PCB front face at akc_pcb_y.
-    // PCB screws to the plate front (2 x M2 self-tap) BEFORE mounting.
+    // v5.3: L-bracket carrying the 42 mm AS5047P board. The top bar
+    // screws UP into the bridge underside: M3 CLEARANCE (3.4) through
+    // the bar, self-tap PILOTS (2.7) live in the bridge. The bar starts
+    // at the plate front plane (= board back plane) and runs aft, so
+    // nothing hangs over the board top edge (z=+21 passes 2 mm under
+    // the bridge). The vertical plate backs the full board and takes
+    // FOUR M3 self-taps on the 37 mm corner grid.
+    // The board's SMT connector (P3, SPI) sits on the chip side at the
+    // -X edge and exits SIDEWAYS through the open center - no slot
+    // needed in the plate. PCB screws to the plate BEFORE mounting.
     plate_y0 = akc_pcb_y + as_pcb_t;             // plate front face
+    plate_z0 = -as_pcb_h/2 - 2;                  // -23, under board edge
+    plate_z1 = akc_bridge_z0 - 0.2;              // 22.8, air to the bridge
     color([0.95, 0.62, 0.15])
     difference() {
         union() {
-            // Top bar under the bridge.
-            translate([-12.5, akc_brk_bar_y0, akc_bridge_z0 - akc_brk_t])
-                cube([25, akc_brk_bar_y1 - akc_brk_bar_y0, akc_brk_t]);
-            // Vertical plate down to the axis (PCB back support).
-            translate([-12.5, plate_y0, -as_pcb_h/2 - 1])
-                cube([25, akc_brk_t, as_pcb_h/2 + 1 + akc_bridge_z0 - akc_brk_t + 0.01]);
+            // Top bar under the bridge (starts at the plate front plane).
+            translate([-akc_brk_w/2, akc_brk_bar_y0, akc_bridge_z0 - akc_brk_t])
+                cube([akc_brk_w, akc_brk_bar_y1 - akc_brk_bar_y0, akc_brk_t]);
+            // Vertical plate backing the board.
+            translate([-akc_brk_w/2, plate_y0, plate_z0])
+                cube([akc_brk_w, akc_brk_t, plate_z1 - plate_z0]);
         }
         // M3 clearance through the bar (threads bite in the bridge only).
         for (p = akc_brk_screw)
             translate([p[0], p[1], akc_bridge_z0 - akc_brk_t - 0.2])
                 cylinder(h=akc_brk_t + 0.6, d=akc_brk_clr_d);
-        // PCB M2 self-tap pilots into the plate front face.
-        for (sx = [-1, 1])
-            translate([sx * as_hole_dx/2, plate_y0 - 0.2, 0])
+        // PCB M3 self-tap pilots, 4-corner grid, into the plate front.
+        for (sx = [-1, 1]) for (sz = [-1, 1])
+            translate([sx * as_hole_dx/2, plate_y0 - 0.2, sz * as_hole_dy/2])
                 rotate([-90, 0, 0]) cylinder(h=akc_brk_t + 0.4, d=as_hole_d);
-        // Ribbon slot at the plate bottom edge.
-        translate([0, plate_y0 + akc_brk_t/2, -as_pcb_h/2 + 1])
-            cube([12, akc_brk_t + 2, 6], center=true);
     }
     if (with_pcb_vis)
-        translate([0, akc_pcb_y, 0]) as5047_pcb_vis();
+        translate([0, akc_pcb_y, 0]) as5047_pcb_vis(rot=0);
 }
 
 module ankle_section_demo(cut=true) {
@@ -1956,7 +2041,10 @@ if (is_undef(part_mode) || part_mode == "assembly") {
              " | air gap ", as_gap,
              " | PCB face ", as_pivot_pcb_y,
              " | plate ", enc_plate_in_y, "..", enc_plate_out_y));
-    echo("Lower side v5.2: OPEN carrier - housings+bridge; hub|ring|inner-collar sandwich retains each crank");
+    echo("Lower side v5.3: OPEN carrier for the 42mm AS5047P - bridge raised to z23..31, flange 31 (+9), end walls onto housings; hub|ring|inner-collar sandwich retains each crank");
+    echo(str("v5.3 board fit: PCB top z=", as_pcb_h/2, " | bridge z0=", akc_bridge_z0,
+             " | flange z0=", carrier_flange_z0, " | spine z0=", lsp_z0,
+             " | connector exits -X, tip x=", -as_pcb_w/2 - as_conn_out));
     echo(str("Ankle chain [carrier-local y]: hub ", -carrier_len/2 - 0.15,
              " | ring face ", -akc_ring_face, " | collar body ",
              -akc_ring_face + akc_collar_nose, "..",
@@ -1994,7 +2082,7 @@ if (is_undef(part_mode) || part_mode == "assembly") {
     echo(str("OpenCR (IMU) center above hip [mm] = ", ocr_center_z - hip_z,
              "  -> firmware ELL_IMU candidate (v4 internal mount: update FW)"));
     echo("Robot mass estimate: lower ~230 g / upper ~550 g+ (re-weigh: measured 84x34x25 pack) -> ~30:70");
-    echo("Printed robot parts v5.2: ankle_carrier(OPEN), ankle_pcb_bracket, ankle_collar x2, lower_spine, upper_body a/b");
+    echo("Printed robot parts v5.3: ankle_carrier(OPEN, raised bridge), ankle_pcb_bracket(42mm L), ankle_collar x2, lower_spine(REUSED PRINT, hip +9), upper_body a/b");
     echo("Printed rope parts v5: lower_socket front/rear (WITH integrated axles), upper sockets (rear tip = magnet pocket)");
     echo("============================================================");
 } else if (part_mode == "lower_socket") {
@@ -2026,8 +2114,9 @@ if (is_undef(part_mode) || part_mode == "assembly") {
 } else if (part_mode == "ankle_pcb_lid") {
     echo("DEPRECATED (v5.2): ankle_pcb_lid is retired - use ankle_pcb_bracket.");
 } else if (part_mode == "ankle_pcb_bracket") {
-    // Print with the T bar on the bed (flip: bar face up -> down).
-    rotate([180, 0, 0]) translate([0, 0, -(akc_bridge_z0)])
+    // v5.3 print orientation: PLATE FLAT ON THE BED (PCB seating face
+    // down), the bar rises as a vertical wall - no supports needed.
+    translate([0, 0, -(akc_pcb_y + as_pcb_t)]) rotate([90, 0, 0])
         ankle_pcb_bracket_part(with_pcb_vis=false);
 } else if (part_mode == "ankle_collar") {
     // v5.2 ankle INNER collar (extended 2.6 nose). Print 2.
